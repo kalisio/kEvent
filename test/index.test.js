@@ -5,7 +5,7 @@ import core, { kalisio } from 'kCore'
 import event, { hooks } from '../src'
 
 describe('kEvent', () => {
-  let app
+  let app, eventService
   
   before(() => {
     chailint(chai, util)
@@ -16,6 +16,13 @@ describe('kEvent', () => {
 
   it('is CommonJS compatible', () => {
     expect(typeof event).to.equal('function')
+  })
+
+  it('registers the global services', () => {
+    app.configure(core)
+    app.configure(event)
+    eventService = app.getService('events')
+    expect(eventService).toExist()
   })
 
   // Cleanup
