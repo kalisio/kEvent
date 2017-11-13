@@ -1,9 +1,9 @@
 # kEvent
 
-[![Build Status](https://travis-ci.org/kalisio/kTeam.png?branch=master)](https://travis-ci.org/kalisio/kEvent)
-[![Code Climate](https://codeclimate.com/github/kalisio/kTeam/badges/gpa.svg)](https://codeclimate.com/github/kalisio/kEvent)
-[![Test Coverage](https://codeclimate.com/github/kalisio/kTeam/badges/coverage.svg)](https://codeclimate.com/github/kalisio/kEvent/coverage)
-[![Dependency Status](https://img.shields.io/david/kalisio/kTeam.svg?style=flat-square)](https://david-dm.org/kalisio/kEvent)
+[![Build Status](https://travis-ci.org/kalisio/kEvent.png?branch=master)](https://travis-ci.org/kalisio/kEvent)
+[![Code Climate](https://codeclimate.com/github/kalisio/kEvent/badges/gpa.svg)](https://codeclimate.com/github/kalisio/kEvent)
+[![Test Coverage](https://codeclimate.com/github/kalisio/kEvent/badges/coverage.svg)](https://codeclimate.com/github/kalisio/kEvent/coverage)
+[![Dependency Status](https://img.shields.io/david/kalisio/kEvent.svg?style=flat-square)](https://david-dm.org/kalisio/kEvent)
 
 > Basic utils to support event management for Kalisio applications and services
 
@@ -12,7 +12,7 @@
 ```
 npm install kEvent --save
 // Or with Yarn
-yarn add kTeam
+yarn add kEvent
 ```
 
 ## Documentation

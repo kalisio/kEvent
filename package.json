@@ -1,8 +1,8 @@
 {
-  "name": "kNotify",
-  "description": "Basic utils to support notifications (push, emails, etc.) for Kaelia applications and services",
+  "name": "kEvent",
+  "description": "Basic utils to support event for Kaelia applications and services",
   "version": "0.1.0",
-  "homepage": "https://github.com/kalisio/kNotify",
+  "homepage": "https://github.com/kalisio/kEvent",
   "main": "lib/",
   "browser": {
     "lib/": "lib/client/"
@@ -14,7 +14,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/kalisio/kNotify.git"
+    "url": "git://github.com/kalisio/kEvent.git"
   },
   "author": {
     "name": "Kalisio contributors",
@@ -22,7 +22,7 @@
   },
   "contributors": [],
   "bugs": {
-    "url": "https://github.com/kalisio/kNotify/issues"
+    "url": "https://github.com/kalisio/kEvent/issues"
   },
   "engines": {
     "node": ">= 4.6.0"
