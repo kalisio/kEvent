@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "http://mynet.com/schemas/orgs-create.json#",
+  "title": "Event Creation",
+  "description": "Event creation schema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string", 
+      "maxLength": 128,
+      "minLength": 3,
+      "default": "New event",
+      "field": {
+        "component": "form/KTextField",
+        "label": "Title",
+        "helper": "Enter the title"
+      }
+    },
+    "description": {
+      "type": "string", 
+      "maxLength": 256,
+      "field": {
+        "component": "form/KTextField",
+        "label": "Description",
+        "helper": "Enter the description"
+      }
+    }
+  },
+  "required": ["title"]
+}
+
