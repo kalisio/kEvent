@@ -2,6 +2,12 @@
   <div>
     <!-- Manage routing = event/template management -->
     <div v-if="operation === 'manage'">
+      <div v-if="perspective === 'create-event-template'">
+        <k-event-template-editor :context="contextId" service="event-templates" />
+      </div>
+      <div v-else-if="perspective === 'edit-event-template'">
+        <k-event-template-editor :context="contextId" service="event-templates" :id="id" />
+      </div>
     </div>
     <!-- Default routing = event/template list -->
     <div v-else>
@@ -125,13 +131,13 @@ export default {
     createTemplate () {
       this.$router.push({ 
         name: 'events-activity', 
-        params: { context: this.contextId, operation: 'manage', perspective: 'create-template' } 
+        params: { context: this.contextId, operation: 'manage', perspective: 'create-event-template' } 
       })
     },
-    editTemplate () {
+    editTemplate (template) {
       this.$router.push({ 
         name: 'events-activity', 
-        params: { context: this.contextId, operation: 'manage', perspective: 'edit-template' } 
+        params: { context: this.contextId, operation: 'manage', id: template._id, perspective: 'edit-event-template' } 
       })
     },
     removeTemplate () {
@@ -147,6 +153,7 @@ export default {
     // Load the required components
     let loadComponent = this.$store.get('loadComponent')
     this.$options.components['k-nav-bar'] = loadComponent('layout/KNavBar')
+    this.$options.components['k-event-template-editor'] = loadComponent('KEventTemplateEditor')
     this.$options.components['k-popup-editor'] = loadComponent('editor/KPopupEditor')
     this.$options.components['k-grid'] = loadComponent('collection/KGrid')
     this.$options.components['k-fab'] = loadComponent('collection/KFab')
