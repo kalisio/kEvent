@@ -67,7 +67,7 @@ export default {
     eventsGridQuery () {
       return {}
     },
-    templatesQuery () {
+    templatesGridQuery () {
       return {}
     }
   },

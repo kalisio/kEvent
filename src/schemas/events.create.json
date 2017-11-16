@@ -24,8 +24,21 @@
         "label": "Description",
         "helper": "Enter the description"
       }
+    },
+    "template": { 
+      "type": "string",
+      "services": [{
+        "service": "event-templates",
+        "field": "title",
+        "icon": "content_copy"
+      }],
+      "field": {
+        "component": "form/KItemField",
+        "label": "Template",
+        "helper": "Select event template"
+      }
     }
   },
-  "required": ["title"]
+  "required": ["title", "template"]
 }
 
