@@ -1,13 +1,36 @@
 <template>
   <div>
-    <k-editor :context="contextId" service="event-templates" :id="id" />
-    <div class="layout-padding row justify-center">
-      <q-stepper flat ref="stepper" v-model="currentStep" color="primary" :contractable="true">
-        <q-step v-for="(step, title) in steps" default name="title" title="title" icon="step.icon">
-          <q-stepper-navigation>
-            <q-btn color="primary" @click="$refs.stepper.next()">Continue</q-btn>
-            <q-btn color="primary" flat @click="$refs.stepper.previous()">Back</q-btn>
-          </q-stepper-navigation>
+    <div class="row justify-center full-width">
+      <k-form class="col-10" ref="templateForm" :schema="templateSchema"/>
+    </div>
+    <div class="row justify-center full-width">
+    </br>
+      <p class="col-10 caption text-center"><strong>Event workflow for this template</strong>: you can manage below the different steps each actor of the event might be able to fulfill.</p>
+    </div>
+    <div class="row justify-center full-width">
+      <q-stepper class="col-10" flat ref="stepper" v-model="currentStep" color="primary" :contractable="true">
+        <q-step v-for="(step, index) in steps" :name="step.name" :order="index" :title="step.title" :icon="step.icon" :active-icon="preview ? step.icon : 'edit'" :done-icon="step.icon">
+          <k-form :ref="'stepForm-' + step.name" v-show="!preview" :schema="stepSchema"/>
+          <div v-show="preview">
+            <p>{{step.description}}</p>
+          </div>
+          <div class="row justify-center">
+            <q-btn class="col-1" v-show="index > 0" flat color="primary" icon="navigate_before" @click="onPreviousStep(index)">
+              <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">Previous step</q-tooltip>
+            </q-btn>
+            <q-btn class="col-1" v-show="!preview" flat color="primary" icon="playlist_add" @click="onAddStep(index)">
+              <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">Add a new step</q-tooltip>
+            </q-btn>
+            <q-btn class="col-1" v-show="!preview && (steps.length > 1)" flat color="primary" icon="delete_sweep" @click="onRemoveStep(index)">
+              <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">Remove current step</q-tooltip>
+            </q-btn>
+            <q-btn class="col-1" flat color="primary" :icon="preview ? 'edit' : 'play_arrow'" @click="onPreviewOrEdit">
+              <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">{{!preview ? 'Preview workflow' : 'Edit workflow'}}</q-tooltip>
+            </q-btn>
+            <q-btn class="col-1" v-show="index < (steps.length - 1)" flat color="primary" icon="navigate_next" @click="onNextStep(index)">
+              <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">Next step</q-tooltip>
+            </q-btn>
+          </div>
         </q-step>
       </q-stepper>
     </div>
@@ -15,45 +38,122 @@
 </template>
 
 <script>
-import { QStepper, QStep, QStepperNavigation, QBtn } from 'quasar'
-import { mixins as kCoreMixins } from 'kCore/client'
-import mixins from '../mixins'
+import _ from 'lodash'
+import { QStepper, QStep, QStepperNavigation, QBtn, QTooltip, uid } from 'quasar'
+import { mixins } from 'kCore/client'
+
+const defaultStep = {
+  title: 'New step',
+  icon: 'check'
+}
 
 export default {
   name: 'k-event-template-editor',
-  mixins: [kCoreMixins.baseActivity],
+  mixins: [mixins.service, mixins.objectProxy],
   components: {
     QStepper,
     QStep,
     QStepperNavigation,
-    QBtn
-  },
-  props: {
-    contextId: {
-      type: String,
-      default: ''
-    },
-    id : {
-      type: String,
-      default: '',
-    }
+    QBtn,
+    QTooltip
   },
   data () {
     return {
-      steps: {
-        'First step': {
-          icon: 'attach_money'
-        }
-      },
-      currentStep: 'First step'
+      steps: [],
+      currentStep: '',
+      preview: false
+    }
+  },
+  computed: {
+    templateSchema () {
+      return this.id ? 'event-templates.update' : 'event-templates.create'
+    },
+    stepSchema () {
+      return this.id ? 'event-template-step.update' : 'event-template-step.create'
     }
   },
   methods: {
+    generateStep () {
+      let newStep = _.cloneDeep(defaultStep)
+      // We generate a UID so that we can identify each step uniquely,
+      // indeed titles might be similar
+      newStep.name = uid().toString()
+      return newStep
+    },
+    getCurrentStep () {
+      return this.steps.find(step => step.name === this.currentStep)
+    },
+    onAddStep (index) {
+      // Apply current changes when editing
+      if (!this.preview) {
+        this.applyStepChanges()
+      }
+      this.steps.push(this.generateStep())
+      this.onNextStep(index)
+    },
+    onRemoveStep (index) {
+      // Before modifying array check if current step is the last one,
+      // if so go back otherwise jump to previous
+      if (index > 0) {
+        this.currentStep = this.steps[index - 1].name
+      } else {
+        // when removing first step the second will replace it
+        this.currentStep = this.steps[1].name
+      }
+      // Can't use splice because Vue does not detect the change
+      this.steps = this.steps.filter((step, i) => i !== index)
+      // Restore step form when editing
+      this.restoreStep()
+    },
+    onPreviousStep (index) {
+      // Apply current form changes when editing
+      this.applyStepChanges()
+      this.currentStep = this.steps[index - 1].name
+      this.restoreStep()
+    },
+    onNextStep (index) {
+      // Apply current form changes when editing
+      this.applyStepChanges()
+      this.currentStep = this.steps[index + 1].name
+      // Restore step form when editing
+      this.restoreStep()
+    },
+    onPreviewOrEdit () {
+      // Apply current form changes before previewing
+      this.applyStepChanges()
+      this.preview = !this.preview
+      // Restore step form when editing
+      this.restoreStep()
+    },
+    applyStepChanges () {
+      if (this.preview) return
+
+      const currentForm = 'stepForm-' + this.currentStep
+      console.log(currentForm)
+      console.log(this.$refs)
+      let form = this.$refs[currentForm][0].validate()
+      if (form.isValid) {
+        _.assign(this.getCurrentStep(), form.values)
+      }
+    },
+    restoreStep () {
+      if (this.preview) return
+
+      const currentForm = 'stepForm-' + this.currentStep
+      console.log(currentForm)
+      console.log(this.$refs)
+      let form = this.$refs[currentForm][0]
+      this.$refs.form.fill(this.getCurrentStep())
+    }
   },
   created () {
     // Load the required components
     let loadComponent = this.$store.get('loadComponent')
-    this.$options.components['k-editor'] = loadComponent('editor/KEditor')
+    this.$options.components['k-form'] = loadComponent('form/KForm')
+    // Initialize step data
+    let initialStep = this.generateStep()
+    this.steps.push(initialStep)
+    this.currentStep = initialStep.name
   }
 }
 </script>

@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "http://mynet.com/schemas/orgs-create.json#",
+  "title": "Event Template Step Creation",
+  "description": "Event Template Step creation schema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string", 
+      "maxLength": 128,
+      "minLength": 3,
+      "default": "New step",
+      "field": {
+        "component": "form/KTextField",
+        "label": "Step title",
+        "helper": "Enter the title for this step"
+      }
+    },
+    "icon": {
+      "type": "string", 
+      "default": "check",
+      "field": {
+        "component": "form/KIconField",
+        "label": "Step icon",
+        "helper": "Select step icon"
+      }
+    },
+    "description": {
+      "type": "string", 
+      "maxLength": 256,
+      "default": "Step content",
+      "field": {
+        "component": "form/KTextField",
+        "label": "Step description",
+        "helper": "Enter the step description"
+      }
+    },
+    "interaction": {
+      "type": "array", 
+      "field": {
+        "component": "form/KChipsField",
+        "label": "Step interaction",
+        "helper": "Enter the step interaction"
+      }
+    }
+  },
+  "required": ["title", "description"]
+}
+
