@@ -8,9 +8,9 @@
       <p class="col-10 caption text-center"><strong>Event workflow for this template</strong>: you can manage below the different steps each actor of the event might be able to fulfill.</p>
     </div>
     <div class="row justify-center full-width">
-      <q-stepper class="col-10" flat ref="stepper" v-model="currentStep" color="primary" :contractable="true">
+      <q-stepper class="col-10" flat ref="stepper" v-model="currentStep" color="primary" contractable="true">
         <q-step v-for="(step, index) in steps" :name="step.name" :order="index" :title="step.title" :icon="step.icon" :active-icon="preview ? step.icon : 'edit'" :done-icon="step.icon">
-          <k-form :ref="'stepForm-' + step.name" v-show="!preview" :schema="stepSchema"/>
+          <k-form ref="stepForm" v-show="!preview" :schema="stepSchema"/>
           <div v-show="preview">
             <p>{{step.description}}</p>
           </div>
@@ -128,10 +128,7 @@ export default {
     applyStepChanges () {
       if (this.preview) return
 
-      const currentForm = 'stepForm-' + this.currentStep
-      console.log(currentForm)
-      console.log(this.$refs)
-      let form = this.$refs[currentForm][0].validate()
+      let form = this.$refs.stepForm[0].validate()
       if (form.isValid) {
         _.assign(this.getCurrentStep(), form.values)
       }
@@ -139,11 +136,8 @@ export default {
     restoreStep () {
       if (this.preview) return
 
-      const currentForm = 'stepForm-' + this.currentStep
-      console.log(currentForm)
-      console.log(this.$refs)
-      let form = this.$refs[currentForm][0]
-      this.$refs.form.fill(this.getCurrentStep())
+      let form = this.$refs.stepForm[0]
+      form.fill(this.getCurrentStep())
     }
   },
   created () {
