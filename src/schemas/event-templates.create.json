@@ -16,6 +16,14 @@
         "helper": "Enter the title"
       }
     },
+    "icon": {
+      "type": "string", 
+      "field": {
+        "component": "form/KIconField",
+        "label": "Icon",
+        "helper": "Select displayed icon"
+      }
+    },
     "description": {
       "type": "string", 
       "maxLength": 256,
