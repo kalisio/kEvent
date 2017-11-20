@@ -1,4 +1,4 @@
 module.exports = function (app, options) {
   let db = options.db || app.db
-  options.Model = db.collection('events')
+  options.Model = db.collection('events-templates')
 }
