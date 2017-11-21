@@ -9,7 +9,6 @@
       "type": "string", 
       "maxLength": 128,
       "minLength": 3,
-      "default": "New event",
       "field": {
         "component": "form/KTextField",
         "label": "Title",
@@ -25,7 +24,7 @@
         "helper": "Enter the description"
       }
     }
-  },
+    },
   "required": ["title", "template"]
 }
 

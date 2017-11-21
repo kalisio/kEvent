@@ -2,7 +2,13 @@
   <div>
     <!-- Manage routing = event/template management -->
     <div v-if="operation === 'manage'">
-      <div v-if="perspective === 'create-event-template'">
+      <div v-if="perspective === 'create-event'">
+        <k-event-editor :context="contextId" service="events" />
+      </div>
+      <div v-else-if="perspective === 'edit-event'">
+        <k-event-editor :context="contextId" service="events" :id="id" />
+      </div>
+      <div v-else-if="perspective === 'create-event-template'">
         <k-event-template-editor :context="contextId" service="event-templates" />
       </div>
       <div v-else-if="perspective === 'edit-event-template'">
@@ -21,11 +27,11 @@
         <k-fab :actions="templateActions()" />
       </div>
       <!-- Create event dialog -->
-      <k-popup-editor ref="createEventDialog" 
-        title="Create a new Event ?" 
-        :context="contextId" 
-        service="events" 
-      />
+      <k-dialog ref="createEventDialog" title="Select your template" closable="false" :actions="createEventactions" @action-triggered="onCreateEventActionTriggered">
+        <div slot="dialog-content">
+          <k-item-chooser ref="templateChooser" :items="template" :services="templateService" />
+        </div>
+      </k-dialog>
       <!-- Remove event dialog -->
       <k-confirm ref="removeEventDialog" 
         :title="`Are you sure you want to remove '${selectionName}' ?`"
@@ -70,6 +76,17 @@ export default {
     selectionName () {
       return this.selection ? this.selection.name : ''
     },
+    templateService () {
+      return [{
+        service: 'event-templates',
+        context: this.contextId,
+        field: 'title',
+        icon: 'content_copy'
+      }]
+    },
+    createEventactions () {
+      return this.template.length > 0 ? ['Continue', 'Cancel'] : ['Cancel']
+    },
     eventsGridQuery () {
       return {}
     },
@@ -79,7 +96,8 @@ export default {
   },
   data () {
     return {
-      selection: null
+      selection: null,
+      template: []
     }
   },
   methods: {
@@ -102,13 +120,22 @@ export default {
     createEvent () {
       this.$refs.createEventDialog.open()
     },
-    removeEvent () {
-      this.selection = event
-      this.$refs.deleteEventDialog.open()
+    onCreateEventActionTriggered (action) {
+      this.$refs.createEventDialog.close()
+      if (action === 'Continue') {
+        this.$router.push({ 
+          name: 'events-activity', 
+          params: { context: this.contextId, operation: 'manage', perspective: 'create-event' } 
+        })
+      }
     },
-    removeEventConfirmed (event) {
-      this.$refs.deleteEventDialog.close()
-      this.$api.getService('events').remove(this.selection.id)
+    removeEvent (event) {
+      this.selection = event
+      this.$refs.removeEventDialog.open()
+    },
+    removeEventConfirmed () {
+      this.$refs.removeEventDialog.close()
+      this.$api.getService('events', this.contextId).remove(this.selection.id)
     },
     manageEventProperties (event) {
       this.$router.push({ 
@@ -140,23 +167,25 @@ export default {
         params: { context: this.contextId, operation: 'manage', id: template._id, perspective: 'edit-event-template' } 
       })
     },
-    removeTemplate () {
+    removeTemplate (template) {
       this.selection = template
-      this.$refs.deleteTemplateDialog.open()
+      this.$refs.removeTemplateDialog.open()
     },
-    removeTemplateConfirmed (template) {
-      this.$refs.deleteTemplateDialog.close()
-      this.$api.getService('event-templates').remove(this.selection.id)
+    removeTemplateConfirmed () {
+      this.$refs.removeTemplateDialog.close()
+      this.$api.getService('event-templates', this.contextId).remove(this.selection.id)
     }
   },
   created () {
     // Load the required components
     let loadComponent = this.$store.get('loadComponent')
     this.$options.components['k-nav-bar'] = loadComponent('layout/KNavBar')
+    this.$options.components['k-event-editor'] = loadComponent('KEventEditor')
     this.$options.components['k-event-template-editor'] = loadComponent('KEventTemplateEditor')
-    this.$options.components['k-popup-editor'] = loadComponent('editor/KPopupEditor')
+    this.$options.components['k-item-chooser'] = loadComponent('form/KItemChooser')
     this.$options.components['k-grid'] = loadComponent('collection/KGrid')
     this.$options.components['k-fab'] = loadComponent('collection/KFab')
+    this.$options.components['k-dialog'] = loadComponent('frame/KDialog')
     this.$options.components['k-confirm'] = loadComponent('frame/KConfirm')
     // Register the actions
     this.registerAction('createEvent', { label: 'Create', icon: 'add' })

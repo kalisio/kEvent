@@ -5,7 +5,7 @@
       <div v-show="preview">
         <p>{{step.description}}</p>
       </div>
-      <div class="row justify-center">
+      <div class="row justify-end">
         <q-btn class="col-1" v-show="index > 0" flat color="primary" icon="navigate_before" @click="onPreviousStep(index)">
           <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">Previous step</q-tooltip>
         </q-btn>
