@@ -8,7 +8,10 @@ import logger from 'loglevel'
 // export * from './components'
 
 export default function init () {
-  // const app = this
+  const api = this
 
   logger.debug('Initializing kalisio event')
+  
+  api.declareService('events', { context: true })
+  api.declareService('event-templates', { context: true })
 }

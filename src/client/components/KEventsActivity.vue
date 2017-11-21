@@ -3,31 +3,31 @@
     <!-- Manage routing = event/template management -->
     <div v-if="operation === 'manage'">
       <div v-if="perspective === 'create-event'">
-        <k-event-editor :context="contextId" service="events" />
+        <k-event-editor service="events" />
       </div>
       <div v-else-if="perspective === 'edit-event'">
-        <k-event-editor :context="contextId" service="events" :id="id" />
+        <k-event-editor service="events" :id="id" />
       </div>
       <div v-else-if="perspective === 'create-event-template'">
-        <k-event-template-editor :context="contextId" service="event-templates" />
+        <k-event-template-editor service="event-templates" />
       </div>
       <div v-else-if="perspective === 'edit-event-template'">
-        <k-event-template-editor :context="contextId" service="event-templates" :id="id" />
+        <k-event-template-editor service="event-templates" :id="id" />
       </div>
     </div>
     <!-- Default routing = event/template list -->
     <div v-else>
       <k-nav-bar :tabs="eventsTabs()" :selected="perspective" />
       <div v-if="perspective === 'current-events'">
-        <k-grid ref="eventsGrid" :context="contextId" service="events" :base-query="eventsGridQuery" :actions="eventItemActions()" />
+        <k-grid ref="eventsGrid" service="events" :base-query="eventsGridQuery" :actions="eventItemActions()" />
         <k-fab :actions="eventActions()" />
       </div>
       <div v-else-if="perspective === 'event-templates'">
-        <k-grid ref="templatesGrid" :context="contextId" service="event-templates" :base-query="templatesGridQuery" :actions="templateItemActions()" />
+        <k-grid ref="templatesGrid" service="event-templates" :base-query="templatesGridQuery" :actions="templateItemActions()" />
         <k-fab :actions="templateActions()" />
       </div>
       <!-- Create event dialog -->
-      <k-dialog ref="createEventDialog" title="Select your template" closable="false" :actions="createEventactions" @action-triggered="onCreateEventActionTriggered">
+      <k-dialog ref="createEventDialog" title="Select your template" :closable="false" :actions="createEventactions" @action-triggered="onCreateEventActionTriggered">
         <div slot="dialog-content">
           <k-item-chooser ref="templateChooser" :items="template" :services="templateService" />
         </div>
@@ -79,7 +79,6 @@ export default {
     templateService () {
       return [{
         service: 'event-templates',
-        context: this.contextId,
         field: 'title',
         icon: 'content_copy'
       }]
@@ -135,7 +134,7 @@ export default {
     },
     removeEventConfirmed () {
       this.$refs.removeEventDialog.close()
-      this.$api.getService('events', this.contextId).remove(this.selection.id)
+      this.$api.getService('events').remove(this.selection.id)
     },
     manageEventProperties (event) {
       this.$router.push({ 
@@ -173,7 +172,7 @@ export default {
     },
     removeTemplateConfirmed () {
       this.$refs.removeTemplateDialog.close()
-      this.$api.getService('event-templates', this.contextId).remove(this.selection.id)
+      this.$api.getService('event-templates').remove(this.selection.id)
     }
   },
   created () {

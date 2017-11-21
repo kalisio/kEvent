@@ -32,7 +32,7 @@ export default {
       let templateForm = this.$refs.templateForm.validate()
       let workflowForm = this.$refs.workflow.validate()
       if (!templateForm.isValid || !workflowForm.isValid) {
-        if (done) done()
+        done()
         return
       }
       // Merge everything into one object
@@ -41,9 +41,11 @@ export default {
         // Update the item
         if (this.applyButton === 'Update') {
           this.servicePatch(this.id, values)
+          .then(_ => done())
         } else {
           // Creation mode => create the item
           this.serviceCreate(values)
+          .then(_ => done())
         }
       }
       this.$emit('applied')
