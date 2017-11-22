@@ -24,7 +24,7 @@
         "helper": "Enter the description"
       }
     }
-    },
+  },
   "required": ["title", "template"]
 }
 

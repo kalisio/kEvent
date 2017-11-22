@@ -24,8 +24,34 @@
         "label": "Description",
         "helper": "Enter the description"
       }
+    },
+    "actors": { 
+      "type": "array",
+      "services": [{
+        "service": "members",
+        "field": "title",
+        "icon": "perm_identity"
+      },
+      {
+        "service": "groups",
+        "field": "name",
+        "icon": "group"
+      },
+      {
+        "service": "tags",
+        "field": "value",
+        "baseQuery": {
+          "scope": "members"
+        },
+        "icon": "label"
+      }],
+      "field": {
+        "component": "form/KItemField",
+        "label": "Actors",
+        "helper": "Select event actors"
+      }
     }
   },
-  "required": ["title", "template"]
+  "required": ["title", "actors"]
 }
 

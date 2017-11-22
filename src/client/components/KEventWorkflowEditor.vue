@@ -1,7 +1,7 @@
 <template>
   <q-stepper flat ref="stepper" v-model="currentStep" color="primary" contractable @step="onStepSelected">
     <q-step v-for="(step, index) in steps" :name="step.name" :order="index" :title="step.title" :icon="step.icon" :active-icon="preview ? step.icon : 'edit'" :done-icon="step.icon">
-      <k-form ref="stepForm" v-show="!preview" :schema="stepSchema"/>
+      <k-form ref="stepForm" @form-ready="onStepFormReady" v-show="!preview" :schema="stepSchema"/>
       <div v-show="preview">
         <p>{{step.description}}</p>
       </div>
@@ -43,21 +43,15 @@ export default {
     QBtn,
     QTooltip
   },
-  model: {
-    prop: 'steps'
-  },
   props: {
     id: {
       type: String,
       default: ''
-    },
-    steps: {
-      type: Array,
-      required: true
     }
   },
   data () {
     return {
+      steps: [],
       currentStep: '',
       preview: false
     }
@@ -126,8 +120,13 @@ export default {
       // Restore step form when editing
       this.restoreStep()
     },
+    onStepFormReady () {
+      this.restoreStep()
+    },
     applyStepChanges () {
       if (this.preview) return
+      // DOM not ready
+      if (!this.$refs.stepForm) return
 
       let form = this.$refs.stepForm[0].validate()
       if (form.isValid) {
@@ -136,12 +135,28 @@ export default {
     },
     restoreStep () {
       if (this.preview) return
+      // DOM not ready
+      if (!this.$refs.stepForm) return
 
       let form = this.$refs.stepForm[0]
       form.fill(this.getCurrentStep())
     },
+    fill (steps) {
+      this.steps = steps
+      this.currentStep = this.steps[0].name
+      // Restore step form when editing
+      this.restoreStep()
+    },
     validate () {
-      return this.$refs.stepForm[0].validate()
+      let result = { 
+        isValid: false, 
+        steps: this.steps
+      }
+      // DOM not ready
+      if (this.$refs.stepForm) {
+        result.isValid = this.$refs.stepForm[0].validate()
+      }
+      return result
     }
   },
   created () {
@@ -150,11 +165,7 @@ export default {
     this.$options.components['k-form'] = loadComponent('form/KForm')
     // Initialize step data on creation
     if (!this.id) {
-      let initialStep = this.generateStep()
-      this.steps.push(initialStep)
-      this.currentStep = initialStep.name
-    } else {
-      this.currentStep = this.steps[0].name
+      this.fill([ this.generateStep() ])
     }
   }
 }

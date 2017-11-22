@@ -1,11 +1,11 @@
 <template>
   <div class="row justify-center full-width">
-    <k-form class="col-10" ref="templateForm" :schema="templateSchema"/>
+    <k-form class="col-10" ref="templateForm" :schema="templateSchema" @form-ready="fillTemplateForm"/>
     </br>
     <p class="col-10 caption text-center">
       <strong>Event workflow for this template</strong>: you can manage below the different steps each actor of the event might be able to fulfill.
     </p>
-    <k-event-workflow-editor ref="workflow" class="col-10" :id="id" v-model="steps" />
+    <k-event-workflow-editor ref="workflowForm" class="col-10" :id="id" />
     <!-- Buttons section -->
     <div class="col-10">
       <div class="row justify-around" style="padding: 18px">
@@ -27,16 +27,26 @@ export default {
   },
   mixins: [mixins.service, mixins.objectProxy],
   methods: {
+    fillTemplateForm () {
+      if (this.$refs.templateForm && this.$refs.templateForm.isReady && this.getObject()) {
+        this.$refs.templateForm.fill(this.getObject())
+      }
+    },
+    fillWorkflowForm () {
+      if (this.$refs.workflowForm && this.getObject()) {
+        this.$refs.workflowForm.fill(this.getObject().steps)
+      }
+    },
     apply (event, done) {
       // check for both: global template form and current workflow form
       let templateForm = this.$refs.templateForm.validate()
-      let workflowForm = this.$refs.workflow.validate()
+      let workflowForm = this.$refs.workflowForm.validate()
       if (!templateForm.isValid || !workflowForm.isValid) {
         done()
         return
       }
       // Merge everything into one object
-      let values = _.merge({ steps: this.steps }, templateForm.values)
+      let values = _.merge({ steps: workflowForm.steps }, templateForm.values)
       if (this.isServiceValid()) {
         // Update the item
         if (this.applyButton === 'Update') {
@@ -53,7 +63,6 @@ export default {
   },
   data () {
     return {
-      steps: [],
       applyButton: 'Create'
     }
   },
@@ -70,8 +79,8 @@ export default {
     // In this case we are updating an existing object
     this.$on('object-changed', object => {
       this.applyButton = 'Update'
-      this.$refs.templateForm.fill(object)
-      this.steps = object.steps
+      this.fillTemplateForm()
+      this.fillWorkflowForm()
     })
   }
 }

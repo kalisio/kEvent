@@ -1,11 +1,11 @@
 <template>
   <div class="row justify-center full-width">
-    <k-form class="col-10" ref="eventForm" :schema="eventSchema"/>
+    <k-form class="col-10" ref="eventForm" :schema="eventSchema" @form-ready="fillEventForm"/>
     </br>
     <p class="col-10 caption text-center">
       <strong>Event workflow</strong>: you can manage below the different steps each actor of the event might be able to fulfill.
     </p>
-    <k-event-workflow-editor ref="workflow" class="col-10" :id="id" v-model="steps" />
+    <k-event-workflow-editor ref="workflowForm" class="col-10" :id="id" />
     <!-- Buttons section -->
     <div class="col-10">
       <div class="row justify-around" style="padding: 18px">
@@ -26,23 +26,33 @@ export default {
     QBtn
   },
   props: {
-    template: {
-      type: Object,
+    templateId: {
+      type: String,
       required: true
     }
   },
   mixins: [mixins.service, mixins.objectProxy],
   methods: {
+    fillEventForm () {
+      if (this.$refs.eventForm && this.$refs.eventForm.isReady && this.getObject()) {
+        this.$refs.templateForm.fill(this.getObject())
+      }
+    },
+    fillWorkflowForm () {
+      if (this.$refs.workflowForm && this.getObject()) {
+        this.$refs.workflowForm.fill(this.getObject().steps)
+      }
+    },
     apply (event, done) {
       // check for both: global event form and current workflow form
       let eventForm = this.$refs.eventForm.validate()
-      let workflowForm = this.$refs.workflow.validate()
+      let workflowForm = this.$refs.workflowForm.validate()
       if (!eventForm.isValid || !workflowForm.isValid) {
         if (done) done()
         return
       }
       // Merge everything into one object
-      let values = _.merge({ steps: this.steps }, eventForm.values)
+      let values = _.merge({ steps: workflowForm.steps }, eventForm.values)
       if (this.isServiceValid()) {
         // Update the item
         if (this.applyButton === 'Update') {
@@ -57,7 +67,6 @@ export default {
   },
   data () {
     return {
-      steps: [],
       applyButton: 'Create'
     }
   },
@@ -71,14 +80,20 @@ export default {
     let loadComponent = this.$store.get('loadComponent')
     this.$options.components['k-form'] = loadComponent('form/KForm')
     this.$options.components['k-event-workflow-editor'] = loadComponent('KEventWorkflowEditor')
-    if (this.template) {
-      this.steps = this.template.steps
+    // Creation mode from a template
+    if (this.templateId) {
+      this.$api.getService('event-templates')
+      .get(this.templateId)
+      .then(template => {
+        // Set the template as the target object
+        this.setObject(template)
+      })
     }
     // In this case we are updating an existing object
     this.$on('object-changed', object => {
       this.applyButton = 'Update'
-      this.$refs.eventForm.fill(object)
-      this.steps = object.steps
+      this.fillEventForm()
+      this.fillWorkflowForm()
     })
   }
 }

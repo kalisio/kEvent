@@ -3,7 +3,7 @@
     <!-- Manage routing = event/template management -->
     <div v-if="operation === 'manage'">
       <div v-if="perspective === 'create-event'">
-        <k-event-editor service="events" />
+        <k-event-editor service="events" :templateId="id"/>
       </div>
       <div v-else-if="perspective === 'edit-event'">
         <k-event-editor service="events" :id="id" />
@@ -29,20 +29,20 @@
       <!-- Create event dialog -->
       <k-dialog ref="createEventDialog" title="Select your template" :closable="false" :actions="createEventactions" @action-triggered="onCreateEventActionTriggered">
         <div slot="dialog-content">
-          <k-item-chooser ref="templateChooser" :items="template" :services="templateService" />
+          <k-item-chooser ref="templateChooser" :default-items="[]" :services="templateService" @item-selection-changed="onUpdateEventTemplate"/>
         </div>
       </k-dialog>
       <!-- Remove event dialog -->
       <k-confirm ref="removeEventDialog" 
         :title="`Are you sure you want to remove '${selectionName}' ?`"
         action="Yes"
-        @confirmed="removeEventConfirmed" 
+        @confirmed="onRemoveEventConfirmed" 
       />
       <!-- Remove template dialog -->
       <k-confirm ref="removeTemplateDialog" 
         :title="`Are you sure you want to remove '${selectionName}' ?`"
         action="Yes"
-        @confirmed="removeTemplateConfirmed" 
+        @confirmed="onRemoveTemplateConfirmed" 
       />
     </div>
   </div>
@@ -84,7 +84,7 @@ export default {
       }]
     },
     createEventactions () {
-      return this.template.length > 0 ? ['Continue', 'Cancel'] : ['Cancel']
+      return this.eventTemplate ? ['Continue', 'Cancel'] : ['Cancel']
     },
     eventsGridQuery () {
       return {}
@@ -96,7 +96,7 @@ export default {
   data () {
     return {
       selection: null,
-      template: []
+      eventTemplate: null
     }
   },
   methods: {
@@ -119,12 +119,15 @@ export default {
     createEvent () {
       this.$refs.createEventDialog.open()
     },
+    onUpdateEventTemplate (items) {
+      this.eventTemplate = items.length > 0 ? items[0] : null
+    },
     onCreateEventActionTriggered (action) {
       this.$refs.createEventDialog.close()
       if (action === 'Continue') {
         this.$router.push({ 
           name: 'events-activity', 
-          params: { context: this.contextId, operation: 'manage', perspective: 'create-event' } 
+          params: { context: this.contextId, operation: 'manage', id: this.eventTemplate._id, perspective: 'create-event' } 
         })
       }
     },
@@ -132,7 +135,7 @@ export default {
       this.selection = event
       this.$refs.removeEventDialog.open()
     },
-    removeEventConfirmed () {
+    onRemoveEventConfirmed () {
       this.$refs.removeEventDialog.close()
       this.$api.getService('events').remove(this.selection.id)
     },
@@ -170,7 +173,7 @@ export default {
       this.selection = template
       this.$refs.removeTemplateDialog.open()
     },
-    removeTemplateConfirmed () {
+    onRemoveTemplateConfirmed () {
       this.$refs.removeTemplateDialog.close()
       this.$api.getService('event-templates').remove(this.selection.id)
     }
