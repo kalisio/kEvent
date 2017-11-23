@@ -1,7 +1,7 @@
 <template>
   <q-stepper flat ref="stepper" v-model="currentStep" color="primary" contractable @step="onStepSelected">
     <q-step v-for="(step, index) in steps" :name="step.name" :order="index" :title="step.title" :icon="step.icon" :active-icon="preview ? step.icon : 'edit'" :done-icon="step.icon">
-      <k-form ref="stepForm" @form-ready="onStepFormReady" v-show="!preview" :schema="stepSchema"/>
+      <k-form ref="stepForm" v-show="!preview" :schema="schema"/>
       <div v-show="preview">
         <p>{{step.description}}</p>
       </div>
@@ -28,21 +28,28 @@
 
 <script>
 import _ from 'lodash'
+import { mixins } from 'kCore/client'
 import { QStepper, QStep, QBtn, QTooltip, uid } from 'quasar'
 
 const defaultStep = {
   title: 'New step',
-  icon: 'check'
+  icon: 'check',
+  description: 'Step content'
 }
 
 export default {
-  name: 'k-event-workflow-editor',
+  name: 'k-event-workflow-form',
   components: {
     QStepper,
     QStep,
     QBtn,
     QTooltip
   },
+  mixins: [
+    mixins.service,
+    mixins.schemaProxy,
+    mixins.refsResolver()
+  ],
   props: {
     id: {
       type: String,
@@ -78,7 +85,8 @@ export default {
         this.applyStepChanges()
       }
       this.steps.push(this.generateStep())
-      this.onNextStep(index)
+      this.currentStep = this.steps[index + 1].name
+      this.restoreStep()
     },
     onRemoveStep (index) {
       // Before modifying array check if current step is the last one,
@@ -120,53 +128,61 @@ export default {
       // Restore step form when editing
       this.restoreStep()
     },
-    onStepFormReady () {
-      this.restoreStep()
-    },
     applyStepChanges () {
       if (this.preview) return
-      // DOM not ready
-      if (!this.$refs.stepForm) return
-
+      
       let form = this.$refs.stepForm[0].validate()
       if (form.isValid) {
         _.assign(this.getCurrentStep(), form.values)
       }
+      return form
     },
     restoreStep () {
       if (this.preview) return
-      // DOM not ready
-      if (!this.$refs.stepForm) return
-
-      let form = this.$refs.stepForm[0]
-      form.fill(this.getCurrentStep())
+      
+      this.build()
+      .then(_ => {
+        let form = this.$refs.stepForm[0]
+        form.fill(this.getCurrentStep())
+      })
     },
-    fill (steps) {
-      this.steps = steps
+    build () {
+      // Because our step form is under a v-if caused by the Quasar stepper
+      // it is destroyed/recreated by Vue so that we need to restore the refs each time it is build
+      this.setRefs(['stepForm'])
+      // Build the internal form
+      return Promise.all([
+        this.loadSchema(),
+        this.loadRefs()
+      ])
+      .then(_ => {
+        return this.$refs.stepForm[0].build()
+      })
+    },
+    fill (object) {
+      this.steps = object.steps
       this.currentStep = this.steps[0].name
       // Restore step form when editing
       this.restoreStep()
     },
     validate () {
-      let result = { 
-        isValid: false, 
-        steps: this.steps
+      // Apply current form changes when editing
+      let form = this.applyStepChanges()
+      return { 
+        isValid: form.isValid, 
+        values: {
+          steps: this.steps
+        }
       }
-      // DOM not ready
-      if (this.$refs.stepForm) {
-        result.isValid = this.$refs.stepForm[0].validate()
-      }
-      return result
     }
   },
   created () {
     // Load the required components
     let loadComponent = this.$store.get('loadComponent')
     this.$options.components['k-form'] = loadComponent('form/KForm')
-    // Initialize step data on creation
-    if (!this.id) {
-      this.fill([ this.generateStep() ])
-    }
+    // Initialize step data on creation so that local ref to form can be resolved
+    this.steps = [ this.generateStep() ]
+    this.currentStep = this.steps[0].name
   }
 }
 </script>

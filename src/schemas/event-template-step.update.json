@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-06/schema#",
-  "$id": "http://mynet.com/schemas/orgs-create.json#",
+  "$id": "http://www.kalisio.xyz/schemas/event-template-steps.update.json#",
   "title": "Event Template Step Creation",
   "description": "Event Template Step creation schema",
   "type": "object",

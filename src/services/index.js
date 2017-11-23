@@ -9,8 +9,7 @@ export function createEventService(organisation, db) {
     servicesPath,
     modelsPath,
     path: organisation._id.toString() + '/events',
-    db,
-    perspectives: ['steps']
+    db
   })
 }
 
@@ -25,8 +24,7 @@ export function createEventTemplateService(organisation, db) {
     servicesPath,
     modelsPath,
     path: organisation._id.toString() + '/event-templates',
-    db,
-    perspectives: ['steps']
+    db
   })
 }
 

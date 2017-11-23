@@ -1,28 +1,26 @@
 <template>
   <div>
     <!-- Manage routing = event/template management -->
-    <div v-if="operation === 'manage'">
-      <div v-if="perspective === 'create-event'">
-        <k-event-editor service="events" :templateId="id"/>
-      </div>
-      <div v-else-if="perspective === 'edit-event'">
-        <k-event-editor service="events" :id="id" />
-      </div>
-      <div v-else-if="perspective === 'create-event-template'">
-        <k-event-template-editor service="event-templates" />
-      </div>
-      <div v-else-if="perspective === 'edit-event-template'">
-        <k-event-template-editor service="event-templates" :id="id" />
-      </div>
+    <div v-if="operation === 'create-event'">
+      <k-event-editor service="events" :templateId="id"/>
+    </div>
+    <div v-else-if="operation === 'edit-event'">
+      <k-event-editor service="events" :id="id" />
+    </div>
+    <div v-else-if="operation === 'create-event-template'">
+      <k-event-template-editor service="event-templates" />
+    </div>
+    <div v-else-if="operation === 'edit-event-template'">
+      <k-event-template-editor service="event-templates" :id="id" />
     </div>
     <!-- Default routing = event/template list -->
     <div v-else>
-      <k-nav-bar :tabs="eventsTabs()" :selected="perspective" />
-      <div v-if="perspective === 'current-events'">
+      <k-nav-bar :tabs="eventsTabs()" :selected="operation" />
+      <div v-if="operation === 'current-events'">
         <k-grid ref="eventsGrid" service="events" :base-query="eventsGridQuery" :actions="eventItemActions()" />
         <k-fab :actions="eventActions()" />
       </div>
-      <div v-else-if="perspective === 'event-templates'">
+      <div v-else-if="operation === 'event-templates'">
         <k-grid ref="templatesGrid" service="event-templates" :base-query="templatesGridQuery" :actions="templateItemActions()" />
         <k-fab :actions="templateActions()" />
       </div>
@@ -74,7 +72,7 @@ export default {
   },
   computed: {
     selectionName () {
-      return this.selection ? this.selection.name : ''
+      return this.selection ? this.selection.title : ''
     },
     templateService () {
       return [{
@@ -103,10 +101,10 @@ export default {
     eventsTabs () {
       return [ 
         { name: 'current-events', label: 'Current events', icon: 'playlist_play', route: { 
-          name: 'events-activity', params: { contextId: this.contextId, perspective: 'current-events' } } 
+          name: 'events-activity', params: { contextId: this.contextId, operation: 'current-events' } } 
         },
         { name: 'event-templates', label: 'Templates', icon: 'content_copy', route: { 
-          name: 'events-activity', params: { contextId: this.contextId, perspective: 'event-templates' } } 
+          name: 'events-activity', params: { contextId: this.contextId, operation: 'event-templates' } } 
         }       
       ]
     },
@@ -114,7 +112,7 @@ export default {
       return this.filterActions(['createEvent'])
     },
     eventItemActions () {
-      return this.filterActions(['manageEventMap', 'manageEventProperties'])
+      return this.filterActions(['editEvent'])
     },
     createEvent () {
       this.$refs.createEventDialog.open()
@@ -127,7 +125,7 @@ export default {
       if (action === 'Continue') {
         this.$router.push({ 
           name: 'events-activity', 
-          params: { context: this.contextId, operation: 'manage', id: this.eventTemplate._id, perspective: 'create-event' } 
+          params: { context: this.contextId, id: this.eventTemplate._id, operation: 'create-event' } 
         })
       }
     },
@@ -139,16 +137,10 @@ export default {
       this.$refs.removeEventDialog.close()
       this.$api.getService('events').remove(this.selection.id)
     },
-    manageEventProperties (event) {
+    editEvent (event) {
       this.$router.push({ 
         name: 'events-activity', 
-        params: { context: this.contextId, operation: 'manage', id: event._id, perspective: 'properties' } 
-      })
-    },
-    manageEventMap (event) {
-      this.$router.push({ 
-        name: 'events-activity', 
-        params: { context: this.contextId, operation: 'manage', id: event._id, perspective: 'map' } 
+        params: { context: this.contextId, id: event._id, operation: 'edit-event' } 
       })
     },
     templateActions () {
@@ -160,13 +152,13 @@ export default {
     createTemplate () {
       this.$router.push({ 
         name: 'events-activity', 
-        params: { context: this.contextId, operation: 'manage', perspective: 'create-event-template' } 
+        params: { context: this.contextId, operation: 'create-event-template' } 
       })
     },
     editTemplate (template) {
       this.$router.push({ 
         name: 'events-activity', 
-        params: { context: this.contextId, operation: 'manage', id: template._id, perspective: 'edit-event-template' } 
+        params: { context: this.contextId, id: template._id, operation: 'edit-event-template' } 
       })
     },
     removeTemplate (template) {
@@ -191,8 +183,7 @@ export default {
     this.$options.components['k-confirm'] = loadComponent('frame/KConfirm')
     // Register the actions
     this.registerAction('createEvent', { label: 'Create', icon: 'add' })
-    this.registerAction('manageEventMap', { label: 'Map', icon: 'map' })
-    this.registerAction('manageEventProperties', { label: 'Properties', icon: 'description' })
+    this.registerAction('editEvent', { label: 'Edit', icon: 'description' })
     this.registerAction('removeEvent', { label: 'Remove', icon: 'remove_circle' })
     this.registerAction('createTemplate', { label: 'Create', icon: 'add' })
     this.registerAction('editTemplate', { label: 'Edit', icon: 'edit' })
