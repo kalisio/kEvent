@@ -17,11 +17,11 @@
     <div v-else>
       <k-nav-bar :tabs="eventsTabs()" :selected="operation" />
       <div v-if="operation === 'current-events'">
-        <k-grid ref="eventsGrid" service="events" :base-query="eventsGridQuery" :actions="eventItemActions()" />
+        <k-grid ref="eventsGrid" service="events" :renderer-options="{ nameField: 'title' }" :base-query="eventsGridQuery" :actions="eventItemActions()" />
         <k-fab :actions="eventActions()" />
       </div>
       <div v-else-if="operation === 'event-templates'">
-        <k-grid ref="templatesGrid" service="event-templates" :base-query="templatesGridQuery" :actions="templateItemActions()" />
+        <k-grid ref="templatesGrid" service="event-templates" :renderer-options="{ nameField: 'title' }" :base-query="templatesGridQuery" :actions="templateItemActions()" />
         <k-fab :actions="templateActions()" />
       </div>
       <!-- Create event dialog -->
