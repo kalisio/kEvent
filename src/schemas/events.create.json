@@ -27,14 +27,21 @@
     },
     "actors": { 
       "type": "array",
+      "multiselect": true,
       "services": [{
         "service": "members",
-        "field": "title",
+        "field": "profile.name",
+        "baseQuery": {
+          "$select": ["_id", "profile.name"]
+        },
         "icon": "perm_identity"
       },
       {
         "service": "groups",
         "field": "name",
+        "baseQuery": {
+          "$select": ["_id", "name"]
+        },
         "icon": "group"
       },
       {
