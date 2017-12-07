@@ -42,7 +42,7 @@ export default {
     this.$on('applied', _ => {
       this.$router.push({ 
         name: 'events-activity', 
-        params: { context: this.contextId, operation: 'current-events' } 
+        params: { contextId: this.contextId, operation: 'current-events' } 
       })
     })
   }

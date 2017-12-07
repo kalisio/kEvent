@@ -15,17 +15,17 @@
     </div>
     <!-- Default routing = event/template list -->
     <div v-else>
-      <k-nav-bar :tabs="eventsTabs()" :selected="operation" />
+      <k-nav-bar :tabs="actions.tab" :selected="operation" />
       <div v-if="operation === 'current-events'">
-        <k-grid ref="eventsGrid" service="events" :renderer-options="{ nameField: 'title' }" :base-query="eventsGridQuery" :actions="eventItemActions()" />
-        <k-fab :actions="eventActions()" />
+        <k-grid ref="eventsGrid" service="events" :renderer-options="{ nameField: 'title' }" :base-query="eventsGridQuery" :actions="actions.event" />
+        <k-fab :actions="actions.events" />
       </div>
       <div v-else-if="operation === 'event-templates'">
-        <k-grid ref="templatesGrid" service="event-templates" :renderer-options="{ nameField: 'title' }" :base-query="templatesGridQuery" :actions="templateItemActions()" />
-        <k-fab :actions="templateActions()" />
+        <k-grid ref="templatesGrid" service="event-templates" :renderer-options="{ nameField: 'title' }" :base-query="templatesGridQuery" :actions="actions.template" />
+        <k-fab :actions="actions.templates" />
       </div>
       <!-- Create event dialog -->
-      <k-dialog ref="createEventDialog" title="Select your template" :closable="false" :actions="createEventactions" @action-triggered="onCreateEventActionTriggered">
+      <k-dialog ref="createEventDialog" title="Select your template" :closable="false" :actions="createEventActions" @action-triggered="onCreateEventActionTriggered">
         <div slot="dialog-content">
           <k-item-chooser ref="templateChooser" :default-items="[]" :services="templateService" @item-selection-changed="onUpdateEventTemplate"/>
         </div>
@@ -81,7 +81,7 @@ export default {
         icon: 'content_copy'
       }]
     },
-    createEventactions () {
+    createEventActions () {
       return this.eventTemplate ? ['Continue', 'Cancel'] : ['Cancel']
     },
     eventsGridQuery () {
@@ -98,21 +98,26 @@ export default {
     }
   },
   methods: {
-    eventsTabs () {
-      return [ 
-        { name: 'current-events', label: 'Current events', icon: 'playlist_play', route: { 
-          name: 'events-activity', params: { contextId: this.contextId, operation: 'current-events' } } 
-        },
-        { name: 'event-templates', label: 'Templates', icon: 'content_copy', route: { 
-          name: 'events-activity', params: { contextId: this.contextId, operation: 'event-templates' } } 
-        }       
-      ]
-    },
-    eventActions () {
-      return this.filterActions(['createEvent'])
-    },
-    eventItemActions () {
-      return this.filterActions(['editEvent'])
+    refreshActions () {
+      this.clearActions()
+      this.registerAction('events', { name: 'create-event', label: 'Create', icon: 'add', handler: this.createEvent })
+      this.registerAction('event', { name: 'edit-event', label: 'Edit', icon: 'description', route: {
+        name: 'events-activity', params: { contextId: this.contextId, operation: 'edit-event-template' } }
+      })
+      this.registerAction('event', { name: 'remove-event', label: 'Remove', icon: 'remove_circle', handler: this.removeEvent })
+      this.registerAction('templates', { name: 'create-event-template', label: 'Add', icon: 'add', route: { 
+        name: 'events-activity', params: { contextId: this.contextId, operation: 'create-event-template' } }
+      })
+      this.registerAction('template', { name: 'edit-event-template', label: 'Edit', icon: 'edit', route: { 
+        name: 'events-activity', params: { contextId: this.contextId, operation: 'edit-event-template' } }
+      })
+      this.registerAction('template', { name: 'remove-event-template', label: 'Remove', icon: 'remove_circle', handler: this.removeTemplate })
+      this.registerAction('tab', { name: 'current-events', label: 'Current events', icon: 'playlist_play', route: { 
+        name: 'events-activity', params: { contextId: this.contextId, operation: 'current-events' } } 
+      })
+      this.registerAction('tab', { name: 'event-templates', label: 'Templates', icon: 'content_copy', route: { 
+        name: 'events-activity', params: { contextId: this.contextId, operation: 'event-templates' } } 
+      })
     },
     createEvent () {
       this.$refs.createEventDialog.open()
@@ -125,7 +130,7 @@ export default {
       if (action === 'Continue') {
         this.$router.push({ 
           name: 'events-activity', 
-          params: { context: this.contextId, id: this.eventTemplate._id, operation: 'create-event' } 
+          params: { contextId: this.contextId, id: this.eventTemplate._id, operation: 'create-event' } 
         })
       }
     },
@@ -136,30 +141,6 @@ export default {
     onRemoveEventConfirmed () {
       this.$refs.removeEventDialog.close()
       this.$api.getService('events').remove(this.selection.id)
-    },
-    editEvent (event) {
-      this.$router.push({ 
-        name: 'events-activity', 
-        params: { context: this.contextId, id: event._id, operation: 'edit-event' } 
-      })
-    },
-    templateActions () {
-      return this.filterActions(['createTemplate'])
-    },
-    templateItemActions () {
-      return this.filterActions(['editTemplate', 'removeTemplate'])
-    },
-    createTemplate () {
-      this.$router.push({ 
-        name: 'events-activity', 
-        params: { context: this.contextId, operation: 'create-event-template' } 
-      })
-    },
-    editTemplate (template) {
-      this.$router.push({ 
-        name: 'events-activity', 
-        params: { context: this.contextId, id: template._id, operation: 'edit-event-template' } 
-      })
     },
     removeTemplate (template) {
       this.selection = template
@@ -182,12 +163,7 @@ export default {
     this.$options.components['k-dialog'] = loadComponent('frame/KDialog')
     this.$options.components['k-confirm'] = loadComponent('frame/KConfirm')
     // Register the actions
-    this.registerAction('createEvent', { label: 'Create', icon: 'add' })
-    this.registerAction('editEvent', { label: 'Edit', icon: 'description' })
-    this.registerAction('removeEvent', { label: 'Remove', icon: 'remove_circle' })
-    this.registerAction('createTemplate', { label: 'Create', icon: 'add' })
-    this.registerAction('editTemplate', { label: 'Edit', icon: 'edit' })
-    this.registerAction('removeTemplate', { label: 'Remove', icon: 'remove_circle' })
+    this.refreshActions()
   }
 }
 </script>
