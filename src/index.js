@@ -5,7 +5,7 @@ import services from './services'
 // We tested the workaround given here https://github.com/babel/babel/issues/2877#issuecomment-270700000 with success so far
 export * from './services'
 export * as hooks from './hooks'
-export * as permissions from './permissions'
+export * from './common'
 
 const debug = makeDebug('kalisio:kEvent')
 
