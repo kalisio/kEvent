@@ -4,6 +4,8 @@
 [![Code Climate](https://codeclimate.com/github/kalisio/kEvent/badges/gpa.svg)](https://codeclimate.com/github/kalisio/kEvent)
 [![Test Coverage](https://codeclimate.com/github/kalisio/kEvent/badges/coverage.svg)](https://codeclimate.com/github/kalisio/kEvent/coverage)
 [![Dependency Status](https://img.shields.io/david/kalisio/kEvent.svg?style=flat-square)](https://david-dm.org/kalisio/kEvent)
+[![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://kalisio.gitbooks.io/kalisio/api)
+[![Known Vulnerabilities](https://snyk.io/test/github/kalisio/kEvent/badge.svg)](https://snyk.io/test/github/kalisio/kEvent)
 
 > Basic utils to support event management for Kalisio applications and services
 
