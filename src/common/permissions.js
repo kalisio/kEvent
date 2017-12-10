@@ -12,11 +12,11 @@ export function defineEventAbilities (subject, can, cannot) {
           can('service', organisation._id.toString() + '/events')
         }
         if (role >= permissions.Roles.manager) {
-          can('all', 'events')
+          can('all', 'events', { context: organisation._id })
           // The unique identifier of a service is its path not its name.
           // Indeed we have for instance a 'events' service in each organisation.
           can('service', organisation._id.toString() + '/event-templates')
-          can('all', 'event-templates')
+          can('all', 'event-templates', { context: organisation._id })
         }
       })
     }

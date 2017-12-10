@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { mixins as kCoreMixins } from 'kCore/client'
+import { Store, mixins as kCoreMixins } from 'kCore/client'
 
 export default {
   name: 'k-events-activity',
@@ -100,24 +100,40 @@ export default {
   methods: {
     refreshActions () {
       this.clearActions()
-      this.registerAction('events', { name: 'create-event', label: 'Create', icon: 'add', handler: this.createEvent })
-      this.registerAction('event', { name: 'edit-event', label: 'Edit', icon: 'description', route: {
-        name: 'events-activity', params: { contextId: this.contextId, operation: 'edit-event-template' } }
-      })
-      this.registerAction('event', { name: 'remove-event', label: 'Remove', icon: 'remove_circle', handler: this.removeEvent })
-      this.registerAction('templates', { name: 'create-event-template', label: 'Add', icon: 'add', route: { 
-        name: 'events-activity', params: { contextId: this.contextId, operation: 'create-event-template' } }
-      })
-      this.registerAction('template', { name: 'edit-event-template', label: 'Edit', icon: 'edit', route: { 
-        name: 'events-activity', params: { contextId: this.contextId, operation: 'edit-event-template' } }
-      })
-      this.registerAction('template', { name: 'remove-event-template', label: 'Remove', icon: 'remove_circle', handler: this.removeTemplate })
-      this.registerAction('tab', { name: 'current-events', label: 'Current events', icon: 'playlist_play', route: { 
-        name: 'events-activity', params: { contextId: this.contextId, operation: 'current-events' } } 
-      })
-      this.registerAction('tab', { name: 'event-templates', label: 'Templates', icon: 'content_copy', route: { 
-        name: 'events-activity', params: { contextId: this.contextId, operation: 'event-templates' } } 
-      })
+      if (this.$can('create', 'events', this.contextId)) {
+        this.registerAction('events', { name: 'create-event', label: 'Create', icon: 'add', handler: this.createEvent })
+      }
+      if (this.$can('update', 'events', this.contextId)) {
+        this.registerAction('event', { name: 'edit-event', label: 'Edit', icon: 'description', route: {
+          name: 'events-activity', params: { contextId: this.contextId, operation: 'edit-event-template' } }
+        })
+      }
+      if (this.$can('remove', 'events', this.contextId)) {
+        this.registerAction('event', { name: 'remove-event', label: 'Remove', icon: 'remove_circle', handler: this.removeEvent })
+      }
+      if (this.$can('create', 'event-templates', this.contextId)) {
+        this.registerAction('templates', { name: 'create-event-template', label: 'Add', icon: 'add', route: { 
+          name: 'events-activity', params: { contextId: this.contextId, operation: 'create-event-template' } }
+        })
+      }
+      if (this.$can('update', 'event-templates', this.contextId)) {
+        this.registerAction('template', { name: 'edit-event-template', label: 'Edit', icon: 'edit', route: { 
+          name: 'events-activity', params: { contextId: this.contextId, operation: 'edit-event-template' } }
+        })
+      }
+      if (this.$can('remove', 'event-templates', this.contextId)) {
+        this.registerAction('template', { name: 'remove-event-template', label: 'Remove', icon: 'remove_circle', handler: this.removeTemplate })
+      }
+      if (this.$can('read', 'events', this.contextId)) {
+        this.registerAction('tab', { name: 'current-events', label: 'Current events', icon: 'playlist_play', route: { 
+          name: 'events-activity', params: { contextId: this.contextId, operation: 'current-events' } } 
+        })
+      }
+      if (this.$can('read', 'event-templates', this.contextId)) {
+        this.registerAction('tab', { name: 'event-templates', label: 'Templates', icon: 'content_copy', route: { 
+          name: 'events-activity', params: { contextId: this.contextId, operation: 'event-templates' } } 
+        })
+      }
     },
     createEvent () {
       this.$refs.createEventDialog.open()
@@ -162,8 +178,6 @@ export default {
     this.$options.components['k-fab'] = loadComponent('collection/KFab')
     this.$options.components['k-dialog'] = loadComponent('frame/KDialog')
     this.$options.components['k-confirm'] = loadComponent('frame/KConfirm')
-    // Register the actions
-    this.refreshActions()
   }
 }
 </script>
