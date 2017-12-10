@@ -34,14 +34,12 @@
       <k-confirm ref="removeEventDialog" 
         :title="`Are you sure you want to remove '${selectionName}' ?`"
         action="Yes"
-        @confirmed="onRemoveEventConfirmed" 
-      />
+        @confirmed="onRemoveEventConfirmed" />
       <!-- Remove template dialog -->
       <k-confirm ref="removeTemplateDialog" 
         :title="`Are you sure you want to remove '${selectionName}' ?`"
         action="Yes"
-        @confirmed="onRemoveTemplateConfirmed" 
-      />
+        @confirmed="onRemoveTemplateConfirmed" />
     </div>
   </div>
 </template>
