@@ -12,6 +12,7 @@ export function createOrganisationServices (hook) {
 }
 
 export function removeOrganisationServices (hook) {
+  let app = hook.app
   removeEventService.call(app, hook.result)
   removeEventTemplateService.call(app, hook.result)
   return hook
