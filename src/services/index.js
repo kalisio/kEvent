@@ -32,6 +32,21 @@ export function removeEventTemplateService(organisation) {
   // TODO
 }
 
+export function createEventLogService(organisation, db) {
+  const app = this
+
+  app.createService('event-logs', {
+    servicesPath,
+    modelsPath,
+    path: organisation._id.toString() + '/event-logs',
+    db
+  })
+}
+
+export function removeEventLogService(organisation) {
+  // TODO
+}
+
 export default async function () {
   const app = this
 
@@ -43,5 +58,6 @@ export default async function () {
     let db = app.db.instance.db(organisation._id.toString())
     createEventService.call(app, organisation, db)
     createEventTemplateService.call(app, organisation, db)
+    createEventLogService.call(app, organisation, db)
   })
 }
