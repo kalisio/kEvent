@@ -1,8 +1,8 @@
 import request from 'superagent'
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
-import core, { kalisio } from 'kCore'
-import team, { hooks as teamHooks, permissions as teamPermissions } from 'kTeam'
+import core, { kalisio, hooks as coreHooks, permissions as corePermissions } from 'kCore'
+import team, { permissions as teamPermissions } from 'kTeam'
 import event, { hooks, permissions } from '../src'
 
 describe('kEvent', () => {
@@ -14,20 +14,20 @@ describe('kEvent', () => {
 
     // Register all default hooks for authorisation
     // Default rules for all users
-    teamPermissions.defineAbilities.registerHook(teamPermissions.defineUserAbilities)
+    corePermissions.defineAbilities.registerHook(corePermissions.defineUserAbilities)
     // Then rules for organisations
-    teamPermissions.defineAbilities.registerHook(teamPermissions.defineOrganisationAbilities)
+    corePermissions.defineAbilities.registerHook(teamPermissions.defineOrganisationAbilities)
     // Then rules for groups
-    teamPermissions.defineAbilities.registerHook(teamPermissions.defineGroupAbilities)
+    corePermissions.defineAbilities.registerHook(teamPermissions.defineGroupAbilities)
     // Then rules for events
-    teamPermissions.defineAbilities.registerHook(permissions.defineEventAbilities)
+    corePermissions.defineAbilities.registerHook(permissions.defineEventAbilities)
     
     app = kalisio()
     // Register authorisation hook
     app.hooks({
-      before: { all: teamHooks.authorise }
+      before: { all: coreHooks.authorise }
       /* For debug
-      before: { all: [coreHooks.log, teamHooks.authorise] },
+      before: { all: [coreHooks.log, coreHooks.authorise] },
       after: { all: coreHooks.log },
       error: { all: coreHooks.log }
       */

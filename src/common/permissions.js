@@ -1,4 +1,4 @@
-import { permissions } from 'kTeam/common'
+import { permissions } from 'kCore/common'
 
 // Hook computing event abilities for a given user
 export function defineEventAbilities (subject, can, cannot) {
