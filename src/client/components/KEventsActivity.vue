@@ -167,15 +167,14 @@ export default {
   },
   created () {
     // Load the required components
-    let loadComponent = this.$store.get('loadComponent')
-    this.$options.components['k-nav-bar'] = loadComponent('layout/KNavBar')
-    this.$options.components['k-event-editor'] = loadComponent('KEventEditor')
-    this.$options.components['k-event-template-editor'] = loadComponent('KEventTemplateEditor')
-    this.$options.components['k-item-chooser'] = loadComponent('form/KItemChooser')
-    this.$options.components['k-grid'] = loadComponent('collection/KGrid')
-    this.$options.components['k-fab'] = loadComponent('collection/KFab')
-    this.$options.components['k-dialog'] = loadComponent('frame/KDialog')
-    this.$options.components['k-confirm'] = loadComponent('frame/KConfirm')
+    this.$options.components['k-nav-bar'] = this.$load('layout/KNavBar')
+    this.$options.components['k-event-editor'] = this.$load('KEventEditor')
+    this.$options.components['k-event-template-editor'] = this.$load('KEventTemplateEditor')
+    this.$options.components['k-item-chooser'] = this.$load('form/KItemChooser')
+    this.$options.components['k-grid'] = this.$load('collection/KGrid')
+    this.$options.components['k-fab'] = this.$load('collection/KFab')
+    this.$options.components['k-dialog'] = this.$load('frame/KDialog')
+    this.$options.components['k-confirm'] = this.$load('frame/KConfirm')
   }
 }
 </script>

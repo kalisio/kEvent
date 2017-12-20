@@ -34,9 +34,8 @@ export default {
   ],
   created () {
     // Load the required components
-    let loadComponent = this.$store.get('loadComponent')
-    this.$options.components['k-form'] = loadComponent('form/KForm')
-    this.$options.components['k-event-workflow-form'] = loadComponent('KEventWorkflowForm')
+    this.$options.components['k-form'] = this.$load('form/KForm')
+    this.$options.components['k-event-workflow-form'] = this.$load('KEventWorkflowForm')
     this.refresh()
     // Manage return to activity once created/updated
     this.$on('applied', _ => {

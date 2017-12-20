@@ -178,8 +178,7 @@ export default {
   },
   created () {
     // Load the required components
-    let loadComponent = this.$store.get('loadComponent')
-    this.$options.components['k-form'] = loadComponent('form/KForm')
+    this.$options.components['k-form'] = this.$load('form/KForm')
     // Initialize step data on creation so that local ref to form can be resolved
     this.steps = [ this.generateStep() ]
     this.currentStep = this.steps[0].name
