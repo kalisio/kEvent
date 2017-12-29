@@ -5,14 +5,14 @@
   "description": "Event creation schema",
   "type": "object",
   "properties": {
-    "title": {
+    "name": {
       "type": "string", 
       "maxLength": 128,
       "minLength": 3,
       "field": {
         "component": "form/KTextField",
-        "label": "Title",
-        "helper": "Enter the title"
+        "label": "Name",
+        "helper": "Enter the name of this event"
       }
     },
     "description": {
@@ -21,10 +21,10 @@
       "field": {
         "component": "form/KTextField",
         "label": "Description",
-        "helper": "Enter the description"
+        "helper": "Enter a description of this event"
       }
     }
   },
-  "required": ["title", "template"]
+  "required": ["name"]
 }
 

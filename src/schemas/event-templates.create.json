@@ -5,15 +5,23 @@
   "description": "Event Template creation schema",
   "type": "object",
   "properties": {
-    "title": {
+    "name": {
       "type": "string", 
       "maxLength": 128,
       "minLength": 3,
       "default": "New template",
       "field": {
         "component": "form/KTextField",
-        "label": "Title",
-        "helper": "Enter the title"
+        "label": "Name",
+        "helper": "Enter the name of this template"
+      }
+    },
+    "icon": {
+      "type": "string", 
+      "field": {
+        "component": "form/KIconField",
+        "label": "Icon",
+        "helper": "Select an icon to represent this template"
       }
     },
     "description": {
@@ -22,10 +30,10 @@
       "field": {
         "component": "form/KTextField",
         "label": "Description",
-        "helper": "Enter the description"
+        "helper": "Enter a description of this template"
       }
     }
   },
-  "required": ["title"]
+  "required": ["name", "icon"]
 }
 
