@@ -1,13 +1,13 @@
 <template>
   <div>
     <!-- 
-      Members collection
+      Events collection
      -->
     <k-grid service="events" :base-query="baseQuery" :actions="actions.event" />
     <!-- 
       Router view to enable routing to modals
      -->
-    <router-view service="events"  backRoute="events-activity"></router-view>
+    <router-view service="events" backRoute="events-activity"></router-view>
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 
-      Members collection
+      Templates collection
      -->
     <k-grid service="event-templates" :base-query="baseQuery" :actions="actions.template" />
     <!-- 
