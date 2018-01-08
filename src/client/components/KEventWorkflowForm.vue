@@ -46,7 +46,6 @@ export default {
     QTooltip
   },
   mixins: [
-    mixins.service,
     mixins.schemaProxy,
     mixins.refsResolver()
   ],
@@ -61,11 +60,6 @@ export default {
       steps: [],
       currentStep: '',
       preview: false
-    }
-  },
-  computed: {
-    stepSchema () {
-      return this.id ? 'event-template-step.update' : 'event-template-step.create'
     }
   },
   methods: {

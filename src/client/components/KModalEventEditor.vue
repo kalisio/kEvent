@@ -6,7 +6,7 @@
       <p class="col-10 caption text-center">
         <strong>Event workflow</strong>: you can manage below the different steps each actor of the event might be able to fulfill.
       </p>
-      <k-event-workflow-form ref="workflowForm" service="event-template-step" :id="id" />
+      <k-event-workflow-form ref="workflowForm" schemaName="event-template-step" :id="id" />
     </div>
   </k-modal>
 </template>
@@ -15,7 +15,7 @@
 import { mixins } from 'kCore/client'
 
 export default {
-  name: 'k-event-template-editor',
+  name: 'k-event-editor',
   mixins: [
     mixins.service,
     mixins.objectProxy,
