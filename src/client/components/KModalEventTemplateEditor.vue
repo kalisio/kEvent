@@ -2,11 +2,11 @@
   <k-modal title="New event template" :toolbar="toolbar" :buttons="buttons">
     <div slot="modal-content" class="column xs-gutter">
       <k-form ref="templateForm" :schema="schema" />
-    </br>
-    <p class="col-10 caption text-center">
-      <strong>Event workflow for this template</strong>: you can manage below the different steps each actor of the event might be able to fulfill.
-    </p>
-    <k-event-workflow-form ref="workflowForm" schemaName="event-template-step" :id="id" />
+      </br>
+      <p class="col-10 caption text-center">
+        <strong>Event workflow for this template</strong>: you can manage below the different steps each actor of the event might be able to fulfill.
+      </p>
+      <k-event-workflow-form ref="workflowForm" schemaName="event-template-step" :id="id" />
     </div>
   </k-modal>
 </template>

@@ -1,8 +1,8 @@
 <template>
   <k-modal title="New event" :toolbar="toolbar" :buttons="buttons">
-    <k-form ref="eventForm" :schema="schema" />
-    </br>
-    <div v-show="templateId" >
+    <div slot="modal-content" class="column xs-gutter">
+      <k-form ref="eventForm" :schema="schema" />
+      </br>
       <p class="col-10 caption text-center">
         <strong>Event workflow</strong>: you can manage below the different steps each actor of the event might be able to fulfill.
       </p>
@@ -51,14 +51,13 @@ export default {
     this.$options.components['k-event-workflow-form'] = this.$load('KEventWorkflowForm')
     this.refresh()
     .then(_ => {
-      console.log('after refresh')
+      console.log(this.templateId)
       // Creation mode from a template
       if (this.templateId) {
         this.$api.getService('event-templates')
         .get(this.templateId)
         .then(template => {
           // Set the template as reference values
-          console.log(template)
           this._object = template
           this.fillEditor()
         })
