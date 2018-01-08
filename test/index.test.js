@@ -25,7 +25,7 @@ describe('kEvent', () => {
     app = kalisio()
     // Register authorisation hook
     app.hooks({
-      before: { all: coreHooks.authorise }
+      before: { all: [coreHooks.processObjectIDs, coreHooks.authorise] }
       /* For debug
       before: { all: [coreHooks.log, coreHooks.authorise] },
       after: { all: coreHooks.log },

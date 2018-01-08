@@ -8,7 +8,7 @@ export function createEventService(organisation, db) {
   app.createService('events', {
     servicesPath,
     modelsPath,
-    path: organisation._id.toString() + '/events',
+    context: organisation,
     db
   })
 }
@@ -23,7 +23,7 @@ export function createEventTemplateService(organisation, db) {
   app.createService('event-templates', {
     servicesPath,
     modelsPath,
-    path: organisation._id.toString() + '/event-templates',
+    context: organisation,
     db
   })
 }
@@ -38,7 +38,7 @@ export function createEventLogService(organisation, db) {
   app.createService('event-logs', {
     servicesPath,
     modelsPath,
-    path: organisation._id.toString() + '/event-logs',
+    context: organisation,
     db
   })
 }
