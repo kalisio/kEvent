@@ -22,14 +22,6 @@ export default {
     contextId: {
       type: String,
       default: ''
-    },
-    id: {
-      type: String,
-      default: '',
-    },
-    perspective: {
-      type: String,
-      default: '',
     }
   },
   computed: {
@@ -74,12 +66,17 @@ export default {
       this.registerAction('event', { 
         name: 'remove-event', label: 'Remove', icon: 'remove_circle',
         permissions: { operation: 'remove', service: 'events', context: this.contextId },
-        handler: this.removeEventTemplate
+        handler: this.removeEvent
       })
       this.registerAction('event', { 
         name: 'edit-event', label: 'Edit', icon: 'description', 
         permissions: { operation: 'update', service: 'events', context: this.contextId },
-        route: { name: 'edit-event', params: { contextId: this.contextId } }
+        route: { name: 'event-activity', params: { contextId: this.contextId, pane: 'properties' } }
+      })
+      this.registerAction('event', { 
+        name: 'map-event', label: 'Map', icon: 'map', 
+        permissions: { operation: 'update', service: 'events', context: this.contextId },
+        route: { name: 'event-activity', params: { contextId: this.contextId, pane: 'map' } }
       })
     },
     removeEvent (event) {
