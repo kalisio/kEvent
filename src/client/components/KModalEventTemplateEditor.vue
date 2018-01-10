@@ -1,5 +1,5 @@
 <template>
-  <k-modal title="New event template" :toolbar="toolbar" :buttons="buttons">
+  <k-modal title="New event template" :toolbar="toolbar" :buttons="buttons" :route="true">
     <div slot="modal-content" class="column xs-gutter">
       <k-form ref="templateForm" :schema="schema" />
       </br>

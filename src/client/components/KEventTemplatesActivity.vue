@@ -7,7 +7,7 @@
     <!-- 
       Router view to enable routing to modals
      -->
-    <router-view service="event-templates" backRoute="event-templates-activity"></router-view>
+    <router-view service="event-templates" router="router()"></router-view>
   </div>
 </template>
 
@@ -30,6 +30,12 @@ export default {
     }
   },
   methods: {
+    router () {
+      return { 
+        onApply: { name: 'event-templates-activity', params: { contextId: this.contextId } },
+        onDismiss: { name: 'event-templates-activity', params: { contextId: this.contextId } }
+      }
+    },
     refreshActivity () {
       this.clearActivity()
       this.setTitle(this.$store.get('context.name'))
