@@ -82,7 +82,7 @@ export default {
     removeEvent (event) {
       Dialog.create({
         title: 'Remove \'' + event.name + '\' ?',
-        message: 'Are you sure you want to remove the event <br>' + event.name + '</br> ?',
+        message: 'Are you sure you want to remove the event <b>' + event.name + '</b> ?',
         buttons: [
           'Cancel',
           {
