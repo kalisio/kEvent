@@ -3,7 +3,7 @@
     <!-- 
       Events collection
      -->
-    <k-grid service="events" :base-query="baseQuery" :actions="actions.event" />
+    <k-grid service="events" :base-query="baseQuery" :renderer="renderer" :actions="actions.event" />
     <!-- 
       Router view to enable routing to modals
      -->
@@ -13,11 +13,12 @@
 
 <script>
 import { Store, mixins as kCoreMixins } from 'kCore/client'
+import { mixins as kMapMixins } from 'kMap/client'
 import { Dialog } from 'quasar'
 
 export default {
   name: 'k-events-activity',
-  mixins: [kCoreMixins.baseActivity],
+  mixins: [kCoreMixins.baseActivity, kMapMixins.geolocation],
   props: {
     contextId: {
       type: String,
@@ -27,6 +28,17 @@ export default {
   computed: {
     baseQuery () {
       return {}
+    }
+  },
+  data () {
+    return {
+      renderer: { 
+        component: 'KEventCard', 
+        props: {
+          options: {
+          }
+        } 
+      }
     }
   },
   methods: {
