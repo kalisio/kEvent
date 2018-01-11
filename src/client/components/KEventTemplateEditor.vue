@@ -5,7 +5,7 @@
     <p class="col-10 caption text-center">
       <strong>Event workflow for this template</strong>: you can manage below the different steps each actor of the event might be able to fulfill.
     </p>
-    <k-event-workflow-form ref="workflowForm" service="event-template-step" class="col-10" :id="id" />
+    <k-event-workflow-form ref="workflowForm" service="event-workflow" class="col-10" :id="id" />
     <!-- Buttons section -->
     <div class="col-10">
       <div class="row justify-around" style="padding: 18px">

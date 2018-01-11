@@ -154,7 +154,7 @@ export default {
       })
     },
     fill (object) {
-      this.steps = object.steps
+      this.steps = object.workflow
       this.currentStep = this.steps[0].name
       // Restore step form when editing
       this.restoreStep()
@@ -165,7 +165,7 @@ export default {
       return { 
         isValid: form.isValid, 
         values: {
-          steps: this.steps
+          workflow: this.steps
         }
       }
     }

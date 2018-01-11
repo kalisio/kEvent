@@ -17,6 +17,7 @@
     },
     "icon": {
       "type": "string", 
+      "default": "mode_edit",
       "field": {
         "component": "form/KIconField",
         "label": "Icon",

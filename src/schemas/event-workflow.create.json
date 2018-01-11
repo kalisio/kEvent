@@ -1,14 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-06/schema#",
-  "$id": "http://www.kalisio.xyz/schemas/event-template-steps.update.json#",
+  "$id": "http://www.kalisio.xyz/schemas/event-workflow.create.json#",
   "title": "Event Template Step Creation",
-  "description": "Event Template Step creation schema",
+  "description": "Event workflow creation schema",
   "type": "object",
   "properties": {
     "title": {
       "type": "string", 
       "maxLength": 128,
       "minLength": 3,
+      "default": "New step",
       "field": {
         "component": "form/KTextField",
         "label": "Step title",
@@ -17,6 +18,7 @@
     },
     "icon": {
       "type": "string", 
+      "default": "check",
       "field": {
         "component": "form/KIconField",
         "label": "Step icon",
@@ -26,6 +28,7 @@
     "description": {
       "type": "string", 
       "maxLength": 256,
+      "default": "Step content",
       "field": {
         "component": "form/KTextField",
         "label": "Step description",

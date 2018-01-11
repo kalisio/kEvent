@@ -6,7 +6,7 @@
       <p class="col-10 caption text-center">
         <strong>Event workflow</strong>: you can manage below the different steps each actor of the event might be able to fulfill.
       </p>
-      <k-event-workflow-form ref="workflowForm" schemaName="event-template-step" :id="id" />
+      <k-event-workflow-form ref="workflowForm" schemaName="event-workflow" :id="id" />
     </div>
   </k-modal>
 </template>

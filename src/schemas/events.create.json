@@ -57,6 +57,23 @@
         "label": "Actors",
         "helper": "Select event actors"
       }
+    },
+    "coordinators": { 
+      "type": "array",
+      "multiselect": true,
+      "services": [{
+        "service": "members",
+        "field": "profile.name",
+        "baseQuery": {
+          "$select": ["_id", "profile.name"]
+        },
+        "icon": "supervisor_account"
+      }],
+      "field": {
+        "component": "form/KItemField",
+        "label": "Coordinators",
+        "helper": "Select event coordinators (other than yourself)"
+      }
     }
   },
   "required": ["name", "actors"]
