@@ -41,12 +41,12 @@ export default {
       this.setTitle(this.$store.get('context.name'))
       // Tabbar actions
       this.registerTabAction({ 
-        name: 'events', label: 'Events', icon: 'playlist_play',
+        name: 'events', label: 'Events', icon: 'whatshot',
         route: { name: 'events-activity', params: { contextId: this.contextId } },
         default: true
       })
       this.registerTabAction({ 
-        name: 'event-templates', label: 'Templates', icon: 'credit_card',
+        name: 'event-templates', label: 'Templates', icon: 'widgets',
         route: { name: 'event-templates-activity', params: { contextId: this.contextId } } 
       })
       // Fab actions
@@ -69,14 +69,19 @@ export default {
         handler: this.removeEvent
       })
       this.registerAction('event', { 
-        name: 'edit-event', label: 'Edit', icon: 'description', 
+        name: 'add-media', label: 'Edit', icon: 'add_a_photo', 
         permissions: { operation: 'update', service: 'events', context: this.contextId },
-        route: { name: 'event-activity', params: { contextId: this.contextId, pane: 'properties' } }
+        route: { name: 'add-media', params: { contextId: this.contextId } }
+      })
+      this.registerAction('event', { 
+        name: 'run-event', label: 'Run', icon: 'message', 
+        permissions: { operation: 'update', service: 'events', context: this.contextId },
+        route: { name: 'run-event', params: { contextId: this.contextId } }
       })
       this.registerAction('event', { 
         name: 'map-event', label: 'Map', icon: 'map', 
         permissions: { operation: 'update', service: 'events', context: this.contextId },
-        route: { name: 'event-activity', params: { contextId: this.contextId, pane: 'map' } }
+        route: { name: 'event-activity', params: { contextId: this.contextId } }
       })
     },
     removeEvent (event) {

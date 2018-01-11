@@ -41,11 +41,11 @@ export default {
       this.setTitle(this.$store.get('context.name'))
       // Tabbar actions
       this.registerTabAction({ 
-        name: 'events', label: 'Events', icon: 'playlist_play',
+        name: 'events', label: 'Events', icon: 'whatshot',
         route: { name: 'events-activity', params: { contextId: this.contextId } } 
       })
       this.registerTabAction({ 
-        name: 'event-templates', label: 'Templates', icon: 'credit_card',
+        name: 'event-templates', label: 'Templates', icon: 'widgets',
         route: { name: 'event-templates-activity', params: { contextId: this.contextId } },
         default: true
       })

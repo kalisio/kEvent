@@ -1,11 +1,7 @@
 <template>
   <div v-if="id !== ''" class="row justify-center full-width">
-    <div v-if="pane === 'properties'" class="col-11">
-      <k-editor service="events" :id="id" />
-    </div>
-    <div v-if="pane === 'map'" class="col-12">
-      <k-map  />
-    </div>
+    <k-map  />
+    <router-view />
   </div>
 </template>
 
@@ -22,10 +18,6 @@ export default {
       required: true
     },
     id: {
-      type: String,
-      required: true
-    },
-    pane: {
       type: String,
       required: true
     }
@@ -45,7 +37,7 @@ export default {
         this.setTitle(event.name)
       })
       // Tabbar actions
-      this.registerTabAction({ 
+     /* this.registerTabAction({ 
         name: 'event-properties', label: 'Properties', icon: 'description',
         route: { name: 'event-activity', params: { contextId: this.contextId, id: this.id, pane: 'properties' } },
         default: true
@@ -54,15 +46,22 @@ export default {
         name: 'event-map', label: 'Map', icon: 'map',
         route: { name: 'event-activity', params: { contextId: this.contextId, id: this.id, pane: 'map' } },
         default: true
-      })
+      }) */
       // Fab actions
+      this.registerFabAction({ 
+        name: 'browse-media', label: 'Browse media', icon: 'collections', 
+        route: { name: 'browse-media', params: { contextId: this.contextId, id: this.id } } 
+      })
+      this.registerFabAction({ 
+        name: 'edit-event', label: 'Properties', icon: 'description', 
+        route: { name: 'edit-event', params: { contextId: this.contextId, id: this.id } } 
+      })
       // Item actions
     }
   },
   created () {
     // Load the required components
     this.$options.components['k-map'] = this.$load('KMap')
-    this.$options.components['k-editor'] = this.$load('editor/KEditor')
   }
 }
 </script>
