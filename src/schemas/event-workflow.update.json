@@ -41,6 +41,6 @@
       }
     }
   },
-  "required": ["title", "description"]
+  "required": ["title", "icon", "description", "interaction"]
 }
 

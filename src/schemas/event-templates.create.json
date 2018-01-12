@@ -35,6 +35,6 @@
       }
     }
   },
-  "required": ["name", "icon"]
+  "required": ["name", "icon", "description"]
 }
 

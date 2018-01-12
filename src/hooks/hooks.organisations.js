@@ -1,6 +1,8 @@
 // import makeDebug from 'debug'
 // const debug = makeDebug('kalisio:kEvent:organisations:hooks')
-import { createEventService, removeEventService, createEventTemplateService, removeEventTemplateService, createEventLogService, removeEventLogService } from '../services'
+import { createEventService, removeEventService,
+         createEventTemplateService, removeEventTemplateService,
+         createEventLogService, removeEventLogService } from '../services'
 
 export function createOrganisationServices (hook) {
   let app = hook.app

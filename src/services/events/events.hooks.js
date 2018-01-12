@@ -1,9 +1,11 @@
+import { addCreatorAsCoordinator } from '../../hooks'
+
 module.exports = {
   before: {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [ addCreatorAsCoordinator ],
     update: [],
     patch: [],
     remove: []
