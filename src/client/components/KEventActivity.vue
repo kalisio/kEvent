@@ -1,7 +1,11 @@
 <template>
-  <div v-if="id !== ''" class="row justify-center full-width">
-    <k-map  />
-    <router-view />
+  <div v-if="id !== ''" class="column justify-center full-width">
+    <div class="full-width full-height">
+      <k-map  />
+    </div>
+    <div>
+      <router-view service="events" :router="router()"></router-view>
+    </div>
   </div>
 </template>
 
@@ -25,8 +29,8 @@ export default {
   methods: {
     router () {
       return { 
-        onApply: { name: 'event-activity', params: { contextId: this.contextId, id: this.id, pane: this.pane } },
-        onDismiss: { name: 'event-activity', params: { contextId: this.contextId, id: this.id, pane: this.pane } }
+        onApply: { name: 'event-activity', params: { contextId: this.contextId, id: this.id } },
+        onDismiss: { name: 'event-activity', params: { contextId: this.contextId, id: this.id } }
       }
     },
     refreshActivity () {
@@ -54,7 +58,7 @@ export default {
       })
       this.registerFabAction({ 
         name: 'edit-event', label: 'Properties', icon: 'description', 
-        route: { name: 'edit-event', params: { contextId: this.contextId, id: this.id } } 
+        route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', id: this.id } } 
       })
       // Item actions
     }
