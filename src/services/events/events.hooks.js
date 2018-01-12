@@ -1,4 +1,4 @@
-import { addCreatorAsCoordinator } from '../../hooks'
+import { addCreatorAsCoordinator, sendNotifications } from '../../hooks'
 
 module.exports = {
   before: {
@@ -15,10 +15,10 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [],
-    update: [],
-    patch: [],
-    remove: []
+    create: [ sendNotifications ],
+    update: [ sendNotifications ],
+    patch: [ sendNotifications ],
+    remove: [ sendNotifications ]
   },
 
   error: {
