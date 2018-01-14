@@ -76,22 +76,28 @@ export default {
       }
       // Item actions
       this.registerAction('event', { 
-        name: 'remove-event', label: 'Remove', icon: 'remove_circle',
+        name: 'remove-event', label: 'Remove', icon: 'remove_circle', scope: 'menu',
         permissions: { operation: 'remove', service: 'events', context: this.contextId },
         handler: this.removeEvent
       })
+      if (this.$can('update', 'events', this.contextId)) {
+        this.registerAction('event', { 
+          name: 'tag-member', label: 'Tag', icon: 'local_offer', scope: 'pane',
+          route: { name: 'tag-event', params: { contextId: this.contextId } }
+        })
+      }
       this.registerAction('event', { 
-        name: 'add-media', label: 'Edit', icon: 'add_a_photo', 
+        name: 'add-media', label: 'Add a photo', icon: 'add_a_photo', scope: 'pane',
         permissions: { operation: 'update', service: 'events', context: this.contextId },
         route: { name: 'add-media', params: { contextId: this.contextId } }
       })
       this.registerAction('event', { 
-        name: 'run-event', label: 'Run', icon: 'message', 
+        name: 'run-event', label: 'Follow', icon: 'message', scope: 'pane',
         permissions: { operation: 'update', service: 'events', context: this.contextId },
         route: { name: 'run-event', params: { contextId: this.contextId } }
       })
       this.registerAction('event', { 
-        name: 'map-event', label: 'Map', icon: 'map', 
+        name: 'map-event', label: 'Map', icon: 'map', scope: 'pane',
         permissions: { operation: 'update', service: 'events', context: this.contextId },
         route: { name: 'event-activity', params: { contextId: this.contextId } }
       })

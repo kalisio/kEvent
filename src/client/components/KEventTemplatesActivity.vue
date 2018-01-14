@@ -58,12 +58,12 @@ export default {
       }
       // Item actions
       this.registerAction('template', { 
-        name: 'remove-event-template', label: 'Remove', icon: 'remove_circle',
+        name: 'remove-event-template', label: 'Remove', icon: 'remove_circle', scope: 'menu',
         permissions: { operation: 'remove', service: 'event-templates', context: this.contextId },
         handler: this.removeEventTemplate
       })
       this.registerAction('template', { 
-        name: 'edit-event-template', label: 'Edit', icon: 'description', 
+        name: 'edit-event-template', label: 'Edit', icon: 'description', scope: 'pane',
         permissions: { operation: 'update', service: 'event-templates', context: this.contextId },
         route: { name: 'edit-event-template', params: { contextId: this.contextId } }
       })
