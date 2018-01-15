@@ -64,11 +64,11 @@ export default {
       // Fab actions
       if (this.$can('create', 'events', this.contextId)) {
         const eventTemplatesService = this.$api.getService('event-templates')
-        eventTemplatesService.find({ $select: ["title", "icon"] })
+        eventTemplatesService.find({ $select: ["name", "icon"] })
         .then(templates => {
           templates.data.forEach(template => {
             this.registerFabAction({ 
-              name: 'create-' + template.name, label: template.name, icon: template.icon, 
+              name: 'create-' + template.name, label: template.name, icon: template.icon.icon, 
               route: { name: 'create-event', params: { contextId: this.contextId, templateId: template._id } }
             })
           })
