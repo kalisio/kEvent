@@ -16,7 +16,8 @@
       }
     },
     "icon": {
-      "type": "string", 
+      "type": "object", 
+      "default": { "icon": "check", "color": "dark" },
       "field": {
         "component": "form/KIconField",
         "label": "Step icon",
