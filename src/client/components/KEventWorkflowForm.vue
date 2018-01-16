@@ -1,6 +1,6 @@
 <template>
   <q-stepper flat ref="stepper" v-model="currentStep" color="primary" contractable @step="onStepSelected">
-    <q-step v-for="(step, index) in steps" :name="step.name" :order="index" :title="step.title" :icon="step.icon" :active-icon="preview ? step.icon : 'edit'" :done-icon="step.icon">
+    <q-step v-for="(step, index) in steps" :name="step.name" :order="index" :title="step.title" :icon="step.icon.name" :active-icon="preview ? step.icon.name : 'edit'" :done-icon="step.icon.name">
       <k-form ref="stepForm" v-show="!preview" :schema="schema"/>
       <div v-show="preview">
         <p>{{step.description}}</p>
