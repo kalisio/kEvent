@@ -68,7 +68,7 @@ export default {
         .then(templates => {
           templates.data.forEach(template => {
             this.registerFabAction({ 
-              name: 'create-' + template.name, label: template.name, icon: template.icon.icon, 
+              name: 'create-' + template.name, label: template.name, icon: template.icon.name, 
               route: { name: 'create-event', params: { contextId: this.contextId, templateId: template._id } }
             })
           })

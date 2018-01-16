@@ -33,7 +33,7 @@ import { QStepper, QStep, QBtn, QTooltip, uid } from 'quasar'
 
 const defaultStep = {
   title: 'New step',
-  icon: 'check',
+  icon: { name: 'check', color: 'dark' },
   description: 'Step content'
 }
 
