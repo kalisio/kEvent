@@ -53,7 +53,6 @@ export default {
         }
       }
       schema.required.push('interaction')
-      console.log(schema)
       return schema
     }
   },
@@ -97,7 +96,6 @@ export default {
           this.participantStep = {}
         }
       }
-      console.log(this.participantState, this.participantStep)
       let action = this.getAction('follow-up')
       if (this.participantStep.stakeholder === 'participant') {
         this.followUpLabel = 'Coordinator is waiting for your input'
