@@ -30,7 +30,7 @@
       "maxLength": 256,
       "default": "Step content",
       "field": {
-        "component": "form/KTextField",
+        "component": "form/KTextareaField",
         "label": "Step description",
         "helper": "Enter the step description"
       }

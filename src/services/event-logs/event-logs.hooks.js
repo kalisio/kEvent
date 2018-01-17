@@ -1,4 +1,5 @@
 import { hooks } from 'kCore'
+import { sendStateNotifications } from '../../hooks'
 
 module.exports = {
   before: {
@@ -15,7 +16,7 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [ sendStateNotifications ],
     update: [],
     patch: [],
     remove: []

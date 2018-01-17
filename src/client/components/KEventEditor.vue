@@ -51,6 +51,8 @@ export default {
         .then(template => {
           // Set the template as reference values
           this._object = template
+          // But remove id so that event has its own
+          delete template._id
           this.fillEditor()
         })
       }

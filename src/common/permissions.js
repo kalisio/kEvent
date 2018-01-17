@@ -22,7 +22,7 @@ export function defineEventAbilities (subject, can, cannot) {
                 }
               })
             }
-            can('read', 'event-logs', { context: organisation._id, 'participant': subject._id })
+            can(['read', 'create'], 'event-logs', { context: organisation._id, 'participant': subject._id })
           }
         }
         if (role >= permissions.Roles.manager) {

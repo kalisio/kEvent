@@ -20,7 +20,7 @@
       "type": "string", 
       "maxLength": 256,
       "field": {
-        "component": "form/KTextField",
+        "component": "form/KTextareaField",
         "label": "Description",
         "helper": "Enter a description of this event"
       }

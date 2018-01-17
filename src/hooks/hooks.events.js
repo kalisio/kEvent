@@ -41,6 +41,6 @@ export async function sendNotifications (hook) {
     }))
   })
   let results = await Promise.all(publishPromises)
-  debug('Published notifications on ' + results.length + ' topics for event ' + hook.result._id.toString())
+  debug('Published event notifications on ' + results.length + ' topics/users for event ' + hook.result._id.toString())
   return hook
 }

@@ -37,7 +37,7 @@ export default {
       return ''
     },
     participantSchema () {
-      if (!this.schema || !this.participantStep.interaction) return null
+      if (!this.schema || !this.hasInteraction(this.participantStep)) return null
       // Start from schema template
       let schema = _.merge({}, this.schema)
       // Then add step interaction
@@ -80,47 +80,74 @@ export default {
       if (this.isParticipant) this.isFollowUpOpen = !this.isFollowUpOpen
       if (this.isCoordinator) this.isParticipantsOpen = !this.isParticipantsOpen
     },
-    refreshParticipantState (logs) {
+    hasInteraction (step) {
+      return !_.isEmpty(step.interaction)
+    },
+    getParticipantStep (state = {}) {
+      const currentStepIndex = this.item.workflow.findIndex(step => step.name === state.step)
       // No log yet, the user is at the first step of the workflow
+      if (currentStepIndex < 0) {
+        return this.item.workflow[0]
+      }
+      const currentStep = this.item.workflow[currentStepIndex]
+      // For interacting steps check if interaction already recorded
+      if (this.hasInteraction(currentStep) && !this.hasInteraction(state)) {
+        return currentStep
+      }
+      const nextStepIndex = currentStepIndex + 1
+      // End of workflow or next step to be fulfilled ?
+      if (nextStepIndex >= 0 && nextStepIndex < this.item.workflow.length) {
+        return this.item.workflow[nextStepIndex]
+      } else {
+        return currentStep
+      }
+    },
+    refreshParticipantState (logs) {
       if (logs.total === 0) {
-        this.participantStep = this.item.workflow[0]
+        // No log yet => initiate the workflow by a log acting as a read receipt
         this.participantState = {}
+        this.participantStep = this.getParticipantStep()
+        let log = this.createParticipantLog()
+        this.serviceCreate(log)
+        // Real-time event should trigger a new refresh for current state
+        return
       } else {
         this.participantState = logs.data[0]
-        const previousStep = this.item.workflow.findIndex(step => step.name === this.participantState.step)
-        const nextStep = (previousStep >= 0 ? previousStep + 1 : -1)
-        // End of workflow or next step to be fulfilled ?
-        if (nextStep >= 0 && nextStep < this.item.workflow.length) {
-          this.participantStep = this.item.workflow[nextStep]
-        } else {
-          this.participantStep = {}
+        this.participantStep = this.getParticipantStep(this.participantState)
+        // When participant has just fullfilled a step we need to initiate the next one (if any) by a log acting as a read receipt
+        // We know this when we get a different step from the current state
+        if (this.participantState.step !== this.participantStep.name) {
+          let log = this.createParticipantLog()
+          this.serviceCreate(log)
+          // Real-time event should trigger a new refresh for current state
+          return
         }
       }
       let action = this.getAction('follow-up')
-      if (this.participantStep.stakeholder === 'participant') {
+      if (!this.hasInteraction(this.participantStep)) {
+        delete action.warning
+      } else if (this.participantStep.stakeholder === 'participant') {
         this.followUpLabel = 'Coordinator is waiting for your input'
         action.warning = 'Action required'
         action.handler = this.followUp
+        // We can then load the schema and local refs in parallel
+        return Promise.all([
+          this.loadSchema(),
+          this.loadRefs()
+        ])
+        .then(_ => this.$refs.participantForm.build())
       } else if (this.participantStep.stakeholder === 'coordinator') {
-        this.followUpLabel = 'Coordinator will give you feedback'
+        this.followUpLabel = 'Waiting for coordinator feedback'
         action.warning = 'Waiting coordination'
         action.handler = this.followUp
-      } else {
-        delete action.warning
       }
-      // We can then load the schema and local refs in parallel
-      return Promise.all([
-        this.loadSchema(),
-        this.loadRefs()
-      ])
-      .then(_ => this.$refs.participantForm.build())
     },
     refreshParticipantLog () {
       return this.loadService().find({
         query: {
-          $sort: { _id: 1 },
+          $sort: { _id: -1 },
           $limit: 1,
-          participant: this.participant,
+          participant: this.userId,
           event: this.item._id
         }
       })
@@ -142,7 +169,7 @@ export default {
       return this.loadService().find({
         query: {
           $limit: 0,
-          //stakeholder: 'coordinator',
+          stakeholder: 'coordinator',
           event: this.item._id
         }
       })
@@ -153,6 +180,7 @@ export default {
       const user = this.$store.get('user')
       if (user) {
         this.userId = user._id
+        // Check user role in event
         this.isParticipant = _.findIndex(this.item.participants, participant => {
           if (participant.service === 'members' && participant._id === user._id) return true
           if (participant.service === 'groups' || participant.service === 'organisations') {
@@ -166,35 +194,40 @@ export default {
         this.isCoordinator = _.findIndex(this.item.coordinators, coordinator => {
           return (coordinator === user._id)
         }) >= 0
+        // Update according to user role
         if (this.isParticipant) this.refreshParticipantLog()
         if (this.isCoordinator) this.refreshCoordinatorLog()
       }
     },
-    logParticipantState () {
+    createParticipantLog(baseLog = {}) {
+      let log = {
+        type: 'Feature',
+        participant: this.userId,
+        event: this.item._id,
+        step: this.participantStep.name,
+        stakeholder: this.participantStep.stakeholder,
+        properties: {}
+      }
+      // Participant position as geometry
+      const position = this.$store.get('user.position')
+      if (position) {
+        log.geometry = {
+          type: 'Point',
+          coordinates: [position.longitude, position.latitude]
+        }
+      }
+      return _.merge(log, baseLog)
+    },
+    async logParticipantState (event, done) {
       let form = this.$refs.participantForm
       let result = form.validate()
       if (result.isValid) {
         // Directly store as GeoJson objects
-        let log = {
-          type: 'Feature',
-          participant: this.userId,
-          event: this.item._id,
-          step: this.step.name,
-          stakeholder: 'participant',
-          properties: {}
-        }
-        // Interaction stored as feature properties for mapping
-        Object.assign(log.properties, result.values)
-        // Participant position as geometry
-        const position = this.$store.get('user.position')
-        if (position) {
-          log.geometry = {
-            type: 'Point',
-            coordinates: [position.longitude, position.latitude]
-          }
-        }
-        this.serviceCreate(log) 
+        // FIXME: what to store as feature properties for mapping ?
+        let log = this.createParticipantLog(result.values)
+        await this.serviceCreate(log)
       }
+      done()
     }
   },
   created () {
@@ -202,11 +235,10 @@ export default {
     this.$options.components['k-card'] = this.$load('collection/KCard')
     this.$options.components['k-form'] = this.$load('form/KForm')
     // Set the required actor
-    this.refresh()
-    Events.$on('user-changed', this.refresh)
+    Events.$on('user-position-changed', this.refresh)
   },
   beforeDestroy() {
-    Events.$off('user-changed', this.refresh)
+    Events.$off('user-position-changed', this.refresh)
   }
 }
 </script>
