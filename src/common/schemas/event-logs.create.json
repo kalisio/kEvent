@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "http://www.kalisio.xyz/schemas/event-log.create.json#",
+  "title": "Event Log Creation",
+  "description": "Event log creation schema",
+  "type": "object",
+  "properties": {
+    "comment": {
+      "type": "string", 
+      "field": {
+        "component": "form/KTextareaField",
+        "label": "Comment",
+        "helper": "Enter your comment for this step"
+      }
+    }
+  },
+  "required": ["comment"]
+}

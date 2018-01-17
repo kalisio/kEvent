@@ -4,7 +4,7 @@
       <k-form ref="templateForm" :schema="schema" />
       </br>
       <p class="col-10 caption text-center">
-        <strong>Event workflow for this template</strong>: you can manage below the different steps each actor of the event might be able to fulfill.
+        <strong>Event workflow for this template</strong>: you can manage below the different steps each participant of the event might be able to fulfill.
       </p>
       <k-event-workflow-form ref="workflowForm" schemaName="event-workflow" :id="id" />
     </div>

@@ -92,9 +92,8 @@ export default {
         route: { name: 'add-media', params: { contextId: this.contextId } }
       })
       this.registerAction('event', { 
-        name: 'run-event', label: 'Follow', icon: 'message', scope: 'pane',
-        permissions: { operation: 'update', service: 'events', context: this.contextId },
-        route: { name: 'run-event', params: { contextId: this.contextId } }
+        name: 'follow-up', label: 'Follow up', icon: 'message', scope: 'pane',
+        permissions: { operation: 'create', service: 'event-logs', context: this.contextId }
       })
       this.registerAction('event', { 
         name: 'map-event', label: 'Map', icon: 'map', scope: 'pane',

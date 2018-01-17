@@ -1,6 +1,8 @@
+import { hooks } from 'kCore'
+
 module.exports = {
   before: {
-    all: [],
+    all: [ hooks.convertObjectIDs(['participant', 'event']) ],
     find: [],
     get: [],
     create: [],

@@ -125,13 +125,16 @@ describe('kEvent', () => {
   })
 
   it('org manager can create events', () => {
-    return eventService.create({ title: 'event', actors: [{ _id: userObject._id }] }, { user: orgManagerObject, checkAuthorisation: true })
+    return eventService.create({ title: 'event', participants: [{ _id: userObject._id }] }, { user: orgManagerObject, checkAuthorisation: true })
     .then(event => {
       eventObject = event
       return eventService.find({ query: { title: 'event' }, user: orgManagerObject, checkAuthorisation: true })
     })
     .then(events => {
       expect(events.data.length > 0).beTrue()
+      eventObject = events.data[0]
+      expect(eventObject.coordinators.length > 0).beTrue()
+      expect(eventObject.coordinators[0].toString()).to.equal(orgManagerObject._id.toString())
     })
   })
 
@@ -153,7 +156,7 @@ describe('kEvent', () => {
     })
   })
 
-  it('members cannot access events when they are not actors', () => {
+  it('members cannot access events when they are not participants', () => {
     return eventService.find({ query: {}, user: orgUserObject, checkAuthorisation: true })
     .then(events => {
       expect(events.data.length === 0).beTrue()
@@ -161,18 +164,18 @@ describe('kEvent', () => {
   })
 
   it('org manager can update events', () => {
-    return eventService.patch(eventObject._id, { actors: [{ _id: orgUserObject._id }] }, { user: orgManagerObject, checkAuthorisation: true })
+    return eventService.patch(eventObject._id, { participants: [{ _id: orgUserObject._id }] }, { user: orgManagerObject, checkAuthorisation: true })
     .then(event => {
       eventObject = event
       return eventService.find({ query: { title: 'event' }, user: orgManagerObject, checkAuthorisation: true })
     })
     .then(events => {
       expect(events.data.length > 0).beTrue()
-      expect(events.data[0].actors).to.deep.equal([{ _id: orgUserObject._id }])
+      expect(events.data[0].participants).to.deep.equal([{ _id: orgUserObject._id }])
     })
   })
 
-  it('members can access events when they are actors', () => {
+  it('members can access events when they are participants', () => {
     return eventService.find({ query: {}, user: orgUserObject, checkAuthorisation: true })
     .then(events => {
       expect(events.data.length === 1).beTrue()

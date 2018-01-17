@@ -14,5 +14,6 @@ export default function init () {
   logger.debug('Initializing kalisio event')
   
   api.declareService('events', { context: true })
+  api.declareService('event-logs', { context: true })
   api.declareService('event-templates', { context: true })
 }

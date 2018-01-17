@@ -10,21 +10,24 @@ export function defineEventAbilities (subject, can, cannot) {
           // The unique identifier of a service is its path not its name.
           // Indeed we have for instance a 'events' service in each organisation.
           can('service', organisation._id.toString() + '/events')
-          // A simple user can access events in which he is an actor or his group or his org
+          can('service', organisation._id.toString() + '/event-logs')
+          // A simple user can access events in which he is a participant or his group or his org
           if (role < permissions.Roles.manager) {
-            can('read', 'events', { context: organisation._id, 'actors._id': subject._id })
-            can('read', 'events', { context: organisation._id, 'actors._id': organisation._id })
+            can('read', 'events', { context: organisation._id, 'participants._id': subject._id })
+            can('read', 'events', { context: organisation._id, 'participants._id': organisation._id })
             if (subject.groups) {
               subject.groups.forEach(group => {
                 if (group.context.toString() === organisation._id.toString()) {
-                  can('read', 'events', { context: organisation._id, 'actors._id': group._id })
+                  can('read', 'events', { context: organisation._id, 'participants._id': group._id })
                 }
               })
             }
+            can('read', 'event-logs', { context: organisation._id, 'participant': subject._id })
           }
         }
         if (role >= permissions.Roles.manager) {
           can('all', 'events', { context: organisation._id })
+          can('all', 'event-logs', { context: organisation._id })
           // The unique identifier of a service is its path not its name.
           // Indeed we have for instance a 'events' service in each organisation.
           can('service', organisation._id.toString() + '/event-templates')

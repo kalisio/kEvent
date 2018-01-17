@@ -25,7 +25,7 @@
         "helper": "Enter a description of this event"
       }
     },
-    "actors": { 
+    "participants": { 
       "type": "array",
       "multiselect": true,
       "uniqueItems": true,
@@ -56,8 +56,8 @@
       }],
       "field": {
         "component": "form/KItemField",
-        "label": "Actors",
-        "helper": "Select event actors"
+        "label": "Participants",
+        "helper": "Select event participants"
       }
     },
     "coordinators": { 
@@ -80,6 +80,6 @@
       }
     }
   },
-  "required": ["name", "description", "actors", "coordinators"]
+  "required": ["name", "description", "participants", "coordinators"]
 }
 

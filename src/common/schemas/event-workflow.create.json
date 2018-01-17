@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-06/schema#",
   "$id": "http://www.kalisio.xyz/schemas/event-workflow.create.json#",
-  "title": "Event Template Step Creation",
+  "title": "Event Workflow Creation",
   "description": "Event workflow creation schema",
   "type": "object",
   "properties": {
@@ -42,8 +42,21 @@
         "label": "Step interaction",
         "helper": "Enter the step interaction"
       }
+    },
+    "stakeholder": {
+      "type": "string",
+      "default": "participant",
+      "field": {
+        "component": "form/KSelectField",
+        "label": "Stakeholder",
+        "helper": "Select the stakeholder",
+        "options": [
+          { "label": "Participant", "value": "participant", "color": "yellow" },
+          { "label": "Coordinator", "value": "coordinator", "color": "grey" }
+        ]
+      }
     }
   },
-  "required": ["title", "icon", "description", "interaction"]
+  "required": ["title", "icon", "description", "interaction", "stakeholder"]
 }
 
