@@ -93,7 +93,9 @@ export default {
       })
       this.registerAction('event', { 
         name: 'follow-up', label: 'Follow up', icon: 'message', scope: 'pane',
-        permissions: { operation: 'create', service: 'event-logs', context: this.contextId }
+        permissions: { operation: 'create', service: 'event-logs', context: this.contextId },
+        // FIXME: does not work as this is the KCard not the KEventCard
+        //handler: item => this.followUp() // Delegated to items
       })
       this.registerAction('event', { 
         name: 'map-event', label: 'Map', icon: 'map', scope: 'pane',

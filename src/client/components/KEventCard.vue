@@ -2,14 +2,15 @@
   <k-card v-bind="$props">
     <q-icon slot="card-icon" :name="icon"></q-icon>
     <div slot="card-content">
-      <q-collapsible v-if="isParticipant" :opened="isFollowUpOpen" :label="followUpLabel">
-        <k-form ref="participantForm" :schema="participantSchema"/>
-        <q-btn id="save-button" color="primary" @click="logParticipantState" loader>Save</q-btn>
-      </q-collapsible>
-      <q-collapsible v-if="isCoordinator" :opened="isParticipantsOpen" :label="participantsLabel">
-        TODO
-      </q-collapsible>
+      <div v-if="isParticipant">{{participantLabel}}</div>
+      </br>
+      <div v-if="isCoordinator">{{coordinatorLabel}}</div>
     </div>
+    <k-modal ref="modal" v-if="hasParticipantInteraction" :title="title" :toolbar="toolbar" :buttons="buttons" :route="false" >
+      <div slot="modal-content">
+        <k-form ref="form" :schema="schema"/>
+      </div>
+    </k-modal>
   </k-card>
 </template>
 
@@ -25,7 +26,7 @@ export default {
     mixins.baseItem,
     mixins.service,
     mixins.schemaProxy,
-    mixins.refsResolver(['participantForm'])
+    mixins.refsResolver(['form'])
   ],
   components: {
     QIcon, QBtn, QChip, QCollapsible
@@ -36,24 +37,11 @@ export default {
       if (this.participantStep.icon) return this.participantStep.icon.name
       return ''
     },
-    participantSchema () {
-      if (!this.schema || !this.hasInteraction(this.participantStep)) return null
-      // Start from schema template
-      let schema = _.merge({}, this.schema)
-      // Then add step interaction
-      const interaction = this.participantStep.interaction.map(option => { return { label: option, value: option } })
-      schema.properties['interaction'] = {
-        type: 'string',
-        default: interaction[0].value,
-        field: {
-          component: 'form/KSelectField',
-          label: this.participantStep.title,
-          helper: this.participantStep.description,
-          options: interaction
-        }
-      }
-      schema.required.push('interaction')
-      return schema
+    title () {
+      return this.participantStep.title ? this.participantStep.title : 'Enter your choice'
+    },
+    hasParticipantInteraction () {
+      return this.waitingParticipantInteraction(this.participantStep, this.participantState)
     }
   },
   data () {
@@ -63,10 +51,18 @@ export default {
       isCoordinator: false,
       participantStep: {},
       participantState: {},
-      isFollowUpOpen: false,
-      followUpLabel: '',
-      isParticipantsOpen: false,
-      participantsLabel: ''
+      participantLabel: '',
+      coordinatorLabel: '',
+      toolbar: [{ 
+        name: 'close', 
+        icon: 'close', 
+        handler: () => this.$refs.modal.close()
+      }],
+      buttons: [{
+        name: 'Save',
+        color: 'primary',
+        handler: (event, done) => this.logParticipantState(event, done),
+      }]
     }
   },
   methods: {
@@ -76,12 +72,41 @@ export default {
     getSchemaName () {
       return 'event-logs.create'
     },
+    loadSchema () {
+      // Call super
+      return mixins.schemaProxy.methods.loadSchema.call(this)
+      .then(schema => {
+        // Start from schema template and clone it because it will be shared by all cards
+        this.schema = _.cloneDeep(schema)
+        // Then add step interaction
+        const interaction = this.participantStep.interaction.map(option => { return { label: option, value: option } })
+        this.schema.properties['interaction'] = {
+          type: 'string',
+          default: interaction[0].value,
+          field: {
+            component: 'form/KSelectField',
+            label: this.participantStep.title,
+            helper: this.participantStep.description,
+            options: interaction
+          }
+        }
+        this.schema.required.push('interaction')
+        return this.schema
+      })
+    },
     followUp () {
-      if (this.isParticipant) this.isFollowUpOpen = !this.isFollowUpOpen
-      if (this.isCoordinator) this.isParticipantsOpen = !this.isParticipantsOpen
+      console.log(this.item, this.$route.params)
+      if (this.hasParticipantInteraction) {
+        this.$refs.modal.open()
+      } else if (this.isCoordinator) {
+        this.$router.push({ name: 'event-activity', params: { id: this.item._id, contextId: this.$route.params.contextId } })
+      }
     },
     hasInteraction (step) {
       return !_.isEmpty(step.interaction)
+    },
+    waitingParticipantInteraction (step, state) {
+      return (this.hasInteraction(step) && !this.hasInteraction(state) && (step.stakeholder === 'participant'))
     },
     getParticipantStep (state = {}) {
       const currentStepIndex = this.item.workflow.findIndex(step => step.name === state.step)
@@ -91,7 +116,7 @@ export default {
       }
       const currentStep = this.item.workflow[currentStepIndex]
       // For interacting steps check if interaction already recorded
-      if (this.hasInteraction(currentStep) && !this.hasInteraction(state)) {
+      if (this.waitingParticipantInteraction(currentStep, state)) {
         return currentStep
       }
       const nextStepIndex = currentStepIndex + 1
@@ -103,6 +128,7 @@ export default {
       }
     },
     refreshParticipantState (logs) {
+      console.log('participant logs', logs)
       if (logs.total === 0) {
         // No log yet => initiate the workflow by a log acting as a read receipt
         this.participantState = {}
@@ -123,24 +149,26 @@ export default {
           return
         }
       }
+      // Clear current card/action state
       let action = this.getAction('follow-up')
-      if (!this.hasInteraction(this.participantStep)) {
-        delete action.warning
-      } else if (this.participantStep.stakeholder === 'participant') {
-        this.followUpLabel = 'Coordinator is waiting for your input'
+      delete action.warning
+      action.handler = this.followUp
+      this.participantLabel = ''
+      if (this.waitingParticipantInteraction(this.participantStep, this.participantState)) {
+        this.participantLabel = 'Coordinator is waiting for your input'
         action.warning = 'Action required'
-        action.handler = this.followUp
+        console.log('participant action', action)
         // We can then load the schema and local refs in parallel
-        return Promise.all([
+        Promise.all([
           this.loadSchema(),
           this.loadRefs()
         ])
-        .then(_ => this.$refs.participantForm.build())
+        .then(_ => this.$refs.form.build())
       } else if (this.participantStep.stakeholder === 'coordinator') {
-        this.followUpLabel = 'Waiting for coordinator feedback'
-        action.warning = 'Waiting coordination'
-        action.handler = this.followUp
+          this.participantLabel = 'Waiting for coordinator feedback'
+          action.warning = 'Waiting coordination'
       }
+      console.log('participant action', action)
     },
     refreshParticipantLog () {
       return this.loadService().find({
@@ -155,21 +183,25 @@ export default {
       .subscribe(this.refreshParticipantState)
     },
     refreshCoordinatorState (logs) {
+      console.log('coordinator logs', logs)
+      // Clear current card/action state
       let action = this.getAction('follow-up')
+      delete action.warning
+      action.handler = this.followUp
       if (logs.total > 0) {
-        this.participantsLabel = logs.total + ' awaiting participants'
+        this.coordinatorLabel = logs.total + ' participants awaiting coordination'
         action.warning = 'Action required'
-        action.handler = this.followUp
       } else {
-        this.participantsLabel = 'No awaiting participants'
-        delete action.warning
+        this.coordinatorLabel = 'No participants awaiting coordination'
       }
+      console.log('coordinator action', action)
     },
     refreshCoordinatorLog () {
       return this.loadService().find({
         query: {
           $limit: 0,
           stakeholder: 'coordinator',
+          interaction: { $exists: false },
           event: this.item._id
         }
       })
@@ -194,9 +226,14 @@ export default {
         this.isCoordinator = _.findIndex(this.item.coordinators, coordinator => {
           return (coordinator === user._id)
         }) >= 0
+        console.log('refresh ', this.isParticipant, this.isCoordinator, user)
         // Update according to user role
-        if (this.isParticipant) this.refreshParticipantLog()
-        if (this.isCoordinator) this.refreshCoordinatorLog()
+        if (this.isParticipant) {
+          this.refreshParticipantLog()
+        }
+        if (this.isCoordinator) {
+          this.refreshCoordinatorLog()
+        }
       }
     },
     createParticipantLog(baseLog = {}) {
@@ -216,11 +253,12 @@ export default {
           coordinates: [position.longitude, position.latitude]
         }
       }
-      return _.merge(log, baseLog)
+      _.merge(log, baseLog)
+      console.log('creating log', log)
+      return log
     },
     async logParticipantState (event, done) {
-      let form = this.$refs.participantForm
-      let result = form.validate()
+      let result = this.$refs.form.validate()
       if (result.isValid) {
         // Directly store as GeoJson objects
         // FIXME: what to store as feature properties for mapping ?
@@ -233,12 +271,15 @@ export default {
   created () {
     // Load the required components
     this.$options.components['k-card'] = this.$load('collection/KCard')
+    this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-form'] = this.$load('form/KForm')
     // Set the required actor
-    Events.$on('user-position-changed', this.refresh)
+    // Because we can have multiple cards we need a listener per card
+    this.refreshOnGeolocation = _ => this.refresh()
+    Events.$on('user-position-changed', this.refreshOnGeolocation)
   },
   beforeDestroy() {
-    Events.$off('user-position-changed', this.refresh)
+    Events.$off('user-position-changed', this.refreshOnGeolocation)
   }
 }
 </script>
