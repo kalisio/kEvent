@@ -30,7 +30,7 @@ export function toFeatureCollection (hook) {
   // Declare the output GeoJson collection
   let collection = {
     type: 'FeatureCollection',
-    features: hook.result
+    features: hook.result.data
   }
   // Replace the items within the hook with the collection
   replaceItems(hook, collection)
