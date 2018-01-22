@@ -25,6 +25,14 @@
         "helper": "Enter a description of this event"
       }
     },
+    "location": {
+      "type": "object", 
+      "field": {
+        "component": "KLocationField",
+        "label": "Location",
+        "helper": "Enter the location of this event"
+      }
+    },
     "participants": { 
       "type": "array",
       "multiselect": true,

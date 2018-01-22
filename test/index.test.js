@@ -7,7 +7,7 @@ import event, { hooks, permissions } from '../src'
 
 describe('kEvent', () => {
   let app, userService, userObject, orgManagerObject, orgObject, orgUserObject, orgService,
-      authorisationService, eventService, eventObject, eventTemplateService
+      authorisationService, eventService, eventObject, eventTemplateService, eventLogService
   
   before(() => {
     chailint(chai, util)
@@ -90,6 +90,9 @@ describe('kEvent', () => {
       // This should create a service for organisation event templates
       eventTemplateService = app.getService('event-templates', org)
       expect(eventTemplateService).toExist()
+      // This should create a service for organisation event templates
+      eventLogService = app.getService('event-logs', org)
+      expect(eventLogService).toExist()
     })
   })
 
@@ -226,6 +229,7 @@ describe('kEvent', () => {
     orgService.Model.drop()
     eventService.Model.drop()
     eventTemplateService.Model.drop()
+    eventLogService.Model.drop()
     app.db.instance.dropDatabase()
   })
 })
