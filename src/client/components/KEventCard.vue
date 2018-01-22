@@ -170,9 +170,13 @@ export default {
       }
       console.log('participant action', action)
     },
-    refreshParticipantLog () {
-      return this.loadService().find({
-        query: {
+    subscribeParticipantLog () {
+      // Remove previous listener if any
+      this.unsubscribeParticipantLog()
+      this.participantLogListener = this.loadService().find({
+        rx: {
+          listStrategy: 'always'
+        }, query: {
           $sort: { _id: -1 },
           $limit: 1,
           participant: this.userId,
@@ -181,6 +185,12 @@ export default {
       })
       // We can then load the last state of the user
       .subscribe(this.refreshParticipantState)
+    },
+    unsubscribeParticipantLog () {
+      if (this.participantLogListener) {
+        this.participantLogListener.unsubscribe()
+        this.participantLogListener = null
+      }
     },
     refreshCoordinatorState (logs) {
       console.log('coordinator logs', logs)
@@ -196,9 +206,13 @@ export default {
       }
       console.log('coordinator action', action)
     },
-    refreshCoordinatorLog () {
-      return this.loadService().find({
-        query: {
+    subscribeCoordinatorLog () {
+      // Remove previous listener if any
+      this.unsubscribeCoordinatorLog()
+      this.coordinatorLogListener = this.loadService().find({
+        rx: {
+          listStrategy: 'always'
+        }, query: {
           $limit: 0,
           stakeholder: 'coordinator',
           interaction: { $exists: false },
@@ -207,6 +221,12 @@ export default {
       })
       // We can then load the last state of the user
       .subscribe(this.refreshCoordinatorState)
+    },
+    unsubscribeCoordinatorLog () {
+      if (this.coordinatorLogListener) {
+        this.coordinatorLogListener.unsubscribe()
+        this.coordinatorLogListener = null
+      }
     },
     refresh () {
       const user = this.$store.get('user')
@@ -229,10 +249,10 @@ export default {
         console.log('refresh ', this.isParticipant, this.isCoordinator, user)
         // Update according to user role
         if (this.isParticipant) {
-          this.refreshParticipantLog()
+          this.subscribeParticipantLog()
         }
         if (this.isCoordinator) {
-          this.refreshCoordinatorLog()
+          this.subscribeCoordinatorLog()
         }
       }
     },
@@ -280,6 +300,8 @@ export default {
   },
   beforeDestroy() {
     Events.$off('user-position-changed', this.refreshOnGeolocation)
+    this.unsubscribeParticipantLog()
+    this.unsubscribeCoordinatorLog()
   }
 }
 </script>
