@@ -1,7 +1,7 @@
 <template>
   <div v-if="id !== ''" class="column justify-center full-width">
     <div class="full-width full-height">
-      <k-map  />
+      <div id="map" :style="mapStyle()"></div>
     </div>
     <div>
       <router-view service="events" :router="router()"></router-view>
@@ -11,11 +11,17 @@
 
 <script>
 import { Store, mixins as kCoreMixins } from 'kCore/client'
-import { Dialog } from 'quasar'
+import { mixins as kMapMixins } from 'kMap/client'
 
 export default {
   name: 'k-event-activity',
-  mixins: [kCoreMixins.baseActivity],
+  mixins: [
+    kCoreMixins.baseActivity,
+    kMapMixins.map.baseMap,
+    kMapMixins.map.baseLayers,
+    kMapMixins.map.geojsonLayers,
+    kMapMixins.map.serviceLayers
+  ],
   props: {
     contextId: {
       type: String,
@@ -40,17 +46,6 @@ export default {
       .then(event => {
         this.setTitle(event.name)
       })
-      // Tabbar actions
-     /* this.registerTabAction({ 
-        name: 'event-properties', label: 'Properties', icon: 'description',
-        route: { name: 'event-activity', params: { contextId: this.contextId, id: this.id, pane: 'properties' } },
-        default: true
-      })
-      this.registerTabAction({ 
-        name: 'event-map', label: 'Map', icon: 'map',
-        route: { name: 'event-activity', params: { contextId: this.contextId, id: this.id, pane: 'map' } },
-        default: true
-      }) */
       // Fab actions
       this.registerFabAction({ 
         name: 'browse-media', label: 'Browse media', icon: 'collections', 
@@ -60,12 +55,23 @@ export default {
         name: 'edit-event', label: 'Properties', icon: 'description', 
         route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', id: this.id } } 
       })
-      // Item actions
+    },
+    mapStyle () {
+      return { 
+        width: '100%', 
+        height: '100%',
+        fontWeight: 'normal', 
+        zIndex: 0, 
+        position: 'absolute' 
+      }
     }
   },
-  created () {
-    // Load the required components
-    this.$options.components['k-map'] = this.$load('KMap')
+  mounted () {
+    this.setupMap()
+    this.addServiceLayer('Actors', 'event-logs', { event: this.id })
+  },
+  beforeDestroy () {
+    this.removeServiceLayer('Actors')
   }
 }
 </script>
