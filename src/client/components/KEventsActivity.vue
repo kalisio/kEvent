@@ -3,7 +3,7 @@
     <!-- 
       Events collection
      -->
-    <k-grid service="events" :base-query="baseQuery" :renderer="renderer" :actions="actions.event" />
+    <k-grid service="events" :base-query="baseQuery" :renderer="renderer" :contextId="contextId" />
     <!-- 
       Router view to enable routing to modals
      -->
@@ -14,7 +14,6 @@
 <script>
 import { Store, mixins as kCoreMixins } from 'kCore/client'
 import { mixins as kMapMixins } from 'kMap/client'
-import { Dialog } from 'quasar'
 
 export default {
   name: 'k-events-activity',
@@ -74,50 +73,6 @@ export default {
           })
         })
       }
-      // Item actions
-      this.registerAction('event', { 
-        name: 'remove-event', label: 'Remove', icon: 'remove_circle', scope: 'menu',
-        permissions: { operation: 'remove', service: 'events', context: this.contextId },
-        handler: this.removeEvent
-      })
-      if (this.$can('update', 'events', this.contextId)) {
-        this.registerAction('event', { 
-          name: 'tag-member', label: 'Tag', icon: 'local_offer', scope: 'pane',
-          route: { name: 'tag-event', params: { contextId: this.contextId } }
-        })
-      }
-      this.registerAction('event', { 
-        name: 'add-media', label: 'Add a photo', icon: 'add_a_photo', scope: 'pane',
-        permissions: { operation: 'update', service: 'events', context: this.contextId },
-        route: { name: 'add-media', params: { contextId: this.contextId } }
-      })
-      this.registerAction('event', { 
-        name: 'follow-up', label: 'Follow up', icon: 'message', scope: 'pane',
-        permissions: { operation: 'create', service: 'event-logs', context: this.contextId },
-        // FIXME: does not work as this is the KCard not the KEventCard
-        //handler: item => this.followUp() // Delegated to items
-      })
-      this.registerAction('event', { 
-        name: 'map-event', label: 'Map', icon: 'map', scope: 'pane',
-        permissions: { operation: 'update', service: 'events', context: this.contextId },
-        route: { name: 'event-activity', params: { contextId: this.contextId } }
-      })
-    },
-    removeEvent (event) {
-      Dialog.create({
-        title: 'Remove \'' + event.name + '\' ?',
-        message: 'Are you sure you want to remove the event <b>' + event.name + '</b> ?',
-        buttons: [
-          'Cancel',
-          {
-            label: 'Ok',
-            handler: () => {
-              let eventsService = this.$api.getService('events')
-              eventsService.remove(event._id)
-            }
-          }
-        ]
-      })
     }
   },
   created () {

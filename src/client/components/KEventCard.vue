@@ -1,5 +1,5 @@
 <template>
-  <k-card v-bind="$props">
+  <k-card v-bind="$props" :itemActions="actions">
     <q-icon slot="card-icon" :name="icon"></q-icon>
     <div slot="card-content">
       <div v-if="isParticipant">{{participantLabel}}</div>
@@ -18,7 +18,7 @@
 import _ from 'lodash'
 import sift from 'sift'
 import { mixins } from 'kCore/client'
-import { Events, QIcon, QBtn, QChip, QCollapsible } from 'quasar'
+import { Events, QIcon, QBtn, QChip, Dialog, QCollapsible } from 'quasar'
 
 export default {
   name: 'k-event-card',
@@ -94,6 +94,54 @@ export default {
         return this.schema
       })
     },
+    refreshActions () {
+      // Item actions
+      this.clearActions()
+      if (this.$can('remove', 'events', this.contextId, this.item)) {
+        this.registerMenuAction({ 
+          name: 'remove-event', label: 'Remove', icon: 'remove_circle', handler: this.removeEvent
+        })
+      }
+      if (this.$can('update', 'events', this.contextId)) {
+        this.registerPaneAction({ 
+          name: 'tag-member', label: 'Tag', icon: 'local_offer',
+          route: { name: 'tag-event', params: { contextId: this.contextId } }
+        })
+      }
+      if (this.$can('update', 'events', this.contextId, this.item)) {
+        this.registerPaneAction({ 
+          name: 'add-media', label: 'Add a photo', icon: 'add_a_photo',
+          route: { name: 'add-media', params: { contextId: this.contextId } }
+        })
+      }
+      if (this.$can('create', 'event-logs', this.contextId, this.item)) {
+        this.registerPaneAction({ 
+          name: 'follow-up', label: 'Follow up', icon: 'message', handler: this.followUp
+        })
+      }
+      if (this.isCoordinator && this.$can('update', 'events', this.contextId, this.item)) {
+        this.registerPaneAction({ 
+          name: 'map-event', label: 'Map', icon: 'map', 
+          route: { name: 'event-activity', params: { contextId: this.contextId } }
+        })
+      }
+    },
+    removeEvent (event) {
+      Dialog.create({
+        title: 'Remove \'' + event.name + '\' ?',
+        message: 'Are you sure you want to remove the event <b>' + event.name + '</b> ?',
+        buttons: [
+          'Cancel',
+          {
+            label: 'Ok',
+            handler: () => {
+              let eventsService = this.$api.getService('events')
+              eventsService.remove(event._id)
+            }
+          }
+        ]
+      })
+    },
     followUp () {
       console.log(this.item, this.$route.params)
       if (this.hasParticipantInteraction) {
@@ -149,15 +197,12 @@ export default {
           return
         }
       }
-      // Clear current card/action state
+      
       let action = this.getAction('follow-up')
-      delete action.warning
-      action.handler = this.followUp
       this.participantLabel = ''
       if (this.waitingParticipantInteraction(this.participantStep, this.participantState)) {
         this.participantLabel = 'Coordinator is waiting for your input'
         action.warning = 'Action required'
-        console.log('participant action', action)
         // We can then load the schema and local refs in parallel
         Promise.all([
           this.loadSchema(),
@@ -194,10 +239,7 @@ export default {
     },
     refreshCoordinatorState (logs) {
       console.log('coordinator logs', logs)
-      // Clear current card/action state
       let action = this.getAction('follow-up')
-      delete action.warning
-      action.handler = this.followUp
       if (logs.total > 0) {
         this.coordinatorLabel = logs.total + ' participants awaiting coordination'
         action.warning = 'Action required'
@@ -296,6 +338,7 @@ export default {
     // Set the required actor
     // Because we can have multiple cards we need a listener per card
     this.refreshOnGeolocation = _ => this.refresh()
+    if (this.$store.get('user.position')) this.refreshOnGeolocation()
     Events.$on('user-position-changed', this.refreshOnGeolocation)
   },
   beforeDestroy() {

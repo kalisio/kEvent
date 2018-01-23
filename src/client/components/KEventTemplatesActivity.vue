@@ -3,7 +3,7 @@
     <!-- 
       Templates collection
      -->
-    <k-grid service="event-templates" :base-query="baseQuery" :actions="actions.template" />
+    <k-grid service="event-templates" :base-query="baseQuery" :renderer="renderer" :contextId="contextId" />
     <!-- 
       Router view to enable routing to modals
      -->
@@ -13,7 +13,6 @@
 
 <script>
 import { Store, mixins as kCoreMixins } from 'kCore/client'
-import { Dialog } from 'quasar'
 
 export default {
   name: 'k-event-templates-activity',
@@ -27,6 +26,17 @@ export default {
   computed: {
     baseQuery () {
       return {}
+    }
+  },
+  data () {
+    return {
+      renderer: { 
+        component: 'KEventTemplateCard', 
+        props: {
+          options: {
+          }
+        } 
+      }
     }
   },
   methods: {
@@ -56,33 +66,6 @@ export default {
           route: { name: 'create-event-template', params: {} }
         })
       }
-      // Item actions
-      this.registerAction('template', { 
-        name: 'remove-event-template', label: 'Remove', icon: 'remove_circle', scope: 'menu',
-        permissions: { operation: 'remove', service: 'event-templates', context: this.contextId },
-        handler: this.removeEventTemplate
-      })
-      this.registerAction('template', { 
-        name: 'edit-event-template', label: 'Edit', icon: 'description', scope: 'pane',
-        permissions: { operation: 'update', service: 'event-templates', context: this.contextId },
-        route: { name: 'edit-event-template', params: { contextId: this.contextId } }
-      })
-    },
-    removeEventTemplate (template) {
-      Dialog.create({
-        title: 'Remove <b>' + template.name + '</b> ?',
-        message: 'Are you sure you want to remove <b>' + template.name + '</b> ?',
-        buttons: [
-          {
-            label: 'Ok',
-            handler: () => {
-              let eventTemplatesService = this.$api.getService('event-templates')
-              eventTemplatesService.remove(template._id)
-            }
-          },
-          'Cancel'
-        ]
-      })
     }
   },
   created () {
