@@ -1,5 +1,5 @@
 <template>
-  <k-modal ref="modal" title="New event template" :toolbar="toolbar" :buttons="buttons" :route="true">
+  <k-modal ref="modal" :title="editorTitle" :toolbar="toolbar" :buttons="buttons" :route="true">
     <div slot="modal-content" class="column xs-gutter">
       <k-form ref="templateForm" :schema="schema" />
       </br>
@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import lodash from 'lodash'
 import { QToggle } from 'quasar'
 import { mixins } from 'kCore/client'
 
@@ -28,15 +29,19 @@ export default {
     mixins.refsResolver(['templateForm', 'workflowForm'])
   ],
   components: { QToggle },
+  computed: {
+    buttons () {
+      return [
+        { name: this.applyButton, color: 'primary', handler: (event, done) => this.apply(event, done) }
+      ]
+    }
+  },
   data () {
     return {
       hasWorkflow: false,
       toolbar: [
         { name: 'Close', icon: 'close', handler: () => this.doClose() }
-      ],
-      buttons: [
-        { name: 'Create', color: 'primary', handler: (event, done) => this.apply(event, done) }
-      ],
+      ]
     }
   },
   methods: {
@@ -54,7 +59,16 @@ export default {
     this.$options.components['k-form'] = this.$load('form/KForm')
     this.$options.components['k-event-workflow-form'] = this.$load('KEventWorkflowForm')
     // Default state
-    this.refresh().then(_ => this.setFormDisabled('workflowForm', true))
+    this.refresh().then(_ => {
+      // In edition mode activate workflow according to its existence
+      if (this.id) {
+        this.hasWorkflow = !lodash.isNil(this.getObject().workflow)
+        this.setFormDisabled('workflowForm', !this.hasWorkflow)
+      } else {
+        // In creation mode disabled by default
+        this.setFormDisabled('workflowForm', true)
+      }
+    })
     this.$on('applied', this.doClose)
   },
   beforeDestroy() {

@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-06/schema#",
   "$id": "http://www.kalisio.xyz/schemas/events.update.json#",
-  "title": "Event Creation",
-  "description": "Event creation schema",
+  "title": "<%= object.name %>",
+  "description": "Event update schema",
   "type": "object",
   "properties": {
     "name": {

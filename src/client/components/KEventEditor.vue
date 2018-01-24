@@ -1,5 +1,5 @@
 <template>
-  <k-modal ref="modal" title="New event" :toolbar="toolbar" :buttons="buttons" :route="true">
+  <k-modal ref="modal" :title="editorTitle" :toolbar="toolbar" :buttons="buttons" :route="true">
     <div slot="modal-content" class="column xs-gutter">
       <k-form ref="eventForm" :schema="schema" @field-changed="onFieldChanged" />
     </div>
@@ -25,14 +25,18 @@ export default {
       required: true
     }
   },
+  computed: {
+    buttons () {
+      return [
+        { name: this.applyButton, color: 'primary', handler: (event, done) => this.apply(event, done) }
+      ]
+    }
+  },
   data () {
     return {
       toolbar: [
         { name: 'Close', icon: 'close', handler: () => this.doClose() }
-      ],
-      buttons: [
-        { name: 'Create', color: 'primary', handler: (event, done) => this.apply(event, done) }
-      ],
+      ]
     }
   },
   methods: {

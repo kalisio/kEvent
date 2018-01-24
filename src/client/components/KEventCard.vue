@@ -108,7 +108,7 @@ export default {
           route: { name: 'edit-event', params: { contextId: this.contextId } }
         })
       }
-      if (this.$can('create', 'event-logs', this.contextId, this.item)) {
+      if (this.item.hasWorkflow && this.$can('create', 'event-logs', this.contextId, this.item)) {
         this.registerPaneAction({ 
           name: 'follow-up', label: 'Follow up', icon: 'message', handler: this.followUp
         })
@@ -285,7 +285,9 @@ export default {
         this.isCoordinator = _.findIndex(this.item.coordinators, coordinator => {
           return (coordinator === user._id)
         }) >= 0
-        // Update according to user role
+        // Update actions according to user role
+        this.refreshActions()
+        // Update content according to user role
         if (this.isParticipant) {
           this.subscribeParticipantLog()
         }
