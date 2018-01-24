@@ -1,12 +1,12 @@
 import { hooks } from 'kCore'
-import { sendStateNotifications } from '../../hooks'
+import { addLogDefaults, sendStateNotifications, updatePreviousLog } from '../../hooks'
 
 module.exports = {
   before: {
     all: [ hooks.convertObjectIDs(['participant', 'event']) ],
     find: [],
     get: [],
-    create: [],
+    create: [ addLogDefaults, updatePreviousLog ],
     update: [],
     patch: [],
     remove: []

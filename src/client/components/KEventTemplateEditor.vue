@@ -3,15 +3,19 @@
     <div slot="modal-content" class="column xs-gutter">
       <k-form ref="templateForm" :schema="schema" />
       </br>
-      <p class="col-10 caption text-center">
-        <strong>Event workflow for this template</strong>: you can manage below the different steps each participant of the event might be able to fulfill.
+      <p class="col-10 caption pull-left">
+        <q-toggle icon="fa-retweet" v-model="hasWorkflow" @change="onWorkflow"/>
+        <strong v-show="!hasWorkflow">Add a workflow to this template</strong>
+        <strong v-show="hasWorkflow">Workflow</strong>
+        <span v-show="hasWorkflow">: manage below the different steps each participant of the event will have to fulfill.</span>
       </p>
-      <k-event-workflow-form ref="workflowForm" schemaName="event-workflow" :id="id" />
+      <k-event-workflow-form v-show="hasWorkflow" ref="workflowForm" schemaName="event-workflow" :id="id" />
     </div>
   </k-modal>
 </template>
 
 <script>
+import { QToggle } from 'quasar'
 import { mixins } from 'kCore/client'
 
 export default {
@@ -23,8 +27,10 @@ export default {
     mixins.baseEditor(['templateForm', 'workflowForm']),
     mixins.refsResolver(['templateForm', 'workflowForm'])
   ],
+  components: { QToggle },
   data () {
     return {
+      hasWorkflow: false,
       toolbar: [
         { name: 'Close', icon: 'close', handler: () => this.doClose() }
       ],
@@ -34,6 +40,10 @@ export default {
     }
   },
   methods: {
+    onWorkflow (hasWorkflow) {
+      // Activate workflow form accordingly
+      this.setFormDisabled('workflowForm', !hasWorkflow)
+    },
     doClose () {
       this.$refs.modal.close(_ => this.$router.push({ name: 'event-templates-activity' }))
     }
@@ -43,7 +53,8 @@ export default {
     this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-form'] = this.$load('form/KForm')
     this.$options.components['k-event-workflow-form'] = this.$load('KEventWorkflowForm')
-    this.refresh()
+    // Default state
+    this.refresh().then(_ => this.setFormDisabled('workflowForm', true))
     this.$on('applied', this.doClose)
   },
   beforeDestroy() {

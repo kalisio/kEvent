@@ -102,21 +102,21 @@ export default {
           name: 'remove-event', label: 'Remove', icon: 'remove_circle', handler: this.removeEvent
         })
       }
-      if (this.$can('update', 'events', this.contextId)) {
+      if (this.$can('update', 'events', this.contextId, this.item)) {
         this.registerPaneAction({ 
-          name: 'tag-member', label: 'Tag', icon: 'local_offer',
-          route: { name: 'tag-event', params: { contextId: this.contextId } }
+          name: 'edit-event', label: 'Edit', icon: 'description',
+          route: { name: 'edit-event', params: { contextId: this.contextId } }
+        })
+      }
+      if (this.$can('create', 'event-logs', this.contextId, this.item)) {
+        this.registerPaneAction({ 
+          name: 'follow-up', label: 'Follow up', icon: 'message', handler: this.followUp
         })
       }
       if (this.$can('update', 'events', this.contextId, this.item)) {
         this.registerPaneAction({ 
           name: 'add-media', label: 'Add a photo', icon: 'add_a_photo',
           route: { name: 'add-media', params: { contextId: this.contextId } }
-        })
-      }
-      if (this.$can('create', 'event-logs', this.contextId, this.item)) {
-        this.registerPaneAction({ 
-          name: 'follow-up', label: 'Follow up', icon: 'message', handler: this.followUp
         })
       }
       if (this.isCoordinator && this.$can('update', 'events', this.contextId, this.item)) {
@@ -143,7 +143,6 @@ export default {
       })
     },
     followUp () {
-      console.log(this.item, this.$route.params)
       if (this.hasParticipantInteraction) {
         this.$refs.modal.open()
       } else if (this.isCoordinator) {
@@ -176,7 +175,6 @@ export default {
       }
     },
     refreshParticipantState (logs) {
-      console.log('participant logs', logs)
       if (logs.total === 0) {
         // No log yet => initiate the workflow by a log acting as a read receipt
         this.participantState = {}
@@ -213,7 +211,6 @@ export default {
           this.participantLabel = 'Waiting for coordinator feedback'
           action.warning = 'Waiting coordination'
       }
-      console.log('participant action', action)
     },
     subscribeParticipantLog () {
       // Remove previous listener if any
@@ -225,7 +222,8 @@ export default {
           $sort: { _id: -1 },
           $limit: 1,
           participant: this.userId,
-          event: this.item._id
+          event: this.item._id,
+          lastInEvent: true
         }
       })
       // We can then load the last state of the user
@@ -238,7 +236,6 @@ export default {
       }
     },
     refreshCoordinatorState (logs) {
-      console.log('coordinator logs', logs)
       let action = this.getAction('follow-up')
       if (logs.total > 0) {
         this.coordinatorLabel = logs.total + ' participants awaiting coordination'
@@ -246,7 +243,6 @@ export default {
       } else {
         this.coordinatorLabel = 'No participants awaiting coordination'
       }
-      console.log('coordinator action', action)
     },
     subscribeCoordinatorLog () {
       // Remove previous listener if any
@@ -258,7 +254,8 @@ export default {
           $limit: 0,
           stakeholder: 'coordinator',
           interaction: { $exists: false },
-          event: this.item._id
+          event: this.item._id,
+          lastInEvent: true
         }
       })
       // We can then load the last state of the user
@@ -288,7 +285,6 @@ export default {
         this.isCoordinator = _.findIndex(this.item.coordinators, coordinator => {
           return (coordinator === user._id)
         }) >= 0
-        console.log('refresh ', this.isParticipant, this.isCoordinator, user)
         // Update according to user role
         if (this.isParticipant) {
           this.subscribeParticipantLog()
@@ -316,7 +312,6 @@ export default {
         }
       }
       _.merge(log, baseLog)
-      console.log('creating log', log)
       return log
     },
     async logParticipantState (event, done) {

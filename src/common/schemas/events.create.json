@@ -86,8 +86,18 @@
         "label": "Coordinators",
         "helper": "Select event coordinators (other than yourself)"
       }
+    },
+    "hasWorkflow": {
+      "type": "boolean", 
+      "default": true,
+      "field": {
+        "component": "form/KToggleField",
+        "label": "Workflow",
+        "helper": "Activate workflow for this event",
+        "icon": "fa-retweet"
+      }
     }
   },
-  "required": ["name", "description", "participants", "coordinators"]
+  "required": ["name", "description", "participants", "coordinators", "hasWorkflow"]
 }
 
