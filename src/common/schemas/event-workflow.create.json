@@ -38,9 +38,13 @@
     "interaction": {
       "type": "array", 
       "field": {
-        "component": "form/KChipsField",
+        "component": "form/KChipsWithIconField",
         "label": "Step interaction",
-        "helper": "Enter the step interaction"
+        "helper": "Enter the step interaction",
+        "icon" : {
+          "name" : "label",
+          "color" : "red"
+        }
       }
     },
     "stakeholder": {

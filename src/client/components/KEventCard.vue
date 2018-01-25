@@ -1,6 +1,6 @@
 <template>
   <k-card v-bind="$props" :itemActions="actions">
-    <q-icon slot="card-icon" :name="icon"></q-icon>
+    <q-icon slot="card-icon" :name="icon.name" :color="icon.color"></q-icon>
     <div slot="card-content">
       <div v-if="isParticipant">{{participantLabel}}</div>
       </br>
@@ -33,9 +33,9 @@ export default {
   },
   computed: {
     icon () {
-      if (this.participantState.icon) return this.participantState.icon.name
-      if (this.participantStep.icon) return this.participantStep.icon.name
-      return ''
+      if (this.participantState.interaction) return this.participantState.interaction.icon
+      if (this.participantStep.icon) return this.participantStep.icon
+      return {}
     },
     title () {
       return this.participantStep.title ? this.participantStep.title : 'Enter your choice'
@@ -79,15 +79,15 @@ export default {
         // Start from schema template and clone it because it will be shared by all cards
         this.schema = _.cloneDeep(schema)
         // Then add step interaction
-        const interaction = this.participantStep.interaction.map(option => { return { label: option, value: option } })
+        const options = this.participantStep.interaction.map(option => { return { label: option.value, value: option } })
         this.schema.properties['interaction'] = {
-          type: 'string',
-          default: interaction[0].value,
+          type: 'object',
+          default: options[0].value,
           field: {
             component: 'form/KSelectField',
             label: this.participantStep.title,
             helper: this.participantStep.description,
-            options: interaction
+            options
           }
         }
         this.schema.required.push('interaction')
