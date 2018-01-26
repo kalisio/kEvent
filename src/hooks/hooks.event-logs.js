@@ -3,6 +3,10 @@ import { getItems } from 'feathers-hooks-common'
 const debug = makeDebug('kalisio:kEvent:event-logs:hooks')
 
 export async function updatePreviousLog (hook) {
+  if (hook.type !== 'before') {
+    throw new Error(`The 'updatePreviousLog' hook should only be used as a 'before' hook.`)
+  }
+
   let item = getItems(hook)
   const participant = item.participant
   const event = item.event
@@ -18,8 +22,10 @@ export async function updatePreviousLog (hook) {
       paginate: false
     })
     if (previousLogs.length > 0) {
+      let previousLog = previousLogs[0]
       debug('Tagging previous log for participant ' + participant.toString() + ' on event ' + event.toString())
-      await hook.service.patch(previousLogs[0]._id.toString(), { lastInEvent: false })
+      item.previous = previousLog._id
+      await hook.service.patch(previousLog._id.toString(), { lastInEvent: false })
     }
   }
   
@@ -28,7 +34,7 @@ export async function updatePreviousLog (hook) {
 
 export async function addLogDefaults (hook) {
   if (hook.type !== 'before') {
-    throw new Error(`The 'addLogDefaults' hook should only be used as a 'after' hook.`)
+    throw new Error(`The 'addLogDefaults' hook should only be used as a 'before' hook.`)
   }
 
   const participant = hook.data.participant

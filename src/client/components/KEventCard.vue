@@ -17,38 +17,35 @@
 <script>
 import _ from 'lodash'
 import sift from 'sift'
-import { mixins } from 'kCore/client'
-import { Events, QIcon, QBtn, QChip, Dialog, QCollapsible } from 'quasar'
+import { Events, QIcon, Dialog } from 'quasar'
+import { mixins as kCoreMixins } from 'kCore/client'
+import mixins from '../mixins'
 
 export default {
   name: 'k-event-card',
   mixins: [
-    mixins.baseItem,
-    mixins.service,
-    mixins.schemaProxy,
-    mixins.refsResolver(['form'])
+    kCoreMixins.baseItem,
+    kCoreMixins.service,
+    kCoreMixins.schemaProxy,
+    kCoreMixins.refsResolver(['form']),
+    mixins.eventLogs
   ],
   components: {
-    QIcon, QBtn, QChip, QCollapsible
+    QIcon
   },
   computed: {
     icon () {
-      if (this.participantState.interaction) return this.participantState.interaction.icon
-      if (this.participantStep.icon) return this.participantStep.icon
-      return {}
+      return this.getIcon(this.participantState, this.participantStep)
     },
     title () {
       return this.participantStep.title ? this.participantStep.title : 'Enter your choice'
     },
     hasParticipantInteraction () {
-      return this.waitingParticipantInteraction(this.participantStep, this.participantState)
+      return this.waitingInteraction(this.participantStep, this.participantState, 'participant')
     }
   },
   data () {
     return {
-      userId: '',
-      isParticipant: false,
-      isCoordinator: false,
       participantStep: {},
       participantState: {},
       participantLabel: '',
@@ -67,30 +64,17 @@ export default {
   },
   methods: {
     loadService () {
-      return this._service = this.$api.getService('event-logs')
+      return this._service = this.$api.getService('event-logs', this.contextId)
     },
     getSchemaName () {
       return 'event-logs.create'
     },
     loadSchema () {
       // Call super
-      return mixins.schemaProxy.methods.loadSchema.call(this)
+      return kCoreMixins.schemaProxy.methods.loadSchema.call(this)
       .then(schema => {
         // Start from schema template and clone it because it will be shared by all cards
-        this.schema = _.cloneDeep(schema)
-        // Then add step interaction
-        const options = this.participantStep.interaction.map(option => { return { label: option.value, value: option } })
-        this.schema.properties['interaction'] = {
-          type: 'object',
-          default: options[0].value,
-          field: {
-            component: 'form/KSelectField',
-            label: this.participantStep.title,
-            helper: this.participantStep.description,
-            options
-          }
-        }
-        this.schema.required.push('interaction')
+        this.schema = this.generateSchemaForStep(this.participantStep, schema)
         return this.schema
       })
     },
@@ -149,47 +133,22 @@ export default {
         this.$router.push({ name: 'event-activity', params: { id: this.item._id, contextId: this.$route.params.contextId } })
       }
     },
-    hasInteraction (step) {
-      return !_.isEmpty(step.interaction)
-    },
-    waitingParticipantInteraction (step, state) {
-      return (this.hasInteraction(step) && !this.hasInteraction(state) && (step.stakeholder === 'participant'))
-    },
-    getParticipantStep (state = {}) {
-      const currentStepIndex = this.item.workflow.findIndex(step => step.name === state.step)
-      // No log yet, the user is at the first step of the workflow
-      if (currentStepIndex < 0) {
-        return this.item.workflow[0]
-      }
-      const currentStep = this.item.workflow[currentStepIndex]
-      // For interacting steps check if interaction already recorded
-      if (this.waitingParticipantInteraction(currentStep, state)) {
-        return currentStep
-      }
-      const nextStepIndex = currentStepIndex + 1
-      // End of workflow or next step to be fulfilled ?
-      if (nextStepIndex >= 0 && nextStepIndex < this.item.workflow.length) {
-        return this.item.workflow[nextStepIndex]
-      } else {
-        return currentStep
-      }
-    },
     refreshParticipantState (logs) {
       if (logs.total === 0) {
         // No log yet => initiate the workflow by a log acting as a read receipt
         this.participantState = {}
-        this.participantStep = this.getParticipantStep()
-        let log = this.createParticipantLog()
+        this.participantStep = this.getWorkflowStep()
+        let log = this.createParticipantLog(this.participantStep)
         this.serviceCreate(log)
         // Real-time event should trigger a new refresh for current state
         return
       } else {
         this.participantState = logs.data[0]
-        this.participantStep = this.getParticipantStep(this.participantState)
+        this.participantStep = this.getWorkflowStep(this.participantState)
         // When participant has just fullfilled a step we need to initiate the next one (if any) by a log acting as a read receipt
         // We know this when we get a different step from the current state
         if (this.participantState.step !== this.participantStep.name) {
-          let log = this.createParticipantLog()
+          let log = this.createParticipantLog(this.participantStep)
           this.serviceCreate(log)
           // Real-time event should trigger a new refresh for current state
           return
@@ -198,7 +157,7 @@ export default {
       
       let action = this.getAction('follow-up')
       this.participantLabel = ''
-      if (this.waitingParticipantInteraction(this.participantStep, this.participantState)) {
+      if (this.waitingInteraction(this.participantStep, this.participantState, 'participant')) {
         this.participantLabel = 'Coordinator is waiting for your input'
         action.warning = 'Action required'
         // We can then load the schema and local refs in parallel
@@ -207,7 +166,7 @@ export default {
           this.loadRefs()
         ])
         .then(_ => this.$refs.form.build())
-      } else if (this.participantStep.stakeholder === 'coordinator') {
+      } else if (this.waitingInteraction(this.participantStep, this.participantState, 'coordinator')) {
           this.participantLabel = 'Waiting for coordinator feedback'
           action.warning = 'Waiting coordination'
       }
@@ -268,23 +227,8 @@ export default {
       }
     },
     refresh () {
-      const user = this.$store.get('user')
-      if (user) {
-        this.userId = user._id
-        // Check user role in event
-        this.isParticipant = _.findIndex(this.item.participants, participant => {
-          if (participant.service === 'members' && participant._id === user._id) return true
-          if (participant.service === 'groups' || participant.service === 'organisations') {
-            if (sift({ [participant.service + '._id']: participant._id }, [user])) return true
-          }
-          if (participant.service === 'tags') {
-            if (user.tags.findIndex() >= 0) return true
-          }
-          return false
-        }) >= 0
-        this.isCoordinator = _.findIndex(this.item.coordinators, coordinator => {
-          return (coordinator === user._id)
-        }) >= 0
+      this.refreshUser()
+      if (this.userId) {
         // Update actions according to user role
         this.refreshActions()
         // Update content according to user role
@@ -296,34 +240,8 @@ export default {
         }
       }
     },
-    createParticipantLog(baseLog = {}) {
-      let log = {
-        type: 'Feature',
-        participant: this.userId,
-        event: this.item._id,
-        step: this.participantStep.name,
-        stakeholder: this.participantStep.stakeholder,
-        properties: {}
-      }
-      // Participant position as geometry
-      const position = this.$store.get('user.position')
-      if (position) {
-        log.geometry = {
-          type: 'Point',
-          coordinates: [position.longitude, position.latitude]
-        }
-      }
-      _.merge(log, baseLog)
-      return log
-    },
     async logParticipantState (event, done) {
-      let result = this.$refs.form.validate()
-      if (result.isValid) {
-        // Directly store as GeoJson objects
-        // FIXME: what to store as feature properties for mapping ?
-        let log = this.createParticipantLog(result.values)
-        await this.serviceCreate(log)
-      }
+      await this.logState(this.$refs.form, this.participantStep)
       done()
     }
   },
