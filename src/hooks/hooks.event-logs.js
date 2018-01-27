@@ -58,7 +58,7 @@ export async function sendStateNotifications (hook) {
   const participant = hook.result.participant
   const event = hook.result.event
   if (participant) {
-    let result = await pusherService.create({
+    await pusherService.create({
       action: 'message',
       message: hook.result.name,
       pushObject: participant.toString(),
