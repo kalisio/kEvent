@@ -2,9 +2,9 @@ import makeDebug from 'debug'
 import { getItems } from 'feathers-hooks-common'
 const debug = makeDebug('kalisio:kEvent:event-logs:hooks')
 
-export async function updatePreviousLog (hook) {
+export async function linkWithPreviousLog (hook) {
   if (hook.type !== 'before') {
-    throw new Error(`The 'updatePreviousLog' hook should only be used as a 'before' hook.`)
+    throw new Error(`The 'linkWithPreviousLog' hook should only be used as a 'before' hook.`)
   }
 
   let item = getItems(hook)
@@ -25,7 +25,19 @@ export async function updatePreviousLog (hook) {
       let previousLog = previousLogs[0]
       debug('Tagging previous log for participant ' + participant.toString() + ' on event ' + event.toString())
       item.previous = previousLog._id
-      await hook.service.patch(previousLog._id.toString(), { lastInEvent: false })
+      // We don't need to await this one
+      hook.service.patch(previousLog._id.toString(), { lastInEvent: false })
+      // Copy expiry date
+      item.expireAt = previousLog.expireAt
+    }
+    // When the first log is created we need to extract it from the source event
+    if (!item.expireAt) {
+      // Event service is contextual, look for context on initiator service
+      const eventService = hook.app.getService('events', hook.service.context)
+      if (!eventService) return Promise.reject(new Error('No valid context found to retrieve event service for initiator service ' + hook.service.name))
+      let eventObject = await eventService.get(event.toString())
+      // Copy expiry date
+      item.expireAt = eventObject.expireAt
     }
   }
   

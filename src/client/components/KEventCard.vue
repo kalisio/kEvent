@@ -137,18 +137,20 @@ export default {
       if (logs.total === 0) {
         // No log yet => initiate the workflow by a log acting as a read receipt
         this.participantState = {}
-        this.participantStep = this.getWorkflowStep()
-        let log = this.createParticipantLog(this.participantStep)
+        this.participantStep = this.getWorkflowStep() || {} // Use empty object by default to simplify display
+        let log = this.createParticipantLog(this.participantStep, this.participantState)
         this.serviceCreate(log)
         // Real-time event should trigger a new refresh for current state
         return
       } else {
         this.participantState = logs.data[0]
-        this.participantStep = this.getWorkflowStep(this.participantState)
+        this.participantStep = this.getWorkflowStep(this.participantState) || {} // Use empty object by default to simplify display
+        // When no workflow to be fulfilled
+        if (_.isEmpty(this.participantStep)) return
         // When participant has just fullfilled a step we need to initiate the next one (if any) by a log acting as a read receipt
         // We know this when we get a different step from the current state
         if (this.participantState.step !== this.participantStep.name) {
-          let log = this.createParticipantLog(this.participantStep)
+          let log = this.createParticipantLog(this.participantStep, this.participantState)
           this.serviceCreate(log)
           // Real-time event should trigger a new refresh for current state
           return
@@ -241,7 +243,7 @@ export default {
       }
     },
     async logParticipantState (event, done) {
-      await this.logState(this.$refs.form, this.participantStep)
+      await this.logStep(this.$refs.form, this.participantStep, this.participantState)
       done()
     }
   },
@@ -250,6 +252,8 @@ export default {
     this.$options.components['k-card'] = this.$load('collection/KCard')
     this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-form'] = this.$load('form/KForm')
+    // Required alias for the event logs mixin
+    this.event = this.item
     // Set the required actor
     // Because we can have multiple cards we need a listener per card
     this.refreshOnGeolocation = _ => this.refresh()

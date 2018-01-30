@@ -46,7 +46,7 @@ export default {
       // Title
       this.$api.getService('events', this.contextId).get(this.id)
       .then(event => {
-        this.item = event
+        this.event = event
         this.setTitle(event.name)
       })
       // Fab actions
@@ -73,18 +73,31 @@ export default {
       })
     },
     getFeaturePopup (feature, layer) {
-      if (!this.waitingInteraction(this.getWorkflowStep(feature), feature, 'coordinator')) {
-        return L.popup({ autoPan: false }, layer).setContent(feature.interaction.value)
+      let popup = L.popup({ autoPan: false }, layer)
+      const step = this.getWorkflowStep(feature)
+      // Check for any recorded interaction to be displayed
+      if (this.waitingInteraction(step, feature, 'coordinator')) {
+        return popup.setContent('Action required')
+      } else if (this.waitingInteraction(step, feature, 'participant')) {
+        return popup.setContent('Awaiting information')
+      } else if (this.hasInteraction(feature)) {
+        return popup.setContent(feature.interaction.value)
       } else {
-        // No popup because we redirect on editor when action is required
         return null
       }
     },
     getFeatureTooltip (feature, layer) {
-      if (this.waitingInteraction(this.getWorkflowStep(feature), feature, 'coordinator')) {
-        return L.tooltip({ permanent: true }, layer).setContent('Action required')
+      // Default content is participant name
+      let tooltip = L.tooltip({ permanent: true }, layer)
+      const step = this.getWorkflowStep(feature)
+      const name = _.get(feature, 'participant.name', 'Unamed')
+      // Check for any interaction to be performed
+      if (this.waitingInteraction(step, feature, 'coordinator')) {
+        return tooltip.setContent('<b>' + name + ' - Action required' + '</b>')
+      } else if (this.waitingInteraction(step, feature, 'participant')) {
+        return tooltip.setContent('<b>' + name + ' - Awaiting information' + '</b>')
       } else {
-        return L.tooltip({ permanent: true }, layer).setContent(feature.participant)
+        return tooltip.setContent('<b>' + name + '</b>')
       }
     },
     mapStyle () {
@@ -97,7 +110,10 @@ export default {
       }
     },
     onPopupOpen(event) {
-      if (this.waitingInteraction(this.getWorkflowStep(feature), feature, 'coordinator')) {
+      const feature = _.get(event, 'layer.feature')
+      if (!feature) return
+      const step = this.getWorkflowStep(feature)
+      if (this.waitingInteraction(step, feature, 'coordinator')) {
         this.$router.push({ name: 'event-log', params: { logId: event.layer.feature._id } })
       }
     }

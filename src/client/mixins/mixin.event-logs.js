@@ -10,26 +10,29 @@ let eventsMixin = {
   },
   methods: {
     hasInteraction (step) {
-      return !_.isEmpty(step.interaction)
+      if (_.isEmpty(step)) return false
+      else return !_.isEmpty(step.interaction)
     },
     waitingInteraction (step, state, stakeholder) {
       return (this.hasInteraction(step) && !this.hasInteraction(state) && (step.stakeholder === stakeholder))
     },
     getWorkflowStep (state = {}) {
-      const currentStepIndex = this.item.workflow.findIndex(step => step.name === state.step)
+      if (_.isNil(this.event.workflow)) return null
+
+      const currentStepIndex = this.event.workflow.findIndex(step => step.name === state.step)
       // No log yet, the user is at the first step of the workflow
       if (currentStepIndex < 0) {
-        return this.item.workflow[0]
+        return this.event.workflow[0]
       }
-      const currentStep = this.item.workflow[currentStepIndex]
+      const currentStep = this.event.workflow[currentStepIndex]
       // For interacting steps check if interaction already recorded
       if (this.waitingInteraction(currentStep, state, state.stakeholder)) {
         return currentStep
       }
       const nextStepIndex = currentStepIndex + 1
       // End of workflow or next step to be fulfilled ?
-      if (nextStepIndex >= 0 && nextStepIndex < this.item.workflow.length) {
-        return this.item.workflow[nextStepIndex]
+      if (nextStepIndex >= 0 && nextStepIndex < this.event.workflow.length) {
+        return this.event.workflow[nextStepIndex]
       } else {
         return currentStep
       }
@@ -42,28 +45,6 @@ let eventsMixin = {
       // Otherwise use workflow icon for current step
       if (step.icon) return step.icon
       return {}
-    },
-    createParticipantLog(step, baseLog = {}) {
-      let log = {
-        type: 'Feature',
-        participant: this.userId,
-        event: this.item._id,
-        step: step.name,
-        stakeholder: step.stakeholder || 'participant',
-        properties: {}
-      }
-      // Participant position as geometry
-      if (log.stakeholder === 'participant') {
-        const position = this.$store.get('user.position')
-        if (position) {
-          log.geometry = {
-            type: 'Point',
-            coordinates: [position.longitude, position.latitude]
-          }
-        }
-      }
-      _.merge(log, baseLog)
-      return log
     },
     generateSchemaForStep (step, baseSchema) {
       // Start from schema template and clone it because modifications
@@ -84,12 +65,44 @@ let eventsMixin = {
       schema.required.push('interaction')
       return schema
     },
-    logState (form, step, baseLog = {}) {
+    createParticipantLog(step = {}, state = {}) {
+      let log = {
+        type: 'Feature',
+        participant: this.userId,
+        event: this.event._id,
+        // Set this as default in case of no workflow for read receipt
+        stakeholder: 'participant',
+        properties: {}
+      }
+      // Could be missing when no workflow
+      if (step.name) {
+        log.step = step.name
+      }
+      if (step.stakeholder) {
+        log.stakeholder = step.stakeholder
+      }
+      // Participant position as geometry
+      if (log.stakeholder === 'participant') {
+        const position = this.$store.get('user.position')
+        if (position) {
+          log.geometry = {
+            type: 'Point',
+            coordinates: [position.longitude, position.latitude]
+          }
+        }
+      } else if (state.geometry) {
+        // Copy geometry from previous state for coordinator so that we keep the last know user position
+        log.geometry = state.geometry
+      }
+      return log
+    },
+    logStep (form, step, state = {}) {
       let result = form.validate()
       if (result.isValid) {
         // Directly store as GeoJson objects
         // FIXME: what to store as feature properties for mapping ?
-        let log = this.createParticipantLog(step, _.merge(result.values, baseLog))
+        let log = this.createParticipantLog(step, state)
+        _.merge(log, result.values)
         return this.serviceCreate(log)
       } else {
         return Promise.reject(new Error('Cannot log state because form is not valid'))
@@ -100,7 +113,7 @@ let eventsMixin = {
       if (user) {
         this.userId = user._id
         // Check user role in event
-        this.isParticipant = _.findIndex(this.item.participants, participant => {
+        this.isParticipant = _.findIndex(this.event.participants, participant => {
           if (participant.service === 'members' && participant._id === user._id) return true
           if (participant.service === 'groups' || participant.service === 'organisations') {
             if (sift({ [participant.service + '._id']: participant._id }, [user])) return true
@@ -110,7 +123,7 @@ let eventsMixin = {
           }
           return false
         }) >= 0
-        this.isCoordinator = _.findIndex(this.item.coordinators, coordinator => {
+        this.isCoordinator = _.findIndex(this.event.coordinators, coordinator => {
           return (coordinator === user._id)
         }) >= 0
       }

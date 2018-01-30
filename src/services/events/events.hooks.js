@@ -1,3 +1,4 @@
+import { hooks } from 'kCore'
 import { addCreatorAsCoordinator, sendNotifications } from '../../hooks'
 
 module.exports = {
@@ -5,7 +6,7 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [ addCreatorAsCoordinator ],
+    create: [ addCreatorAsCoordinator, hooks.convertDates(['expireAt']) ],
     update: [],
     patch: [],
     remove: []

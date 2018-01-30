@@ -7,8 +7,7 @@
   "properties": {
     "name": {
       "type": "string", 
-      "maxLength": 128,
-      "minLength": 3,
+      "minLength": 1,
       "default": "New template",
       "field": {
         "component": "form/KTextField",
@@ -27,7 +26,6 @@
     },
     "description": {
       "type": "string", 
-      "maxLength": 256,
       "field": {
         "component": "form/KTextareaField",
         "label": "Description",

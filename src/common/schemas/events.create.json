@@ -7,8 +7,7 @@
   "properties": {
     "name": {
       "type": "string", 
-      "maxLength": 128,
-      "minLength": 3,
+      "minLength": 1,
       "default": "New event",
       "field": {
         "component": "form/KTextField",
@@ -18,7 +17,6 @@
     },
     "description": {
       "type": "string", 
-      "maxLength": 256,
       "field": {
         "component": "form/KTextareaField",
         "label": "Description",
@@ -31,6 +29,16 @@
         "component": "KLocationField",
         "label": "Location",
         "helper": "Enter the location of this event"
+      }
+    },
+    "expireAt": {
+      "type": "string", 
+      "format": "date-time",
+      "field": {
+        "component": "form/KDatetimeField",
+        "label": "Expiration date",
+        "helper": "Enter the expiration date for this event",
+        "type": "datetime"
       }
     },
     "participants": { 

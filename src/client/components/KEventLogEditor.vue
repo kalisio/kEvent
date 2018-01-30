@@ -82,12 +82,7 @@ export default {
       }
     },
     async logCoordinatorState (event, done) {
-      let baseLog = {}
-      // Copy user position in this case, do not use the one of the coordinator
-      if (this.step.stakeholder === 'coordinator') {
-        baseLog.geometry = this.state.geometry
-      }
-      await this.logState(this.$refs.form, this.step, baseLog)
+      await this.logStep(this.$refs.form, this.step, this.state)
       done()
     }
   },
@@ -97,7 +92,7 @@ export default {
     this.$options.components['k-form'] = this.$load('form/KForm')
     // Retrieve source log/event
     this.state = await this.loadService().get(this.logId)
-    this.item = await this.$api.getService('events', this.contextId).get(this.id)
+    this.event = await this.$api.getService('events', this.contextId).get(this.id)
     this.step = this.getWorkflowStep(this.state)
     this.refresh()
   }

@@ -1,13 +1,13 @@
 import { populate } from 'feathers-hooks-common'
 import { hooks } from 'kCore'
-import { addLogDefaults, sendStateNotifications, updatePreviousLog } from '../../hooks'
+import { addLogDefaults, sendStateNotifications, linkWithPreviousLog } from '../../hooks'
 
 module.exports = {
   before: {
     all: [ hooks.convertObjectIDs(['participant', 'event']) ],
     find: [],
     get: [],
-    create: [ addLogDefaults, updatePreviousLog ],
+    create: [ addLogDefaults, linkWithPreviousLog ],
     update: [],
     patch: [],
     remove: []
@@ -16,9 +16,15 @@ module.exports = {
   after: {
     all: [],
     find: [ populate({ schema: hook => {
-              return { include: { service: hook.service.getPath(true), nameAs: 'previous', parentField: 'previous', childField: '_id'} }
-            }})
-          ],
+              const usersService = hook.app.getService('users')
+              return {
+                        include: [
+                          { service: hook.service.getPath(true), nameAs: 'previous', parentField: 'previous', childField: '_id' },
+                          { service: usersService.getPath(true), nameAs: 'participant', parentField: 'participant', childField: '_id',
+                            query: { $select: ['profile.name'] } }
+                        ]
+                      }
+            }})],
     get: [],
     create: [ sendStateNotifications ],
     update: [],

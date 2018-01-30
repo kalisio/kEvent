@@ -7,8 +7,7 @@
   "properties": {
     "title": {
       "type": "string", 
-      "maxLength": 128,
-      "minLength": 3,
+      "minLength": 1,
       "default": "New step",
       "field": {
         "component": "form/KTextField",
@@ -27,7 +26,6 @@
     },
     "description": {
       "type": "string", 
-      "maxLength": 256,
       "default": "Step content",
       "field": {
         "component": "form/KTextareaField",
