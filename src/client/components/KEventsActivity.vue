@@ -56,7 +56,7 @@ export default {
         route: { name: 'events-activity', params: { contextId: this.contextId } },
         default: true
       })
-      if (this.$can('create', 'event-templatess', this.contextId)) {
+      if (this.$can('create', 'event-templates', this.contextId)) {
         this.registerTabAction({ 
           name: 'event-templates', label: 'Templates', icon: 'widgets',
           route: { name: 'event-templates-activity', params: { contextId: this.contextId } } 
