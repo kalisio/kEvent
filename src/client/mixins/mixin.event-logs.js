@@ -69,7 +69,7 @@ let eventsMixin = {
       let log = {
         type: 'Feature',
         participant: this.userId,
-        event: this.event._id,
+        event: this.event._id || this.event,
         // Set this as default in case of no workflow for read receipt
         stakeholder: 'participant',
         properties: {}
@@ -90,9 +90,11 @@ let eventsMixin = {
             coordinates: [position.longitude, position.latitude]
           }
         }
-      } else if (state.geometry) {
+      } else {
         // Copy geometry from previous state for coordinator so that we keep the last know user position
-        log.geometry = state.geometry
+        if (state.geometry) log.geometry = state.geometry
+        // Copy also participant ID so that the ID of the coordinator is not used
+        if (state.participant) log.participant = state.participant._id || state.participant
       }
       return log
     },

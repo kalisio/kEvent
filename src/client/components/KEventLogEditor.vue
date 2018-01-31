@@ -13,7 +13,7 @@ import { mixins as kCoreMixins } from 'kCore/client'
 import mixins from '../mixins'
 
 export default {
-  name: 'k-event-card',
+  name: 'k-event-log-editor',
   mixins: [
     kCoreMixins.service,
     kCoreMixins.schemaProxy,
