@@ -19,28 +19,32 @@ export function addCreatorAsCoordinator (hook) {
   return hook
 }
 
-export async function sendNotifications (hook) {
-  if (hook.type !== 'after') {
-    throw new Error(`The 'sendNotifications' hook should only be used as a 'after' hook.`)
-  }
-
-  let pusherService = hook.app.getService('pusher')
-  if (!pusherService) return hook
-  const participants = hook.result.participants || []
-  let publishPromises = []
-  participants.forEach(participant => {
-    let participantService = participant.service
-    if (hook.service.context) {
-      participantService = (typeof hook.service.context === 'object' ? hook.service.context._id.toString() : hook.service.context) + '/' + participantService
+export function sendNotifications (prefix = '') {
+  return async function (hook) {
+    if (hook.type !== 'after') {
+      throw new Error(`The 'sendNotifications' hook should only be used as a 'after' hook.`)
     }
-    publishPromises.push(pusherService.create({
-      action: 'message',
-      message: hook.result.name,
-      pushObject: participant._id.toString(),
-      pushObjectService: participantService
-    }))
-  })
-  let results = await Promise.all(publishPromises)
-  debug('Published event notifications on ' + results.length + ' topics/users for event ' + hook.result._id.toString())
-  return hook
+
+    let pusherService = hook.app.getService('pusher')
+    if (!pusherService) return hook
+    const participants = hook.result.participants || []
+    let publishPromises = []
+    participants.forEach(participant => {
+      let participantService = participant.service
+      if (hook.service.context) {
+        participantService = (typeof hook.service.context === 'object' ? hook.service.context._id.toString() : hook.service.context) + '/' + participantService
+      }
+      publishPromises.push(pusherService.create({
+        action: 'message',
+        // The notification contains the event title + a given prefix
+        message: prefix + hook.result.name,
+        pushObject: participant._id.toString(),
+        pushObjectService: participantService
+      }))
+    })
+    let results = await Promise.all(publishPromises)
+    debug('Published event notifications on ' + results.length + ' topics/users for event ' + hook.result._id.toString())
+    return hook
+  }
 }
+

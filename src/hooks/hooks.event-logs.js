@@ -1,4 +1,5 @@
 import makeDebug from 'debug'
+import _ from 'lodash'
 import { getItems } from 'feathers-hooks-common'
 const debug = makeDebug('kalisio:kEvent:event-logs:hooks')
 
@@ -25,8 +26,7 @@ export async function linkWithPreviousLog (hook) {
       let previousLog = previousLogs[0]
       debug('Tagging previous log for participant ' + participant.toString() + ' on event ' + event.toString())
       item.previous = previousLog._id
-      // We don't need to await this one
-      hook.service.patch(previousLog._id.toString(), { lastInEvent: false })
+      await hook.service.patch(previousLog._id.toString(), { lastInEvent: false })
       // Copy expiry date
       item.expireAt = previousLog.expireAt
     }
@@ -37,6 +37,7 @@ export async function linkWithPreviousLog (hook) {
       if (!eventService) return Promise.reject(new Error('No valid context found to retrieve event service for initiator service ' + hook.service.name))
       let eventObject = await eventService.get(event.toString())
       // Copy expiry date
+      debug('Tagging expiry date on log for participant ' + participant.toString() + ' on event ' + event.toString())
       item.expireAt = eventObject.expireAt
     }
   }
@@ -50,12 +51,14 @@ export async function addLogDefaults (hook) {
   }
 
   const participant = hook.data.participant
+  const event = hook.data.event
   const user = hook.params.user
   // By default we assume the user is the participant
   if (!participant && user) {
     hook.data.participant = user._id
   }
   hook.data.lastInEvent = true
+  debug('Added default log properties for participant ' + participant.toString() + ' on event ' + event.toString())
   
   return hook
 }
@@ -65,18 +68,28 @@ export async function sendStateNotifications (hook) {
     throw new Error(`The 'sendStateNotifications' hook should only be used as a 'after' hook.`)
   }
 
-  let pusherService = hook.app.getService('pusher')
-  if (!pusherService) return hook
-  const participant = hook.result.participant
-  const event = hook.result.event
-  if (participant) {
-    await pusherService.create({
-      action: 'message',
-      message: hook.result.name,
-      pushObject: participant.toString(),
-      pushObjectService: 'users'
-    })
-    debug('Published event state notifications for participant ' + participant.toString() + ' on event ' + event.toString())
+  // A notification occur only when we record the interaction of a given workflow step
+  // from the coordinator toward the participant
+  const interaction = _.get(hook, 'result.interaction')
+  const stakeholder = _.get(hook, 'result.stakeholder')
+  if (interaction && (stakeholder === 'coordinator')) {
+    let pusherService = hook.app.getService('pusher')
+    if (!pusherService) return hook
+    const participant = hook.result.participant
+    let event = hook.result.event
+    if (participant) {
+      // We need the event first to get its title
+      const eventsService = hook.app.getService('events', hook.service.context)
+      event = await eventsService.get(event.toString())
+      await pusherService.create({
+        action: 'message',
+        // The notification contains the event title + a prefix with recorded interaction
+        message: '[' + interaction.value + '] - ' + event.name,
+        pushObject: participant.toString(),
+        pushObjectService: 'users'
+      })
+      debug('Published event state notifications for participant ' + participant.toString() + ' on event ' + event._id.toString())
+    }
   }
   return hook
 }

@@ -16,10 +16,10 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [ sendNotifications ],
-    update: [ sendNotifications ],
-    patch: [ sendNotifications ],
-    remove: [ sendNotifications ]
+    create: [ sendNotifications('[New] - ') ],
+    update: [ sendNotifications('[Updated] - ') ],
+    patch: [ sendNotifications('[Updated] - ') ],
+    remove: [ sendNotifications('[Closed] - ') ]
   },
 
   error: {

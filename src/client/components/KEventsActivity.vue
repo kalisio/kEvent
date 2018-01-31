@@ -56,10 +56,12 @@ export default {
         route: { name: 'events-activity', params: { contextId: this.contextId } },
         default: true
       })
-      this.registerTabAction({ 
-        name: 'event-templates', label: 'Templates', icon: 'widgets',
-        route: { name: 'event-templates-activity', params: { contextId: this.contextId } } 
-      })
+      if (this.$can('create', 'event-templatess', this.contextId)) {
+        this.registerTabAction({ 
+          name: 'event-templates', label: 'Templates', icon: 'widgets',
+          route: { name: 'event-templates-activity', params: { contextId: this.contextId } } 
+        })
+      }
       // Fab actions
       if (this.$can('create', 'events', this.contextId)) {
         const eventTemplatesService = this.$api.getService('event-templates')

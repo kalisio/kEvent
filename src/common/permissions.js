@@ -15,6 +15,7 @@ export function defineEventAbilities (subject, can, cannot) {
           if (role < permissions.Roles.manager) {
             can('read', 'events', { context: organisation._id, 'participants._id': subject._id })
             can('read', 'events', { context: organisation._id, 'participants._id': organisation._id })
+            can('read', 'events', { context: organisation._id, 'coordinators._id': subject._id })
             if (subject.groups) {
               subject.groups.forEach(group => {
                 if (group.context.toString() === organisation._id.toString()) {

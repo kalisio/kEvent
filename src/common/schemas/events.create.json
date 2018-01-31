@@ -38,7 +38,8 @@
         "component": "form/KDatetimeField",
         "label": "Expiration date",
         "helper": "Enter the expiration date for this event",
-        "type": "datetime"
+        "type": "datetime",
+        "defaultOffset": 604800
       }
     },
     "participants": { 

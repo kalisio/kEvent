@@ -22,7 +22,7 @@ export default {
   props: {
     templateId: {
       type: String,
-      required: true
+      default: ''
     }
   },
   computed: {

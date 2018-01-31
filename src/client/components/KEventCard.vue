@@ -92,7 +92,7 @@ export default {
           route: { name: 'edit-event', params: { contextId: this.contextId } }
         })
       }
-      if (this.item.hasWorkflow && this.$can('create', 'event-logs', this.contextId, this.item)) {
+      if (this.item.hasWorkflow && this.$can('read', 'events', this.contextId, this.item)) {
         this.registerPaneAction({ 
           name: 'follow-up', label: 'Follow up', icon: 'message', handler: this.followUp
         })

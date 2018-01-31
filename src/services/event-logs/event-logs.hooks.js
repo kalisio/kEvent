@@ -2,6 +2,28 @@ import { populate } from 'feathers-hooks-common'
 import { hooks } from 'kCore'
 import { addLogDefaults, sendStateNotifications, linkWithPreviousLog } from '../../hooks'
 
+const populatePreviousLog = populate({
+  schema: hook => {
+    return {
+      include: [
+        { service: hook.service.getPath(true), nameAs: 'previous', parentField: 'previous', childField: '_id' }
+      ]
+    }
+  }
+})
+
+const populateParticipant = populate({
+  schema: hook => {
+    const usersService = hook.app.getService('users')
+    return {
+      include: [
+        { service: usersService.getPath(true), nameAs: 'participant', parentField: 'participant', childField: '_id',
+          query: { $select: ['profile.name'] } }
+      ]
+    }
+  }
+})
+
 module.exports = {
   before: {
     all: [ hooks.convertObjectIDs(['participant', 'event']) ],
@@ -15,16 +37,7 @@ module.exports = {
 
   after: {
     all: [],
-    find: [ populate({ schema: hook => {
-              const usersService = hook.app.getService('users')
-              return {
-                        include: [
-                          { service: hook.service.getPath(true), nameAs: 'previous', parentField: 'previous', childField: '_id' },
-                          { service: usersService.getPath(true), nameAs: 'participant', parentField: 'participant', childField: '_id',
-                            query: { $select: ['profile.name'] } }
-                        ]
-                      }
-            }})],
+    find: [ populatePreviousLog, populateParticipant ],
     get: [],
     create: [ sendStateNotifications ],
     update: [],
