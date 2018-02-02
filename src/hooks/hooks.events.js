@@ -37,9 +37,9 @@ export function sendNotifications (prefix = '') {
       publishPromises.push(pusherService.create({
         action: 'message',
         // The notification contains the event title + a given prefix
-        message: prefix + hook.result.name,
-        pushObject: participant._id.toString(),
-        pushObjectService: participantService
+        message: prefix + hook.result.name
+      }, {
+        pushObject: participant
       }))
     })
     let results = await Promise.all(publishPromises)
