@@ -1,15 +1,24 @@
 <template>
   <k-card v-bind="$props" :itemActions="actions">
+    <q-icon slot="card-icon" :name="icon.name" :color="icon.color"></q-icon>
   </k-card>
 </template>
 
 <script>
 import { mixins } from 'kCore/client'
-import { Dialog } from 'quasar'
+import { Dialog, QIcon } from 'quasar'
 
 export default {
   name: 'k-event-template-card',
   mixins: [ mixins.baseItem ],
+  components: {
+    QIcon
+  },
+  computed: {
+    icon () {
+      return this.item.icon
+    }
+  },
   methods: {
     refreshActions () {
       // Item actions

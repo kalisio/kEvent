@@ -47,7 +47,7 @@ export default {
         // Remove id so that event has its own
         delete this._object._id
         // Setup hasWorkflow tag
-        this._object.hasWorkflow = _.isNil(this.template.workflow)
+        this._object.hasWorkflow = !_.isNil(this.template.workflow)
       } else {
         // Otherwise proceed as usual to load the event object
         return mixins.objectProxy.methods.loadObject.call(this)
@@ -63,8 +63,8 @@ export default {
           this.schema = _.cloneDeep(schema)
           // Remove workflow from schema if not present in template
           if (_.isNil(this.template.workflow)) {
-            delete this.schema.properties.workflow
-            _.pull(this.schema.required, 'workflow')
+            delete this.schema.properties.hasWorkflow
+            _.pull(this.schema.required, 'hasWorkflow')
           }
         }
         return this.schema
@@ -84,15 +84,21 @@ export default {
       this.$refs.modal.close(_ => this.$router.push({ name: 'events-activity' }))
     }
   },
-  async created () {
+  created () {
     // Load the required components
     this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-form'] = this.$load('form/KForm')
     // On creation wait for template first
     if (this.templateId) {
-      this.template = await this.$api.getService('event-templates').get(this.templateId)
+      this.$api.getService('event-templates').get(this.templateId)
+      .then(template => {
+        this.template = template
+        this.refresh()
+      })
     }
-    this.refresh()
+    else {
+      this.refresh()
+    }
     this.$on('applied', this.doClose)
   },
   beforeDestroy() {
