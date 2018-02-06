@@ -63,6 +63,16 @@ let eventsMixin = {
         }
       }
       schema.required.push('interaction')
+      // Add a comment entry
+      schema.properties['comment'] = {
+        type: 'string', 
+        field: {
+          component: 'form/KTextareaField',
+          label: 'Comment',
+          helper: 'Enter your comment for this step'
+        }
+      }
+      schema.required.push('comment')
       return schema
     },
     createParticipantLog(step = {}, state = {}) {
