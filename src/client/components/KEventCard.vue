@@ -93,8 +93,14 @@ export default {
         })
       }
       if (this.item.hasWorkflow && this.$can('read', 'events', this.contextId, this.item)) {
-        if (this.waitingInteraction(this.participantStep, this.participantState, 'participant') ||
-            this.waitingInteraction(this.participantStep, this.participantState, 'coordinator')) {
+        let hasFollowUp = false
+        if (this.isParticipant) {
+          hasFollowUp = (this.waitingInteraction(this.participantStep, this.participantState, 'participant') ||
+                         this.waitingInteraction(this.participantStep, this.participantState, 'coordinator'))
+        } else {
+          hasFollowUp = this.isCoordinator
+        }
+        if (hasFollowUp) {
           this.registerPaneAction({ 
             name: 'follow-up', label: 'Follow up', icon: 'message', handler: this.followUp
           })
@@ -104,12 +110,6 @@ export default {
         this.registerPaneAction({ 
           name: 'add-media', label: 'Add a photo', icon: 'add_a_photo',
           route: { name: 'add-media', params: { contextId: this.contextId } }
-        })
-      }
-      if (this.isCoordinator && this.$can('update', 'events', this.contextId, this.item)) {
-        this.registerPaneAction({ 
-          name: 'map-event', label: 'Map', icon: 'map', 
-          route: { name: 'event-activity', params: { contextId: this.contextId } }
         })
       }
     },
