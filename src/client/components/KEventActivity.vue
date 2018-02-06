@@ -41,14 +41,29 @@ export default {
         onDismiss: { name: 'event-activity', params: { contextId: this.contextId, id: this.id } }
       }
     },
+    async refreshEvent () {
+      this.event = await this.$api.getService('events', this.contextId).get(this.id)
+      this.setTitle(this.event.name)
+      // Located event ?
+      if (this.event.location) {
+        // Recenter map
+        this.center(this.event.location.longitude, this.event.location.latitude, 15)
+        // And add event marker
+        let marker = L.marker([this.event.location.latitude, this.event.location.longitude],{
+          icon: L.icon.fontAwesome({
+            iconClasses: 'fa ' + this.event.icon.name || 'fa-circle',
+            markerColor: kCoreUtils.Colors[this.event.icon.color || 'blue'],
+            iconColor: '#FFF'
+          })
+        })
+        // Address as popup
+        marker.bindPopup(this.event.location.name)
+        marker.addTo(this.map)
+      }
+    },
     refreshActivity () {
       this.clearActivity()
-      // Title
-      this.$api.getService('events', this.contextId).get(this.id)
-      .then(event => {
-        this.event = event
-        this.setTitle(event.name)
-      })
+      this.refreshEvent()
       // Fab actions
       this.registerFabAction({ 
         name: 'browse-media', label: 'Browse media', icon: 'collections', 
