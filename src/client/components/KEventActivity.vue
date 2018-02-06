@@ -1,6 +1,6 @@
 <template>
   <div v-if="id !== ''" class="column justify-center full-width">
-    <div class="row">
+    <div class="row full-width">
       <div class="col-3">
         <q-list link separator>
           <q-item v-for="actor in items" :key="actor._id" @click="onActorClicked(actor)">
@@ -20,9 +20,7 @@
 </template>
 
 <script>
-import 'quasar-extras/animate/slideInLeft.css'
-import 'quasar-extras/animate/slideOutLeft.css'
-import { QTransition, QBtn, QList, QItem, QItemSide, QItemMain, QItemTile, QItemSeparator, QIcon } from 'quasar'
+import { QBtn, QList, QItem, QItemSide, QItemMain, QItemTile, QItemSeparator, QIcon } from 'quasar'
 import { Store, mixins as kCoreMixins, utils as kCoreUtils } from 'kCore/client'
 import { mixins as kMapMixins } from 'kMap/client'
 import mixins from '../mixins'
@@ -30,7 +28,6 @@ import mixins from '../mixins'
 export default {
   name: 'k-event-activity',
   components: {
-    QTransition,
     QBtn,
     QList,
     QItem,
@@ -167,7 +164,7 @@ export default {
     },
     mapStyle () {
       return { 
-        width: '100%', 
+        width: '75%', 
         height: '100%',
         fontWeight: 'normal', 
         zIndex: 0, 
