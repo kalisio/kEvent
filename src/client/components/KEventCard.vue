@@ -93,9 +93,12 @@ export default {
         })
       }
       if (this.item.hasWorkflow && this.$can('read', 'events', this.contextId, this.item)) {
-        this.registerPaneAction({ 
-          name: 'follow-up', label: 'Follow up', icon: 'message', handler: this.followUp
-        })
+        if (this.waitingInteraction(this.participantStep, this.participantState, 'participant') ||
+            this.waitingInteraction(this.participantStep, this.participantState, 'coordinator')) {
+          this.registerPaneAction({ 
+            name: 'follow-up', label: 'Follow up', icon: 'message', handler: this.followUp
+          })
+        }
       }
       if (this.$can('update', 'events', this.contextId, this.item)) {
         this.registerPaneAction({ 
@@ -156,7 +159,9 @@ export default {
           return
         }
       }
-      
+
+      // Update actions according to user state
+      this.refreshActions()
       let action = this.getAction('follow-up')
       this.participantLabel = ''
       if (this.waitingInteraction(this.participantStep, this.participantState, 'participant')) {
@@ -197,6 +202,8 @@ export default {
       }
     },
     refreshCoordinatorState (logs) {
+      // Update actions according to user state
+      this.refreshActions()
       let action = this.getAction('follow-up')
       if (logs.total > 0) {
         this.coordinatorLabel = logs.total + ' participants awaiting coordination'
@@ -231,8 +238,6 @@ export default {
     refresh () {
       this.refreshUser()
       if (this.userId) {
-        // Update actions according to user role
-        this.refreshActions()
         // Update content according to user role
         if (this.isParticipant) {
           this.subscribeParticipantLog()
