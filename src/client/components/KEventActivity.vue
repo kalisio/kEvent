@@ -1,7 +1,17 @@
 <template>
   <div v-if="id !== ''" class="column justify-center full-width">
-    <div class="full-width full-height">
-      <div id="map" :style="mapStyle()"></div>
+    <div class="row">
+      <div class="col-3">
+        <q-list link separator>
+          <q-item v-for="actor in items" :key="actor._id" @click="onActorClicked(actor)">
+            <q-item-side :icon="getIcon(actor).name"  :color="getIcon(actor).color" />
+            <q-item-main :label="actor.participant.name" />
+          </q-item>
+        </q-list>
+      </div>      
+      <div class="col-9 full-height">
+        <div id="map" :style="mapStyle()"></div>
+      </div>
     </div>
     <div>
       <router-view service="events" :router="router()"></router-view>
@@ -10,18 +20,33 @@
 </template>
 
 <script>
+import 'quasar-extras/animate/slideInLeft.css'
+import 'quasar-extras/animate/slideOutLeft.css'
+import { QTransition, QBtn, QList, QItem, QItemSide, QItemMain, QItemTile, QItemSeparator, QIcon } from 'quasar'
 import { Store, mixins as kCoreMixins, utils as kCoreUtils } from 'kCore/client'
 import { mixins as kMapMixins } from 'kMap/client'
 import mixins from '../mixins'
 
 export default {
   name: 'k-event-activity',
+  components: {
+    QTransition,
+    QBtn,
+    QList,
+    QItem,
+    QItemSide, 
+    QItemMain,
+    QItemTile,
+    QItemSeparator,
+    QIcon
+  },
   mixins: [
     kCoreMixins.baseActivity,
+    kCoreMixins.baseCollection,
     kMapMixins.map.baseMap,
     kMapMixins.map.baseLayers,
     kMapMixins.map.geojsonLayers,
-    kMapMixins.map.serviceLayers,
+    kMapMixins.map.collectionLayer,
     mixins.eventLogs
   ],
   props: {
@@ -34,12 +59,31 @@ export default {
       required: true
     }
   },
+  data () {
+    return {
+      actors: false,
+      actorRenderer: { 
+        component: 'KActorCard', 
+        props: {
+          options: {
+            layout: 'col-12'
+          }
+        } 
+      }
+    }
+  },
   methods: {
     router () {
       return { 
         onApply: { name: 'event-activity', params: { contextId: this.contextId, id: this.id } },
         onDismiss: { name: 'event-activity', params: { contextId: this.contextId, id: this.id } }
       }
+    },
+    loadService () {
+      return this.$api.getService('event-logs')
+    },
+    getCollectionBaseQuery () {
+      return { lastInEvent: true, event: this.id }
     },
     refreshActivity () {
       this.clearActivity()
@@ -58,6 +102,12 @@ export default {
         name: 'edit-event', label: 'Properties', icon: 'description', 
         route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', id: this.id } } 
       })
+      this.refreshCollection()
+    },
+    getActorIcon (actor) {
+      let icon = this.getIcon(actor)
+      console.log(icon)
+      return 'fa-' + icon
     },
     getPointMarker (feature, latlng) {
       const icon = this.getIcon(feature)
@@ -109,25 +159,37 @@ export default {
         position: 'absolute' 
       }
     },
-    onPopupOpen(event) {
+    onPopupOpen (event) {
       const feature = _.get(event, 'layer.feature')
       if (!feature) return
       const step = this.getWorkflowStep(feature)
       if (this.waitingInteraction(step, feature, 'coordinator')) {
         this.$router.push({ name: 'event-log', params: { logId: event.layer.feature._id } })
       }
+    },
+    onActorClicked (actor) {
+      this.collectionLayer.eachLayer(layer => {
+        if (layer.feature && layer.feature._id === actor._id) {
+          let feature = layer.feature
+          if (feature.geometry && feature.geometry.coordinates) {
+            this.map.flyTo(L.GeoJSON.coordsToLatLng(layer.feature.geometry.coordinates), 14)  
+          }
+        } 
+      })
     }
   },
   mounted () {
-    this.setupMap()
-    let query = { lastInEvent: true, event: this.id }
-    let clusterOptions = { spiderfyDistanceMultiplier: 5.0 }
-    this.addServiceLayer('Actors', 'event-logs', query, null, clusterOptions)
+    if (! this.map) this.setupMap()
+    this.addCollectionLayer('Actors', { spiderfyDistanceMultiplier: 5.0 })
+    // Setup event connections
     this.$on('popupopen', this.onPopupOpen)
+    this.$on('collection-refreshed', this.refreshLayer)
   },
   beforeDestroy () {
-    this.removeServiceLayer('Actors')
+    this.removeCollectionLayer('Actors')
+    // Remove event connections
     this.$off('popupopen', this.onPopupOpen)
+    this.$off('collection-refreshed', this.refreshLayer)
   }
 }
 </script>
