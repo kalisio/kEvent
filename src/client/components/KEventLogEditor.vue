@@ -45,7 +45,7 @@ export default {
       toolbar: [{ 
         name: 'close', 
         icon: 'close', 
-        handler: () => this.$refs.modal.close()
+        handler: () => this.$refs.modal.close(this.router ? _ => this.$router.push(this.router.onDismiss) : null) 
       }],
       buttons: [{
         name: 'Save',
@@ -84,17 +84,28 @@ export default {
     async logCoordinatorState (event, done) {
       await this.logStep(this.$refs.form, this.step, this.state)
       done()
+      this.$refs.modal.close(this.router ? _ => this.$router.push(this.router.onApply) : null) 
     }
+
   },
-  async created () {
+  created () {
     // Load the required components
     this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-form'] = this.$load('form/KForm')
     // Retrieve source log/event
-    this.state = await this.loadService().get(this.logId)
+    /*this.state = await this.loadService().get(this.logId)
     this.event = await this.$api.getService('events', this.contextId).get(this.id)
-    this.step = this.getWorkflowStep(this.state)
-    this.refresh()
+    */
+    this.loadService().get(this.logId)
+    .then(state => {
+      this.state = state
+      return this.$api.getService('events', this.contextId).get(this.id)
+    })
+    .then(event => {
+      this.event = event
+      this.step = this.getWorkflowStep(this.state)
+      this.refresh()
+    })
   }
 }
 </script>

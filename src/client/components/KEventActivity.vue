@@ -120,10 +120,9 @@ export default {
   },
   mounted () {
     this.setupMap()
-    this.addServiceLayer('Actors', 'event-logs', {
-      lastInEvent: true,
-      event: this.id
-    })
+    let query = { lastInEvent: true, event: this.id }
+    let clusterOptions = { spiderfyDistanceMultiplier: 5.0 }
+    this.addServiceLayer('Actors', 'event-logs', query, null, clusterOptions)
     this.$on('popupopen', this.onPopupOpen)
   },
   beforeDestroy () {
