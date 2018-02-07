@@ -19,6 +19,7 @@ import _ from 'lodash'
 import sift from 'sift'
 import { Events, QIcon, Dialog } from 'quasar'
 import { mixins as kCoreMixins } from 'kCore/client'
+import { errors } from 'kMap/common'
 import mixins from '../mixins'
 
 export default {
@@ -245,7 +246,10 @@ export default {
         this.coordinatorLogListener = null
       }
     },
-    refresh () {
+    refresh (error) {
+      // We force a refresh anyway in case of geolocation error
+      if (error && !(error instanceof errors.KPositionError)) return
+
       this.refreshUser()
       if (this.userId) {
         // Update content according to user role
@@ -271,12 +275,15 @@ export default {
     this.event = this.item
     // Set the required actor
     // Because we can have multiple cards we need a listener per card
+    // to have appropriate this binding
     this.refreshOnGeolocation = _ => this.refresh()
     if (this.$store.get('user.position')) this.refreshOnGeolocation()
     Events.$on('user-position-changed', this.refreshOnGeolocation)
+    Events.$on('error', this.refreshOnGeolocation)
   },
   beforeDestroy() {
     Events.$off('user-position-changed', this.refreshOnGeolocation)
+    Events.$off('error', this.refreshOnGeolocation)
     this.unsubscribeParticipantLog()
     this.unsubscribeCoordinatorLog()
   }
