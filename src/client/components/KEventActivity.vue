@@ -110,7 +110,7 @@ export default {
       return this.$api.getService('event-logs')
     },
     getCollectionBaseQuery () {
-      return { event: this.id }
+      return { lastInEvent: true, event: this.id }
     },
     async refreshEvent () {
       this.event = await this.$api.getService('events', this.contextId).get(this.id)
