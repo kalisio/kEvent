@@ -125,7 +125,6 @@ let eventsMixin = {
       if (user) {
         this.userId = user._id
         // Check user role in event
-        console.log(this.event)
         this.isParticipant = _.findIndex(this.event.participants, participant => {
           if (participant.service === 'members' && participant._id === user._id) return true
           if (participant.service === 'groups' || participant.service === 'organisations') {

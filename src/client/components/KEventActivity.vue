@@ -1,36 +1,46 @@
 <template>
-  <div v-if="id !== ''" class="column justify-center full-width">
-    <div class="row full-width">
-      <div class="col-3">
-        <q-list separator>
-          <q-item v-for="actor in items" :key="actor._id">
-            <q-item-side :icon="getIcon(actor).name"  :color="getIcon(actor).color" />
-            <q-item-main :label="actor.participant.name" />
-            <q-item-side right>
-              <q-btn flat round small color="primary" @click="onActorClicked(actor)"><q-icon name="remove_red_eye" /></q-btn>
-            </q-item-side>
-          </q-item>
-        </q-list>
-      </div>      
-      <div class="col-9 full-height">
-        <div id="map" :style="mapStyle()"></div>
+  <div>
+    <q-window-resize-observable @resize="onWindowResized" />
+    <div v-if="id !== ''" class="column justify-center full-width">
+      <div class="row full-width">
+        <div class="col-3 full-height" v-if="pane">
+          <q-scroll-area :style="paneStyle">
+            <q-list separator>
+              <q-item v-for="actor in items" :key="actor._id">
+                <q-item-side :icon="getIcon(actor).name"  :color="getIcon(actor).color" />
+                <q-item-main :label="actor.participant.name" />
+                <q-item-side right>
+                  <q-btn flat round small color="primary" @click="onActorClicked(actor)"><q-icon name="remove_red_eye" /></q-btn>
+                </q-item-side>
+              </q-item>
+            </q-list>
+          </q-scroll-area>
+        </div>      
+        <div class="col-auto full-height">
+          <div id="map" :style="mapStyle">
+          </div>
+        </div>
       </div>
-    </div>
-    <div>
-      <router-view service="events" :router="router()"></router-view>
+      <div>
+        <router-view service="events" :router="router()"></router-view>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { QBtn, QList, QItem, QItemSide, QItemMain, QItemTile, QItemSeparator, QIcon } from 'quasar'
+import { QWindowResizeObservable, QScrollArea, QBtn, QList, QItem, QItemSide, QItemMain, QItemTile, QItemSeparator, QIcon, dom } from 'quasar'
 import { Store, mixins as kCoreMixins, utils as kCoreUtils } from 'kCore/client'
 import { mixins as kMapMixins } from 'kMap/client'
 import mixins from '../mixins'
 
+const { offset } = dom
+
 export default {
   name: 'k-event-activity',
   components: {
+    QWindowResizeObservable,
+    QScrollArea,
     QBtn,
     QList,
     QItem,
@@ -59,9 +69,26 @@ export default {
       required: true
     }
   },
+  computed: {
+    paneStyle () {
+      return 'width: 100%; height: ' + this.viewport.height + 'px'
+    },
+    mapStyle () {
+      let width = this.pane === true ? 75 : 100
+      return 'width: ' + width + '%; height: 100%; fontWeight: normal; zIndex: 0; position: absolute'
+    }
+  },
   data () {
     return {
-      actors: false,
+      viewport: {
+        width: 0,
+        height: 0
+      },
+      mapOffset: {
+        left: 0.0,
+        top: 0
+      },
+      pane: true,
       actorRenderer: { 
         component: 'KActorCard', 
         props: {
@@ -83,7 +110,7 @@ export default {
       return this.$api.getService('event-logs')
     },
     getCollectionBaseQuery () {
-      return { lastInEvent: true, event: this.id }
+      return { event: this.id }
     },
     async refreshEvent () {
       this.event = await this.$api.getService('events', this.contextId).get(this.id)
@@ -114,8 +141,13 @@ export default {
         route: { name: 'browse-media', params: { contextId: this.contextId, id: this.id } } 
       })
       this.registerFabAction({ 
-        name: 'edit-event', label: 'Properties', icon: 'description', 
+        name: 'edit-event', label: 'Event properties', icon: 'description', 
         route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', id: this.id } } 
+      })
+      let label = this.pane === false ? 'View actors pane' : 'Hide actors pane'
+      this.registerFabAction({ 
+        name: 'toggle-pnae', label: label, icon: 'toc',
+        handler: this.togglePane 
       })
       this.refreshCollection()
     },
@@ -153,21 +185,18 @@ export default {
       const name = _.get(feature, 'participant.name', 'Unamed')
       // Check for any interaction to be performed
       if (this.waitingInteraction(step, feature, 'coordinator')) {
-        return tooltip.setContent('<b>' + name + ' - Action required' + '</b>')
+        return tooltip.setContent('<b>' + name + '<br>Action required' + '</b>')
       } else if (this.waitingInteraction(step, feature, 'participant')) {
-        return tooltip.setContent('<b>' + name + ' - Awaiting information' + '</b>')
+        return tooltip.setContent('<b>' + name + '<br>Awaiting information' + '</b>')
       } else {
         return tooltip.setContent('<b>' + name + '</b>')
       }
     },
-    mapStyle () {
-      return { 
-        width: '75%', 
-        height: '100%',
-        fontWeight: 'normal', 
-        zIndex: 0, 
-        position: 'absolute' 
-      }
+    togglePane () {
+      this.pane = !this.pane
+      this.$nextTick(() => {
+        this.refreshMap()
+      })
     },
     onPopupOpen (event) {
       const feature = _.get(event, 'layer.feature')
@@ -181,15 +210,18 @@ export default {
       this.collectionLayer.eachLayer(layer => {
         if (layer.feature && layer.feature._id === actor._id) {
           let feature = layer.feature
-          if (feature.geometry && feature.geometry.coordinates) {
-            this.map.flyTo(L.GeoJSON.coordsToLatLng(layer.feature.geometry.coordinates), 15)  
-          }
+          if (feature.geometry && feature.geometry.coordinates) this.center(feature.geometry.coordinates[0], feature.geometry.coordinates[1])
         } 
       })
+    },
+    onWindowResized (size) {
+      let mapElement = document.getElementById('map')
+      this.viewport.width = size.width
+      this.viewport.height = size.height - offset(mapElement).top
     }
   },
   mounted () {
-    if (! this.map) this.setupMap()
+    this.setupMap()
     this.addCollectionLayer('Actors', { spiderfyDistanceMultiplier: 5.0 })
     // Setup event connections
     this.$on('popupopen', this.onPopupOpen)
