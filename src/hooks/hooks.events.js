@@ -10,8 +10,12 @@ export function addCreatorAsCoordinator (hook) {
   let coordinators = hook.data.coordinators || []
   if (user && Array.isArray(coordinators)) {
     // Add creator as coordinator if not already done
-    if (!coordinators.find(coordinator => coordinator.toString() === user._id.toString())) {
-      coordinators.push(user._id)
+    if (!coordinators.find(coordinator => coordinator._id.toString() === user._id.toString())) {
+      coordinators.push({
+        _id: user._id,
+        service: 'members',
+        name: user.name
+      })
       hook.data.coordinators = coordinators
       debug('Added coordinator to event: ', user)
     }

@@ -182,7 +182,7 @@ export default {
         if (layer.feature && layer.feature._id === actor._id) {
           let feature = layer.feature
           if (feature.geometry && feature.geometry.coordinates) {
-            this.map.flyTo(L.GeoJSON.coordsToLatLng(layer.feature.geometry.coordinates), 15)  
+            this.map.flyTo(L.GeoJSON.coordsToLatLng(layer.feature.geometry.coordinates), 15)
           }
         } 
       })

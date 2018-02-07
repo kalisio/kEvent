@@ -120,27 +120,27 @@ let eventsMixin = {
         return Promise.reject(new Error('Cannot log state because form is not valid'))
       }
     },
+    hasRoleInEvent (user, roles) {
+      return _.findIndex(roles, role => {
+        if (role.service === 'members' && role._id === user._id) return true
+        if (role.service === 'groups' || role.service === 'organisations') {
+          if (sift({ [role.service + '._id']: user._id }, [user])) return true
+        }
+        if (role.service === 'tags') {
+          if (user.tags) {
+            if (_.findIndex(user.tags, { '_id': role._id } >= 0)) return true
+          }
+        }
+        return false
+      }) >= 0
+    },
     refreshUser () {
       const user = this.$store.get('user')
       if (user) {
         this.userId = user._id
         // Check user role in event
-        console.log(this.event)
-        this.isParticipant = _.findIndex(this.event.participants, participant => {
-          if (participant.service === 'members' && participant._id === user._id) return true
-          if (participant.service === 'groups' || participant.service === 'organisations') {
-            if (sift({ [participant.service + '._id']: participant._id }, [user])) return true
-          }
-          if (participant.service === 'tags') {
-            if (user.tags) {
-              if (_.findIndex(user.tags, { '_id': participant._id } >= 0)) return true
-            }
-          }
-          return false
-        }) >= 0
-        this.isCoordinator = _.findIndex(this.event.coordinators, coordinator => {
-          return (coordinator === user._id)
-        }) >= 0
+        this.isParticipant = this.hasRoleInEvent(user, this.event.participants)
+        this.isCoordinator = this.hasRoleInEvent(user, this.event.coordinators)
       }
     }
   }

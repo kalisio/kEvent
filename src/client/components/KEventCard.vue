@@ -49,6 +49,7 @@ export default {
       participantStep: {},
       participantState: {},
       participantLabel: '',
+      nbParticipantsWaitingCoordination: 0,
       coordinatorLabel: '',
       toolbar: [{ 
         name: 'close', 
@@ -94,15 +95,30 @@ export default {
       }
       if (this.item.hasWorkflow && this.$can('read', 'events', this.contextId, this.item)) {
         let hasFollowUp = false
+        let warning = ''
         if (this.isParticipant) {
           hasFollowUp = (this.waitingInteraction(this.participantStep, this.participantState, 'participant') ||
                          this.waitingInteraction(this.participantStep, this.participantState, 'coordinator'))
-        } else {
-          hasFollowUp = this.isCoordinator
+        }
+        if (this.isCoordinator) {
+          hasFollowUp = true
         }
         if (hasFollowUp) {
+          if (this.isParticipant) {
+            if (this.waitingInteraction(this.participantStep, this.participantState, 'participant')) {
+              warning = 'Action required'
+            } else if (this.waitingInteraction(this.participantStep, this.participantState, 'coordinator')) {
+              warning = 'Waiting coordination'
+            }
+          }
+          // Participant warning if any overrides coordinator warning
+          if (!warning && this.isCoordinator) {
+            if (this.nbParticipantsWaitingCoordination > 0) {
+              warning = 'Action required'
+            }
+          }
           this.registerPaneAction({ 
-            name: 'follow-up', label: 'Follow up', icon: 'message', handler: this.followUp
+            name: 'follow-up', label: 'Follow up', icon: 'message', handler: this.followUp, warning
           })
         }
       }
@@ -162,11 +178,9 @@ export default {
 
       // Update actions according to user state
       this.refreshActions()
-      let action = this.getAction('follow-up')
       this.participantLabel = ''
       if (this.waitingInteraction(this.participantStep, this.participantState, 'participant')) {
         this.participantLabel = 'Coordinator is waiting for your input'
-        action.warning = 'Action required'
         // We can then load the schema and local refs in parallel
         Promise.all([
           this.loadSchema(),
@@ -174,8 +188,7 @@ export default {
         ])
         .then(_ => this.$refs.form.build())
       } else if (this.waitingInteraction(this.participantStep, this.participantState, 'coordinator')) {
-          this.participantLabel = 'Waiting for coordinator feedback'
-          action.warning = 'Waiting coordination'
+        this.participantLabel = 'Waiting for coordinator feedback'
       }
     },
     subscribeParticipantLog () {
@@ -202,13 +215,12 @@ export default {
       }
     },
     refreshCoordinatorState (logs) {
+      this.nbParticipantsWaitingCoordination = logs.data.filter(log => (log.stakeholder === 'coordinator') && !this.hasInteraction(log)).length
       // Update actions according to user state
       this.refreshActions()
-      let action = this.getAction('follow-up')
-      logs = logs.data.filter(log => (log.stakeholder === 'coordinator') && !this.hasInteraction(log))
-      if (logs.length > 0) {
-        this.coordinatorLabel = logs.length + ' participants awaiting coordination'
-        action.warning = 'Action required'
+      // Then label 
+      if (this.nbParticipantsWaitingCoordination > 0) {
+        this.coordinatorLabel = this.nbParticipantsWaitingCoordination + ' participants awaiting coordination'
       } else {
         this.coordinatorLabel = 'No participants awaiting coordination'
       }
