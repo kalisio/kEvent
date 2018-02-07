@@ -137,7 +137,7 @@ describe('kEvent', () => {
       expect(events.data.length > 0).beTrue()
       eventObject = events.data[0]
       expect(eventObject.coordinators.length > 0).beTrue()
-      expect(eventObject.coordinators[0].toString()).to.equal(orgManagerObject._id.toString())
+      expect(eventObject.coordinators[0]._id.toString()).to.equal(orgManagerObject._id.toString())
     })
   })
 
@@ -166,7 +166,7 @@ describe('kEvent', () => {
     })
   })
 
-  it('org manager can update events', () => {
+  it('event coordinators can update events', () => {
     return eventService.patch(eventObject._id, { participants: [{ _id: orgUserObject._id }] }, { user: orgManagerObject, checkAuthorisation: true })
     .then(event => {
       eventObject = event

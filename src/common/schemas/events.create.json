@@ -88,7 +88,23 @@
         "baseQuery": {
           "$select": ["_id", "profile.name"]
         },
-        "icon": "supervisor_account"
+        "icon": "perm_identity"
+      },
+      {
+        "service": "groups",
+        "field": "name",
+        "baseQuery": {
+          "$select": ["_id", "name"]
+        },
+        "icon": "group"
+      },
+      {
+        "service": "tags",
+        "field": "value",
+        "baseQuery": {
+          "scope": "members"
+        },
+        "icon": "label"
       }],
       "field": {
         "component": "form/KItemField",
