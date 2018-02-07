@@ -205,8 +205,9 @@ export default {
       // Update actions according to user state
       this.refreshActions()
       let action = this.getAction('follow-up')
-      if (logs.total > 0) {
-        this.coordinatorLabel = logs.total + ' participants awaiting coordination'
+      logs = logs.data.filter(log => (log.stakeholder === 'coordinator') && !this.hasInteraction(log))
+      if (logs.length > 0) {
+        this.coordinatorLabel = logs.length + ' participants awaiting coordination'
         action.warning = 'Action required'
       } else {
         this.coordinatorLabel = 'No participants awaiting coordination'
@@ -219,9 +220,6 @@ export default {
         rx: {
           listStrategy: 'always'
         }, query: {
-          $limit: 0,
-          stakeholder: 'coordinator',
-          interaction: { $exists: false },
           event: this.item._id,
           lastInEvent: true
         }
