@@ -125,13 +125,16 @@ let eventsMixin = {
       if (user) {
         this.userId = user._id
         // Check user role in event
+        console.log(this.event)
         this.isParticipant = _.findIndex(this.event.participants, participant => {
           if (participant.service === 'members' && participant._id === user._id) return true
           if (participant.service === 'groups' || participant.service === 'organisations') {
             if (sift({ [participant.service + '._id']: participant._id }, [user])) return true
           }
           if (participant.service === 'tags') {
-            if (user.tags.findIndex() >= 0) return true
+            if (user.tags) {
+              if (_.findIndex(user.tags, { '_id': participant._id } >= 0)) return true
+            }
           }
           return false
         }) >= 0

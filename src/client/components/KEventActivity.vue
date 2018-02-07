@@ -2,10 +2,13 @@
   <div v-if="id !== ''" class="column justify-center full-width">
     <div class="row full-width">
       <div class="col-3">
-        <q-list link separator>
-          <q-item v-for="actor in items" :key="actor._id" @click="onActorClicked(actor)">
+        <q-list separator>
+          <q-item v-for="actor in items" :key="actor._id">
             <q-item-side :icon="getIcon(actor).name"  :color="getIcon(actor).color" />
             <q-item-main :label="actor.participant.name" />
+            <q-item-side right>
+              <q-btn flat round small color="primary" @click="onActorClicked(actor)"><q-icon name="remove_red_eye" /></q-btn>
+            </q-item-side>
           </q-item>
         </q-list>
       </div>      
@@ -115,11 +118,6 @@ export default {
         route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', id: this.id } } 
       })
       this.refreshCollection()
-    },
-    getActorIcon (actor) {
-      let icon = this.getIcon(actor)
-      console.log(icon)
-      return 'fa-' + icon
     },
     getPointMarker (feature, latlng) {
       const icon = this.getIcon(feature)
