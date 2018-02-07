@@ -10,7 +10,18 @@
                 <q-item-side :icon="getIcon(actor).name"  :color="getIcon(actor).color" />
                 <q-item-main :label="actor.participant.name" />
                 <q-item-side right>
-                  <q-btn flat round small color="primary" @click="onActorClicked(actor)"><q-icon name="remove_red_eye" /></q-btn>
+                  <div class="row">
+                    <div>
+                      <q-btn flat round small color="primary" @click="onZoomClicked(actor)">
+                        <q-icon name="remove_red_eye" />
+                      </q-btn>
+                    </div>
+                    <div>
+                      <q-btn v-if="canFollowUp(actor)" flat round small color="primary" @click="onFollowUpClicked(actor)">
+                        <q-icon name="message" color="red" />
+                      </q-btn>
+                    </div>
+                  </div>
                 </q-item-side>
               </q-item>
             </q-list>
@@ -201,12 +212,9 @@ export default {
     onPopupOpen (event) {
       const feature = _.get(event, 'layer.feature')
       if (!feature) return
-      const step = this.getWorkflowStep(feature)
-      if (this.waitingInteraction(step, feature, 'coordinator')) {
-        this.$router.push({ name: 'event-log', params: { logId: event.layer.feature._id } })
-      }
+      if (this.canFollowUp(feature)) this.doFollowUp(feature._id)
     },
-    onActorClicked (actor) {
+    onZoomClicked (actor) {
       this.collectionLayer.eachLayer(layer => {
         if (layer.feature && layer.feature._id === actor._id) {
           let feature = layer.feature
@@ -214,10 +222,20 @@ export default {
         } 
       })
     },
+    onFollowUpClicked (actor) {
+      this.doFollowUp(actor._id)
+    },
     onWindowResized (size) {
       let mapElement = document.getElementById('map')
       this.viewport.width = size.width
       this.viewport.height = size.height - offset(mapElement).top
+    },
+    canFollowUp (actor) {
+      const step = this.getWorkflowStep(actor)
+      return this.waitingInteraction(step, actor, 'coordinator')
+    },
+    doFollowUp (actorId) {
+      this.$router.push({ name: 'event-log', params: { logId: actorId } })
     }
   },
   mounted () {
