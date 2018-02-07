@@ -29,6 +29,7 @@
         </div>      
         <div class="col-auto full-height">
           <div id="map" :style="mapStyle">
+            <q-resize-observable @resize="onMapResized" />
           </div>
         </div>
       </div>
@@ -40,7 +41,7 @@
 </template>
 
 <script>
-import { QWindowResizeObservable, QScrollArea, QBtn, QList, QItem, QItemSide, QItemMain, QItemTile, QItemSeparator, QIcon, dom } from 'quasar'
+import { Events, QWindowResizeObservable, QResizeObservable, QScrollArea, QBtn, QList, QItem, QItemSide, QItemMain, QItemTile, QItemSeparator, QIcon, dom } from 'quasar'
 import { Store, mixins as kCoreMixins, utils as kCoreUtils } from 'kCore/client'
 import { mixins as kMapMixins } from 'kMap/client'
 import mixins from '../mixins'
@@ -51,6 +52,7 @@ export default {
   name: 'k-event-activity',
   components: {
     QWindowResizeObservable,
+    QResizeObservable,
     QScrollArea,
     QBtn,
     QList,
@@ -205,9 +207,13 @@ export default {
     },
     togglePane () {
       this.pane = !this.pane
-      this.$nextTick(() => {
-        this.refreshMap()
-      })
+    },
+    canFollowUp (actor) {
+      const step = this.getWorkflowStep(actor)
+      return this.waitingInteraction(step, actor, 'coordinator')
+    },
+    doFollowUp (actorId) {
+      this.$router.push({ name: 'event-log', params: { logId: actorId } })
     },
     onPopupOpen (event) {
       const feature = _.get(event, 'layer.feature')
@@ -226,26 +232,33 @@ export default {
       this.doFollowUp(actor._id)
     },
     onWindowResized (size) {
-      let mapElement = document.getElementById('map')
-      this.viewport.width = size.width
-      this.viewport.height = size.height - offset(mapElement).top
+      // Avoid to refresh the layout when leaving the component
+      if (this.observe) {
+        let mapElement = document.getElementById('map')
+        this.viewport.width = size.width
+        this.viewport.height = size.height - offset(mapElement).top
+      }
     },
-    canFollowUp (actor) {
-      const step = this.getWorkflowStep(actor)
-      return this.waitingInteraction(step, actor, 'coordinator')
-    },
-    doFollowUp (actorId) {
-      this.$router.push({ name: 'event-log', params: { logId: actorId } })
+    onMapResized (size) {
+      // Avoid to refresh the layout when leaving the component
+      if (this.observe) this.refreshMap()
     }
   },
+  created () {
+    // Enable the observers in order to refresh the layout
+    this.observe = true
+  },  
   mounted () {
     this.setupMap()
     this.addCollectionLayer('Actors', { spiderfyDistanceMultiplier: 5.0 })
     // Setup event connections
     this.$on('popupopen', this.onPopupOpen)
     this.$on('collection-refreshed', this.refreshLayer)
+    
   },
   beforeDestroy () {
+    // No need to refresh the layout when leaving the component
+    this.observe = false
     this.removeCollectionLayer('Actors')
     // Remove event connections
     this.$off('popupopen', this.onPopupOpen)
