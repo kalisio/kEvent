@@ -3,7 +3,7 @@
     <q-step v-for="(step, index) in steps" :name="step.name" :order="index" :title="step.title" :icon="step.icon.name" :active-icon="preview ? step.icon.name : 'edit'" :done-icon="step.icon.name">
       <k-form ref="stepForm" v-show="!preview" :schema="schema"/>
       <div v-show="preview">
-        <p>{{step.description}}</p>
+        <k-form ref="previewForm" :schema="previewSchema"/>
       </div>
       <div class="row justify-end">
         <q-btn class="col-1" v-show="index > 0" flat color="primary" icon="navigate_before" @click="onPreviousStep(index)">
@@ -28,8 +28,9 @@
 
 <script>
 import _ from 'lodash'
-import { mixins } from 'kCore/client'
-import { QStepper, QStep, QBtn, QTooltip, uid } from 'quasar'
+import { mixins as kCoreMixins } from 'kCore/client'
+import mixins from '../mixins'
+import { QStepper, QStep, QBtn, QTooltip, Events, uid } from 'quasar'
 
 const defaultStep = {
   title: 'New step',
@@ -48,8 +49,9 @@ export default {
     QTooltip
   },
   mixins: [
-    mixins.schemaProxy,
-    mixins.refsResolver()
+    kCoreMixins.schemaProxy,
+    kCoreMixins.refsResolver(),
+    mixins.eventLogs
   ],
   props: {
     id: {
@@ -61,7 +63,8 @@ export default {
     return {
       steps: [],
       currentStep: '',
-      preview: false
+      preview: false,
+      previewSchema: null
     }
   },
   methods: {
@@ -134,22 +137,48 @@ export default {
       return form.isValid
     },
     restoreStep () {
-      if (this.preview) return
-      
-      let form = this.$refs.stepForm[0]
-      form.fill(this.getCurrentStep())
+      // For preview we need to update the underlying schema to reflect step values
+      if (this.preview) {
+        this.previewSchema = this.generateSchemaForStep(this.getCurrentStep(), this.previewSchemaBase)
+        // We need to force a refresh so that the schema is correctly transfered to child component by Vuejs
+        this.$nextTick().then(_ => {
+          // Force form refresh to default values
+          let form = this.$refs.previewForm[0]
+          form.reset()
+        })
+      } else {
+        // Otherwise simply fill the step form
+        let form = this.$refs.stepForm[0]
+        form.fill(this.getCurrentStep())
+      }
+    },
+    loadPreviewSchema () {
+      return this.$load('event-logs.create', 'schema')
+      .then(schema => {
+        this.previewSchemaBase = schema
+        this.previewSchema = this.generateSchemaForStep(this.getCurrentStep(), this.previewSchemaBase)
+        return schema
+      })
+      .catch(error => {
+        Events.$emit('error', error)
+        throw error
+      })
     },
     build () {
       // Because our step form is under a v-if caused by the Quasar stepper
       // it is destroyed/recreated by Vue so that we need to restore the refs each time it is build
-      this.setRefs(['stepForm'])
+      this.setRefs(['stepForm', 'previewForm'])
       // Build the internal form
       return Promise.all([
         this.loadSchema(),
+        this.loadPreviewSchema(),
         this.loadRefs()
       ])
       .then(_ => {
-        return this.$refs.stepForm[0].build()
+        return Promise.all([
+          this.$refs.stepForm[0].build(),
+          this.$refs.previewForm[0].build()
+        ])
       })
     },
     fill (object) {

@@ -54,13 +54,15 @@ let eventsMixin = {
       const options = step.interaction.map(option => { return { label: option.value, value: option } })
       schema.properties['interaction'] = {
         type: 'object',
-        default: options[0].value,
         field: {
           component: 'form/KSelectField',
           label: step.title,
           helper: step.description,
           options
         }
+      }
+      if (options.length > 0) {
+        schema.properties['interaction'].default = options[0].value
       }
       schema.required.push('interaction')
       // Add a comment entry
