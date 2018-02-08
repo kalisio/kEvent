@@ -154,7 +154,10 @@ export default {
       })
     },
     fill (object) {
-      this.steps = object.workflow
+      // If no workflow given this will use default one
+      if (object.workflow) {
+        this.steps = object.workflow
+      }
       this.currentStep = this.steps[0].name
       // Restore step form when editing
       this.restoreStep()
