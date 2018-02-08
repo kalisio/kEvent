@@ -50,15 +50,19 @@ export async function addLogDefaults (hook) {
     throw new Error(`The 'addLogDefaults' hook should only be used as a 'before' hook.`)
   }
 
-  const participant = hook.data.participant
+  let participant = hook.data.participant
+  let stakeholder = hook.data.stakeholder
   const event = hook.data.event
   const user = hook.params.user
   // By default we assume the user is the participant
-  if (!participant && user) {
-    hook.data.participant = user._id
+  if (user) {
+    if (!participant) hook.data.participant = participant = user._id
+    if (!stakeholder) hook.data.stakeholder = stakeholder = 'participant'
   }
   hook.data.lastInEvent = true
-  debug('Added default log properties for participant ' + participant.toString() + ' on event ' + event.toString())
+  if (participant && event) {
+    debug('Added default log properties for participant ' + hook.data.participant.toString() + ' on event ' + event.toString())
+  }
   
   return hook
 }
@@ -77,7 +81,7 @@ export async function sendStateNotifications (hook) {
     if (!pusherService) return hook
     const participant = hook.result.participant
     let event = hook.result.event
-    if (participant) {
+    if (participant && event) {
       // We need the event first to get its title
       const eventsService = hook.app.getService('events', hook.service.context)
       event = await eventsService.get(event.toString())

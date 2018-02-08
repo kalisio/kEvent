@@ -22,6 +22,15 @@ module.exports = {
     path: API_PREFIX + '/authentication',
     service: API_PREFIX + '/users'
   },
+  pusher: {
+    accessKeyId: process.env.SNS_ACCESS_KEY,
+    secretAccessKey: process.env.SNS_SECRET_ACCESS_KEY,
+    region: 'eu-west-1',
+    apiVersion: '2010-03-31',
+    platforms: {
+      ANDROID: process.env.SNS_ANDROID_ARN
+    }
+  },
   logs: {
     Console: {
       colorize: true,
