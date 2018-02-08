@@ -144,7 +144,7 @@ export default {
         this.$nextTick().then(_ => {
           // Force form refresh to default values
           let form = this.$refs.previewForm[0]
-          form.reset()
+          form.build().then(_ => form.reset())
         })
       } else {
         // Otherwise simply fill the step form
