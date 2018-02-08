@@ -34,7 +34,7 @@
     "interaction": {
       "type": "array", 
       "uniqueItems": true,
-      "minItems": 1,
+      "minItems": 2,
       "field": {
         "component": "form/KChipsWithIconField",
         "label": "Step interaction",

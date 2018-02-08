@@ -34,7 +34,9 @@ import { QStepper, QStep, QBtn, QTooltip, uid } from 'quasar'
 const defaultStep = {
   title: 'New step',
   icon: { name: 'check', color: 'dark' },
-  description: 'Step content'
+  description: 'Step content',
+  interaction: [],
+  stakeholder: 'participant'
 }
 
 export default {
@@ -75,9 +77,9 @@ export default {
     },
     onAddStep (index) {
       // Apply current changes when editing
-      if (!this.preview) {
-        this.applyStepChanges()
-      }
+      // If not possible the current form is invalid so do nothing
+      if (!this.applyStepChanges()) return
+      
       this.steps.push(this.generateStep())
       this.currentStep = this.steps[index + 1].name
       this.restoreStep()
@@ -123,22 +125,19 @@ export default {
       this.restoreStep()
     },
     applyStepChanges () {
-      if (this.preview) return
+      if (this.preview) return false
       
       let form = this.$refs.stepForm[0].validate()
       if (form.isValid) {
         _.assign(this.getCurrentStep(), form.values)
       }
-      return form
+      return form.isValid
     },
     restoreStep () {
       if (this.preview) return
       
-      this.build()
-      .then(_ => {
-        let form = this.$refs.stepForm[0]
-        form.fill(this.getCurrentStep())
-      })
+      let form = this.$refs.stepForm[0]
+      form.fill(this.getCurrentStep())
     },
     build () {
       // Because our step form is under a v-if caused by the Quasar stepper
@@ -157,16 +156,16 @@ export default {
       // If no workflow given this will use default one
       if (object.workflow) {
         this.steps = object.workflow
+        this.currentStep = this.steps[0].name
       }
-      this.currentStep = this.steps[0].name
       // Restore step form when editing
       this.restoreStep()
     },
     validate () {
       // Apply current form changes when editing
-      let form = this.applyStepChanges()
+      let isValid = this.applyStepChanges()
       return { 
-        isValid: form.isValid, 
+        isValid, 
         values: {
           workflow: this.steps
         }
