@@ -153,6 +153,8 @@ describe('kEvent', () => {
       orgUserObject = user
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('org manager can create event templates', () => {
     return eventTemplateService.create({ title: 'template' }, { user: orgManagerObject, checkAuthorisation: true })
