@@ -154,7 +154,7 @@ describe('kEvent', () => {
     })
   })
   // Let enough time to process
-  .timeout(5000)
+  .timeout(10000)
 
   it('org manager can create event templates', () => {
     return eventTemplateService.create({ title: 'template' }, { user: orgManagerObject, checkAuthorisation: true })
@@ -193,7 +193,7 @@ describe('kEvent', () => {
     })
   })
   // Let enough time to process
-  .timeout(5000)
+  .timeout(10000)
 
   it('non-members cannot access events', (done) => {
     eventService.find({ query: {}, user: userObject, checkAuthorisation: true })
@@ -285,7 +285,7 @@ describe('kEvent', () => {
     })
   })
   // Let enough time to process
-  .timeout(5000)
+  .timeout(10000)
 
   it('removes test user', () => {
     return userService.remove(userObject._id, { user: userObject, checkAuthorisation: true })
