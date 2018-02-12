@@ -2,7 +2,7 @@ import request from 'superagent'
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import core, { kalisio, hooks as coreHooks, permissions as corePermissions } from 'kCore'
-import team, { permissions as teamPermissions } from 'kTeam'
+import team, { permissions as teamPermissions, hooks as teamHooks } from 'kTeam'
 import notify, { hooks as notifyHooks, permissions as notifyPermissions } from 'kNotify'
 import event, { hooks, permissions } from '../src'
 
@@ -37,6 +37,17 @@ describe('kEvent', () => {
       error: { all: coreHooks.log }
       */
     })
+    // Add hooks for contextual services
+    app.on('service', service => {
+      if (service.name === 'groups') {
+        service.hooks({
+          after: {
+            create: [ teamHooks.createGroupAuthorisations ],
+            remove: [ teamHooks.removeGroupAuthorisations ]
+          }
+        })
+      }
+    })
 
     return app.db.connect()
   })
@@ -68,8 +79,8 @@ describe('kEvent', () => {
     expect(orgService).toExist()
     orgService.hooks({
       after: {
-        create: [ hooks.createOrganisationServices ],
-        remove: [ hooks.removeOrganisationServices ]
+        create: [ teamHooks.createOrganisationServices, hooks.createOrganisationServices, teamHooks.createOrganisationAuthorisations ],
+        remove: [ teamHooks.removeOrganisationAuthorisations, teamHooks.createOrganisationServices, hooks.removeOrganisationServices ]
       }
     })
     authorisationService = app.getService('authorisations')
