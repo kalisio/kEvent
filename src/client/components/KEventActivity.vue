@@ -5,26 +5,34 @@
       <div class="row full-width">
         <div class="col-3 full-height" v-if="pane">
           <q-scroll-area :style="paneStyle">
-            <q-list separator>
-              <q-item v-for="actor in items" :key="actor._id">
-                <q-item-side :icon="getIcon(actor).name"  :color="getIcon(actor).color" />
-                <q-item-main :label="actor.participant.name" />
-                <q-item-side right>
-                  <div class="row">
+            <div clas="column full-width">
+              <template v-for="actor in filteredItems">
+                <div class="row justify-between" :key="actor._id">
+                  <div class="row items-center">
+                    <div>
+                      <q-btn flat round small color="primary" @click="onStateClicked(actor)" :disable="! getIcon(actor).name">
+                        <q-icon :name="getIcon(actor).name"  :color="getIcon(actor).color" />
+                      </q-btn>
+                    </div>
+                    <div>
+                      {{actor.participant.name}}
+                    </div>
+                  </div>
+                  <div class="row items-center">
                     <div>
                       <q-btn flat round small color="primary" @click="onZoomClicked(actor)">
                         <q-icon name="remove_red_eye" />
                       </q-btn>
                     </div>
-                    <div>
-                      <q-btn v-if="canFollowUp(actor)" flat round small color="primary" @click="onFollowUpClicked(actor)">
+                    <div v-if="canFollowUp(actor)">
+                      <q-btn flat round small color="primary" @click="onFollowUpClicked(actor)">
                         <q-icon name="message" color="red" />
                       </q-btn>
                     </div>
                   </div>
-                </q-item-side>
-              </q-item>
-            </q-list>
+                </div>
+              </template>
+            </div>
           </q-scroll-area>
         </div>      
         <div class="col-auto full-height">
@@ -41,7 +49,7 @@
 </template>
 
 <script>
-import { Events, QWindowResizeObservable, QResizeObservable, QScrollArea, QBtn, QList, QItem, QItemSide, QItemMain, QItemTile, QItemSeparator, QIcon, dom } from 'quasar'
+import { Events, QWindowResizeObservable, QResizeObservable, QScrollArea, QBtn, QIcon, dom } from 'quasar'
 import { Store, mixins as kCoreMixins, utils as kCoreUtils } from 'kCore/client'
 import { mixins as kMapMixins } from 'kMap/client'
 import mixins from '../mixins'
@@ -55,12 +63,6 @@ export default {
     QResizeObservable,
     QScrollArea,
     QBtn,
-    QList,
-    QItem,
-    QItemSide, 
-    QItemMain,
-    QItemTile,
-    QItemSeparator,
     QIcon
   },
   mixins: [
@@ -83,6 +85,9 @@ export default {
     }
   },
   computed: {
+    filteredItems () {
+      return _.filter(this.items, (item) => this.filterItem(item))
+    },
     paneStyle () {
       return 'width: 100%; height: ' + this.viewport.height + 'px'
     },
@@ -101,6 +106,7 @@ export default {
         left: 0.0,
         top: 0
       },
+      filter: null,
       pane: true,
       actorRenderer: { 
         component: 'KActorCard', 
@@ -177,6 +183,12 @@ export default {
         }
       })
     },
+    filterItem (item) {
+      if (! this.filter) return true
+      if (item.interaction && item.interaction.value === this.filter) return true
+      if (item.previous && item.previous.interaction && item.previous.interaction.value === this.filter) return true
+      return false
+    },
     getFeaturePopup (feature, layer) {
       let popup = L.popup({ autoPan: false }, layer)
       const step = this.getWorkflowStep(feature)
@@ -230,6 +242,19 @@ export default {
     },
     onFollowUpClicked (actor) {
       this.doFollowUp(actor._id)
+    },
+    onStateClicked (actor) {
+      // If a filter is alredy active then clear it
+      if (this.filter) {
+        this.filter = null
+        this.refreshLayer()
+        return
+      }
+      // Otherwise set the filter to the actor's state
+      if (actor.interaction) this.filter = actor.interaction.value
+      else if (actor.previous && actor.previous.interaction) this.filter = actor.previous.interaction.value
+      else this.filter = null
+      this.refreshLayer()
     },
     onWindowResized (size) {
       // Avoid to refresh the layout when leaving the component
