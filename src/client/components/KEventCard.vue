@@ -150,7 +150,7 @@ export default {
       if (this.hasParticipantInteraction) {
         this.$refs.modal.open()
       } else if (this.isCoordinator) {
-        this.$router.push({ name: 'event-activity', params: { id: this.item._id, contextId: this.$route.params.contextId } })
+        this.$router.push({ name: 'event-activity', params: { id: this.item._id, contextId: this.contextId } })
       }
     },
     refreshParticipantState (logs) {
