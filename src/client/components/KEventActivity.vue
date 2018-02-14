@@ -10,8 +10,8 @@
                 <div class="row justify-between" :key="actor._id">
                   <div class="row items-center">
                     <div>
-                      <q-btn flat round small color="primary" @click="onStateClicked(actor)" :disable="! getIcon(actor).name">
-                        <q-icon :name="getIcon(actor).name"  :color="getIcon(actor).color" />
+                      <q-btn v-if="actor.icon" flat round small color="primary" @click="onStateClicked(actor)">
+                        <q-icon :name="actor.icon.name"  :color="actor.icon.color" />
                       </q-btn>
                     </div>
                     <div>
@@ -171,7 +171,7 @@ export default {
       this.refreshCollection()
     },
     getPointMarker (feature, latlng) {
-      const icon = this.getIcon(feature)
+      const icon = feature.icon //this.getIcon(feature, this.getWorkflowStep(feature))
       return this.createMarkerFromStyle(latlng, {
         icon: {
           type: 'icon.fontAwesome',
@@ -184,10 +184,20 @@ export default {
       })
     },
     filterItem (item) {
+      // Is there any filter active ?
       if (! this.filter) return true
-      if (item.interaction && item.interaction.value === this.filter) return true
-      if (item.previous && item.previous.interaction && item.previous.interaction.value === this.filter) return true
-      return false
+      // Is it the same step ?
+      if (item.step !== this.filter.step) return false
+      // Is it the same interaction ?
+      if (item.interaction) {
+        if (item.interaction.value === this.filter.interaction) return true
+        return false
+      } 
+      if (item.previous && item.previous.interaction) {
+        if (item.previous.interaction.value === this.filter.interaction) return true
+        return false
+      }
+      return true
     },
     getFeaturePopup (feature, layer) {
       let popup = L.popup({ autoPan: false }, layer)
@@ -245,15 +255,23 @@ export default {
     },
     onStateClicked (actor) {
       // If a filter is alredy active then clear it
-      if (this.filter) {
+      if (! this.filter) {
+        // Defines the filter to the actor's state
+        this.filter = {
+          'step' : this.getWorkflowStep(actor).name,
+          'interaction': undefined
+        }
+        if (actor.interaction) this.filter.interaction = actor.interaction.value
+        else if (actor.previous && actor.previous.interaction) this.filter.interaction = actor.previous.interaction.value
+      } else {
         this.filter = null
-        this.refreshLayer()
-        return
       }
-      // Otherwise set the filter to the actor's state
-      if (actor.interaction) this.filter = actor.interaction.value
-      else if (actor.previous && actor.previous.interaction) this.filter = actor.previous.interaction.value
-      else this.filter = null
+      this.refreshLayer()
+    },
+    onCollectionRefreshed () {
+      this.items.forEach((item) => {
+        item.icon = this.getIcon(item, this.getWorkflowStep(item))
+      })
       this.refreshLayer()
     },
     onWindowResized (size) {
@@ -278,7 +296,7 @@ export default {
     this.addCollectionLayer('Actors', { spiderfyDistanceMultiplier: 5.0 })
     // Setup event connections
     this.$on('popupopen', this.onPopupOpen)
-    this.$on('collection-refreshed', this.refreshLayer)
+    this.$on('collection-refreshed', this.onCollectionRefreshed)
     
   },
   beforeDestroy () {
@@ -287,7 +305,7 @@ export default {
     this.removeCollectionLayer('Actors')
     // Remove event connections
     this.$off('popupopen', this.onPopupOpen)
-    this.$off('collection-refreshed', this.refreshLayer)
+    this.$off('collection-refreshed', this.onCollectionRefreshed)
   }
 }
 </script>
