@@ -20,7 +20,8 @@
 
 <script>
 import { QList, QItem, QItemMain, QItemSide, QItemSeparator } from 'quasar'
-import { mixins } from 'kCore/client'
+import { mixins as kCoreMixins } from 'kCore/client'
+import { mixins as kMapMixins } from 'kMap/client'
 import Avatar from 'vue-avatar/dist/Avatar'
 
 export default {
@@ -34,8 +35,9 @@ export default {
     Avatar
   },
   mixins: [
-    mixins.baseActivity,
-    mixins.baseCollection
+    kCoreMixins.baseActivity,
+    kCoreMixins.baseCollection,
+    kMapMixins.geolocation
   ],
   data () {
     return {
