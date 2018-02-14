@@ -4366,6 +4366,10 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
+vue-avatar@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/vue-avatar/-/vue-avatar-2.1.1.tgz#98b39bbf64b1b3d5a6dcf731e7f6611a6caa46ad"
+
 vue-hot-reload-api@^2.2.0:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.2.3.tgz#43c8e5506d65a271d2571936d77253019fd3eb17"
