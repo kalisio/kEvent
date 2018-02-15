@@ -163,9 +163,8 @@ export default {
         name: 'edit-event', label: 'Event properties', icon: 'description', 
         route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', id: this.id } } 
       })
-      let label = this.pane === false ? 'View actors pane' : 'Hide actors pane'
       this.registerFabAction({ 
-        name: 'toggle-pnae', label: label, icon: 'toc',
+        name: 'toggle-pane', label: this.getPaneLabel(), icon: 'toc',
         handler: this.togglePane 
       })
       this.refreshCollection()
@@ -227,8 +226,14 @@ export default {
         return tooltip.setContent('<b>' + name + '</b>')
       }
     },
+    getPaneLabel () {
+      return this.pane === false ? 'View actors pane' : 'Hide actors pane'
+    },
     togglePane () {
       this.pane = !this.pane
+      // Update label accordingly
+      let action = this.getAction('toggle-pane')
+      if (action) action.label = this.getPaneLabel()
     },
     canFollowUp (actor) {
       const step = this.getWorkflowStep(actor)
