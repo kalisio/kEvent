@@ -27,6 +27,14 @@ export function defineEventAbilities (subject, can, cannot) {
               }
             })
           }
+          if (subject.tags) {
+            subject.tags.forEach(tag => {
+              if (tag.context.toString() === organisation._id.toString()) {
+                can('read', 'events', { context: organisation._id, 'participants._id': tag._id })
+                can('all', 'events', { context: organisation._id, 'coordinators._id': tag._id })
+              }
+            })
+          }
           // A user can create event logs for himself and coordinator for everybody
           // FIXME: hard to express this with the permission system
           //can(['read', 'create'], 'event-logs', { context: organisation._id, 'participant': subject._id })
