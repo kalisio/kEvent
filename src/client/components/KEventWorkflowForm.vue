@@ -1,7 +1,7 @@
 <template>
   <q-stepper flat ref="stepper" v-model="currentStep" color="primary" contractable @step="onStepSelected">
     <q-step v-for="(step, index) in steps" :name="step.name" :order="index" :title="step.title" :icon="step.icon.name" :active-icon="preview ? step.icon.name : 'edit'" :done-icon="step.icon.name">
-      <k-form ref="stepForm" v-show="!preview" :schema="schema"/>
+      <k-form ref="stepForm" v-show="!preview" :schema="schema" @field-changed="onFieldChanged"/>
       <div v-show="preview">
         <k-form ref="previewForm" :schema="previewSchema"/>
       </div>
@@ -37,6 +37,7 @@ const defaultStep = {
   icon: { name: 'check', color: 'dark' },
   description: 'Step content',
   interaction: [],
+  end: [],
   stakeholder: 'participant'
 }
 
@@ -68,6 +69,9 @@ export default {
     }
   },
   methods: {
+    getForm (form) {
+      return this.$refs[form][0]
+    },
     generateStep () {
       let newStep = _.cloneDeep(defaultStep)
       // We generate a UID so that we can identify each step uniquely,
@@ -130,7 +134,7 @@ export default {
     applyStepChanges () {
       if (this.preview) return false
       
-      let form = this.$refs.stepForm[0].validate()
+      let form = this.getForm('stepForm').validate()
       if (form.isValid) {
         _.assign(this.getCurrentStep(), form.values)
       }
@@ -143,13 +147,14 @@ export default {
         // We need to force a refresh so that the schema is correctly transfered to child component by Vuejs
         this.$nextTick().then(_ => {
           // Force form refresh to default values
-          let form = this.$refs.previewForm[0]
+          let form = this.getForm('previewForm')
           form.build().then(_ => form.reset())
         })
       } else {
         // Otherwise simply fill the step form
-        let form = this.$refs.stepForm[0]
+        let form = this.getForm('stepForm')
         form.fill(this.getCurrentStep())
+        this.setupEndField()
       }
     },
     loadPreviewSchema () {
@@ -164,6 +169,19 @@ export default {
         throw error
       })
     },
+    onFieldChanged (field, value) {
+      // Setup workflow ending values selector depending on interaction field state
+      if (field === 'interaction') {
+        this.setupEndField()
+      }
+    },
+    setupEndField () {
+      let form = this.getForm('stepForm')
+      let interactionField = form.getField('interaction')
+      let endField = form.getField('end')
+      // Add required label field
+      _.set(endField, 'properties.field.options', interactionField.model.map(option => Object.assign({ label: option.value }, option)))
+    },
     build () {
       // Because our step form is under a v-if caused by the Quasar stepper
       // it is destroyed/recreated by Vue so that we need to restore the refs each time it is build
@@ -176,8 +194,8 @@ export default {
       ])
       .then(_ => {
         return Promise.all([
-          this.$refs.stepForm[0].build(),
-          this.$refs.previewForm[0].build()
+          this.getForm('stepForm').build(),
+          this.getForm('previewForm').build()
         ])
       })
     },

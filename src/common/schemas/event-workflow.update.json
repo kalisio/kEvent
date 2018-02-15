@@ -45,6 +45,18 @@
         }
       }
     },
+    "end": {
+      "type": "array", 
+      "uniqueItems": true,
+      "field": {
+        "component": "form/KSelectField",
+        "label": "Workflow end",
+        "helper": "Enter the interaction values ending the workflow",
+        "multiple": true,
+        "chips": true,
+        "options": []
+      }
+    },
     "stakeholder": {
       "type": "string",
       "field": {

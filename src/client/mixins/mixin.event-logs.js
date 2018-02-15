@@ -16,6 +16,12 @@ let eventsMixin = {
     waitingInteraction (step, state, stakeholder) {
       return (this.hasInteraction(step) && !this.hasInteraction(state) && (step.stakeholder === stakeholder))
     },
+    hasEnd (step) {
+      return !_.isEmpty(step.end)
+    },
+    endWorkflow (step, state) {
+      return (this.hasEnd(step) && this.hasInteraction(state) && step.end.includes(state.interaction.value))
+    },
     getWorkflowStep (state = {}) {
       if (_.isNil(this.event.workflow)) return null
 
@@ -27,6 +33,10 @@ let eventsMixin = {
       const currentStep = this.event.workflow[currentStepIndex]
       // For interacting steps check if interaction already recorded
       if (this.waitingInteraction(currentStep, state, state.stakeholder)) {
+        return currentStep
+      }
+      // Check if the last interaction was a workflow end
+      if (this.endWorkflow(currentStep, state)) {
         return currentStep
       }
       const nextStepIndex = currentStepIndex + 1

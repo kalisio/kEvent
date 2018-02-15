@@ -40,11 +40,23 @@
       "field": {
         "component": "form/KChipsWithIconField",
         "label": "Step interaction",
-        "helper": "Enter the step interaction",
+        "helper": "Enter the step interaction values",
         "icon" : {
           "name" : "label",
           "color" : "red"
         }
+      }
+    },
+    "end": {
+      "type": "array", 
+      "uniqueItems": true,
+      "field": {
+        "component": "form/KSelectField",
+        "label": "Workflow end",
+        "helper": "Enter the interaction values ending the workflow",
+        "multiple": true,
+        "chips": true,
+        "options": []
       }
     },
     "stakeholder": {
