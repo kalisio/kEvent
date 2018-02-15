@@ -1,5 +1,6 @@
 import makeDebug from 'debug'
 import _ from 'lodash'
+import logger from 'winston'
 import { getItems } from 'feathers-hooks-common'
 const debug = makeDebug('kalisio:kEvent:event-logs:hooks')
 
@@ -85,14 +86,19 @@ export async function sendStateNotifications (hook) {
       // We need the event first to get its title
       const eventsService = hook.app.getService('events', hook.service.context)
       event = await eventsService.get(event.toString())
-      await pusherService.create({
-        action: 'message',
-        // The notification contains the event title + a prefix with recorded interaction
-        message: '[' + interaction.value + '] - ' + event.name,
-        pushObject: participant.toString(),
-        pushObjectService: 'users'
-      })
-      debug('Published event state notifications for participant ' + participant.toString() + ' on event ' + event._id.toString())
+      // We'd like to be tolerant here because the participants might have be removed from the system while the event is still alive
+      try {
+        await pusherService.create({
+          action: 'message',
+          // The notification contains the event title + a prefix with recorded interaction
+          message: '[' + interaction.value + '] - ' + event.name,
+          pushObject: participant.toString(),
+          pushObjectService: 'users'
+        })
+        debug('Published event state notifications for participant ' + participant.toString() + ' on event ' + event._id.toString())
+      } catch (error) {
+        logger.error(error.message, error)
+      }
     }
   }
   return hook

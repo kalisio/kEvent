@@ -1,3 +1,4 @@
+import logger from 'winston'
 import makeDebug from 'debug'
 const debug = makeDebug('kalisio:kEvent:events:hooks')
 
@@ -46,7 +47,17 @@ export function sendNotifications (prefix = '') {
         pushObjectService: participantService
       }))
     })
-    let results = await Promise.all(publishPromises)
+    // We'd like to be tolerant here because the participants might have be removed from the system while the event is still alive
+    //let results = await Promise.all(publishPromises)
+    let results = []
+    for (let i = 0; i < publishPromises.length; i++) {
+      try {
+        let result = await publishPromises[i]
+        results.push(result)
+      } catch (error) {
+        logger.error(error.message, error)
+      }
+    }
     debug('Published event notifications on ' + results.length + ' topics/users for event ' + hook.result._id.toString())
     return hook
   }
