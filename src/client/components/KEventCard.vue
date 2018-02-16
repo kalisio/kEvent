@@ -139,7 +139,7 @@ export default {
           {
             label: 'Ok',
             handler: () => {
-              let eventsService = this.$api.getService('events')
+              let eventsService = this.$api.getService('events', this.contextId)
               eventsService.remove(event._id)
             }
           }
