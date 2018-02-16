@@ -98,7 +98,10 @@ export async function sendStateNotifications (hook) {
             // To make the log appear right in the event time line use the event creation as reference
             // and make the log appear like an event update
             createdAt: event.createdAt,
-            updatedAt: hook.result.createdAt
+            updatedAt: hook.result.createdAt,
+            // Custom vibration pattern
+            vibration: [500, 1000, 500, 500, 500, 500],
+            sound: 'default'
           },
           pushObject: participant.toString(),
           pushObjectService: 'users'

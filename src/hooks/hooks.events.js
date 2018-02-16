@@ -46,7 +46,10 @@ export function sendNotifications (body) {
           title: hook.result.name,
           body,
           createdAt: hook.result.createdAt,
-          updatedAt: hook.result.updatedAt
+          updatedAt: hook.result.updatedAt,
+          // Custom vibration pattern
+          vibration: [500, 1000, 500, 500, 500, 500],
+          sound: 'default'
         },
         pushObject: participant._id.toString(),
         pushObjectService: participantService
