@@ -1,4 +1,4 @@
-import { populate } from 'feathers-hooks-common'
+import { setNow, populate } from 'feathers-hooks-common'
 import { hooks } from 'kCore'
 import { addLogDefaults, sendStateNotifications, linkWithPreviousLog } from '../../hooks'
 
@@ -29,7 +29,7 @@ module.exports = {
     all: [ hooks.convertObjectIDs(['participant', 'event']) ],
     find: [],
     get: [],
-    create: [ addLogDefaults, linkWithPreviousLog ],
+    create: [ setNow('createdAt'), addLogDefaults, linkWithPreviousLog ],
     update: [],
     patch: [],
     remove: []

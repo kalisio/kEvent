@@ -90,8 +90,16 @@ export async function sendStateNotifications (hook) {
       try {
         await pusherService.create({
           action: 'message',
-          // The notification contains the event title + a prefix with recorded interaction
-          message: '[' + interaction.value + '] - ' + event.name,
+          // The notification contains the event title with recorded interaction
+          // FIXME add dates for correct stacking
+          message: {
+            title: event.name,
+            body: interaction.value,
+            // To make the log appear right in the event time line use the event creation as reference
+            // and make the log appear like an event update
+            createdAt: event.createdAt,
+            updatedAt: hook.result.createdAt
+          },
           pushObject: participant.toString(),
           pushObjectService: 'users'
         })

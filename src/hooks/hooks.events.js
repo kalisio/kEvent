@@ -24,7 +24,7 @@ export function addCreatorAsCoordinator (hook) {
   return hook
 }
 
-export function sendNotifications (prefix = '') {
+export function sendNotifications (body) {
   return async function (hook) {
     if (hook.type !== 'after') {
       throw new Error(`The 'sendNotifications' hook should only be used as a 'after' hook.`)
@@ -42,7 +42,12 @@ export function sendNotifications (prefix = '') {
       publishPromises.push(pusherService.create({
         action: 'message',
         // The notification contains the event title + a given prefix
-        message: prefix + hook.result.name,
+        message: {
+          title: hook.result.name,
+          body,
+          createdAt: hook.result.createdAt,
+          updatedAt: hook.result.updatedAt
+        },
         pushObject: participant._id.toString(),
         pushObjectService: participantService
       }))
