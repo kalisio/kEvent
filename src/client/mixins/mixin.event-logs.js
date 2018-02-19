@@ -54,6 +54,8 @@ let eventsMixin = {
       if (state.previous && state.previous.interaction) return state.previous.interaction.icon
       // Otherwise use workflow icon for current step
       if (step.icon) return step.icon
+      // In case of no workflow
+      if (this.event && this.event.icon) return this.event.icon
       return {}
     },
     generateSchemaForStep (step, baseSchema) {
