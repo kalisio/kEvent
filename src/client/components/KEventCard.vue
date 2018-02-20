@@ -6,7 +6,7 @@
         {{participantLabel}}</br></br>
       </div>
       <div v-if="comment">
-        <k-text-area class="light-paragraph" length="20" :text="comment" /></br>
+        <k-text-area class="light-paragraph" :length="20" :text="comment" /></br>
       </div>
       <div v-if="isCoordinator">
         {{coordinatorLabel}}

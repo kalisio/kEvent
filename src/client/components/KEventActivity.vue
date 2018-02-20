@@ -14,7 +14,7 @@
                     </q-btn>
                     {{actor.participant.name}}
                   </div>
-                  <k-text-area v-if="actor.comment" style="flex-shrink: 0" class="col-auto light-paragraph self-center" length="20" :text="actor.comment" />
+                  <k-text-area v-if="actor.comment" style="flex-shrink: 0" class="col-auto light-paragraph self-center" :length="20" :text="actor.comment" />
                   <div class="col-auto self-center">
                     <q-btn v-if="canFollowUp(actor)" flat round small color="primary" @click="onFollowUpClicked(actor)">
                       <q-icon name="message" color="red" />
@@ -248,6 +248,11 @@ export default {
       if (!feature) return
       if (this.canFollowUp(feature)) this.doFollowUp(feature._id)
     },
+    onFeatureClicked (event) {
+      const feature = _.get(event, 'target.feature')
+      if (!feature) return
+      if (this.canFollowUp(feature)) this.doFollowUp(feature._id)
+    },
     onZoomClicked (actor) {
       this.collectionLayer.eachLayer(layer => {
         if (layer.feature && layer.feature._id === actor._id) {
@@ -304,7 +309,8 @@ export default {
     this.setupMap()
     this.addCollectionLayer('Actors', { spiderfyDistanceMultiplier: 5.0 })
     // Setup event connections
-    this.$on('popupopen', this.onPopupOpen)
+    //this.$on('popupopen', this.onPopupOpen)
+    this.$on('click', this.onFeatureClicked)
     this.$on('collection-refreshed', this.onCollectionRefreshed)
     
   },
@@ -313,7 +319,8 @@ export default {
     this.observe = false
     this.removeCollectionLayer('Actors')
     // Remove event connections
-    this.$off('popupopen', this.onPopupOpen)
+    //this.$off('popupopen', this.onPopupOpen)
+    this.$off('click', this.onFeatureClicked)
     this.$off('collection-refreshed', this.onCollectionRefreshed)
   }
 }
