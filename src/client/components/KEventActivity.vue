@@ -5,34 +5,27 @@
       <div class="row full-width">
         <div class="col-3 full-height" v-if="pane">
           <q-scroll-area :style="paneStyle">
-            <div clas="column full-width">
+            
               <template v-for="actor in filteredItems">
-                <div class="row justify-between" :key="actor._id">
-                  <div class="row items-center">
-                    <div>
-                      <q-btn v-if="actor.icon" flat round small color="primary" @click="onStateClicked(actor)">
-                        <q-icon :name="actor.icon.name"  :color="actor.icon.color" />
-                      </q-btn>
-                    </div>
-                    <div>
-                      {{actor.participant.name}}
-                    </div>
+                <div class="row justify-between no-wrap" style="overflow: auto" :key="actor._id">
+                  <div class="col-auto self-center">
+                    <q-btn v-if="actor.icon" flat round small color="primary" @click="onStateClicked(actor)">
+                      <q-icon :name="actor.icon.name"  :color="actor.icon.color" />
+                    </q-btn>
+                    {{actor.participant.name}}
                   </div>
-                  <div class="row items-center">
-                    <div>
-                      <q-btn flat round small color="primary" @click="onZoomClicked(actor)">
-                        <q-icon name="remove_red_eye" />
-                      </q-btn>
-                    </div>
-                    <div v-if="canFollowUp(actor)">
-                      <q-btn flat round small color="primary" @click="onFollowUpClicked(actor)">
-                        <q-icon name="message" color="red" />
-                      </q-btn>
-                    </div>
+                  <k-text-area v-if="actor.comment" style="flex-shrink: 0" class="col-auto light-paragraph self-center" length="20" :text="actor.comment" />
+                  <div class="col-auto self-center">
+                    <q-btn v-if="canFollowUp(actor)" flat round small color="primary" @click="onFollowUpClicked(actor)">
+                      <q-icon name="message" color="red" />
+                    </q-btn>
+                    <q-btn flat round small color="primary" @click="onZoomClicked(actor)">
+                      <q-icon name="remove_red_eye" />
+                    </q-btn>
                   </div>
                 </div>
               </template>
-            </div>
+            
           </q-scroll-area>
         </div>      
         <div class="col-auto full-height">
@@ -202,12 +195,20 @@ export default {
       let popup = L.popup({ autoPan: false }, layer)
       const step = this.getWorkflowStep(feature)
       // Check for any recorded interaction to be displayed
+      // Nothing visible because clicking on the marker opens a dialog in this case
       if (this.waitingInteraction(step, feature, 'coordinator')) {
-        return popup.setContent('Action required')
-      } else if (this.waitingInteraction(step, feature, 'participant')) {
+        return null
+      }
+      // Already shown in tooltip
+      /*
+      if (this.waitingInteraction(step, feature, 'participant')) {
         return popup.setContent('Awaiting information')
-      } else if (this.hasInteraction(feature)) {
-        return popup.setContent(feature.interaction.value)
+      }
+      */
+      // Recall last interaction state
+      const interaction = this.getInteraction(feature)
+      if (interaction) {
+        return popup.setContent(interaction)
       } else {
         return null
       }
@@ -276,6 +277,7 @@ export default {
     onCollectionRefreshed () {
       this.items.forEach((item) => {
         item.icon = this.getIcon(item, this.getWorkflowStep(item))
+        item.comment = this.getComment(item)
       })
       this.refreshLayer()
     },
@@ -293,6 +295,8 @@ export default {
     }
   },
   created () {
+    // Load the required components
+    this.$options.components['k-text-area'] = this.$load('frame/KTextArea')
     // Enable the observers in order to refresh the layout
     this.observe = true
   },  
