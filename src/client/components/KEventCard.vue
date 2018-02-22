@@ -2,9 +2,15 @@
   <k-card v-bind="$props" :itemActions="actions">
     <q-icon slot="card-icon" :name="icon.name" :color="icon.color"></q-icon>
     <div slot="card-content">
-      <div v-if="isParticipant">{{participantLabel}}</div>
-      </br>
-      <div v-if="isCoordinator">{{coordinatorLabel}}</div>
+      <div v-if="isParticipant">
+        {{participantLabel}}</br></br>
+      </div>
+      <div v-if="comment">
+        <k-text-area class="light-paragraph" :length="20" :text="comment" /></br>
+      </div>
+      <div v-if="isCoordinator">
+        {{coordinatorLabel}}
+      </div>
     </div>
     <k-modal ref="modal" v-if="hasParticipantInteraction" :title="title" :toolbar="toolbar" :buttons="buttons" :route="false" >
       <div slot="modal-content">
@@ -37,6 +43,9 @@ export default {
   computed: {
     icon () {
       return this.getIcon(this.participantState, this.participantStep)
+    },
+    comment () {
+      return this.getComment(this.participantState)
     },
     title () {
       return this.participantStep.title ? this.participantStep.title : 'Enter your choice'
@@ -270,6 +279,7 @@ export default {
     // Load the required components
     this.$options.components['k-card'] = this.$load('collection/KCard')
     this.$options.components['k-modal'] = this.$load('frame/KModal')
+    this.$options.components['k-text-area'] = this.$load('frame/KTextArea')
     this.$options.components['k-form'] = this.$load('form/KForm')
     // Required alias for the event logs mixin
     this.event = this.item

@@ -54,7 +54,23 @@ let eventsMixin = {
       if (state.previous && state.previous.interaction) return state.previous.interaction.icon
       // Otherwise use workflow icon for current step
       if (step.icon) return step.icon
+      // In case of no workflow
+      if (this.event && this.event.icon) return this.event.icon
       return {}
+    },
+    getComment(state = {}) {
+      // When last step had a recorded interaction use its comment if any
+      if (state.comment) return state.comment
+      // If we wait for an interaction use previous state comment if any
+      if (state.previous && state.previous.comment) return state.previous.comment
+      return ''
+    },
+    getInteraction(state = {}) {
+      // When last step had a recorded interaction use it if any
+      if (state.interaction) return state.interaction.value
+      // If we wait for an interaction use previous state if any
+      if (state.previous && state.previous.interaction) return state.previous.interaction.value
+      return ''
     },
     generateSchemaForStep (step, baseSchema) {
       // Start from schema template and clone it because modifications
