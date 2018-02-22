@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import lodash from 'lodash'
+import _ from 'lodash'
 import { QToggle } from 'quasar'
 import { mixins } from 'kCore/client'
 
@@ -29,6 +29,12 @@ export default {
     mixins.refsResolver(['templateForm', 'workflowForm'])
   ],
   components: { QToggle },
+  props: {
+    templateId: {
+      type: String,
+      default: ''
+    }
+  },
   computed: {
     buttons () {
       return [
@@ -45,30 +51,53 @@ export default {
     }
   },
   methods: {
+    loadObject () {
+      // When a template is provided use it as reference for object
+      if (this.template) {
+        this._object = Object.assign({}, this.template)
+        // Remove id so that event has its own
+        delete this._object._id
+        // Setup hasWorkflow tag
+        this._object.hasWorkflow = !_.isNil(this.template.workflow)
+        return Promise.resolve(this._object)
+      } else if (this.id) {
+        // Otherwise proceed as usual to load the event object
+        return mixins.objectProxy.methods.loadObject.call(this)
+      }
+    },
     onWorkflow (hasWorkflow) {
+      if (this.templateId) {
+        if (hasWorkflow) this._object.workflow = this.template.workflow
+        else delete this._object.workflow
+      }
       // Activate workflow form accordingly
       this.setFormDisabled('workflowForm', !hasWorkflow)
     },
     doClose () {
-      this.$refs.modal.close(_ => this.$router.push({ name: 'event-templates-activity' }))
+      this.$refs.modal.close(() => this.$router.push({ name: 'event-templates-activity' }))
     }
   },
-  created () {
+  async created () {
     // Load the required components
     this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-form'] = this.$load('form/KForm')
     this.$options.components['k-event-workflow-form'] = this.$load('KEventWorkflowForm')
+    // On creation check whether we copy or create a new template
+    if (this.templateId) {
+      // FIXME.
+      this.id = null
+      this.template = await this.$api.getService('event-templates').get(this.templateId)
+    }
     // Default state
-    this.refresh().then(_ => {
-      // In edition mode activate workflow according to its existence
-      if (this.id) {
-        this.hasWorkflow = !lodash.isNil(this.getObject().workflow)
-        this.setFormDisabled('workflowForm', !this.hasWorkflow)
-      } else {
-        // In creation mode disabled by default
-        this.setFormDisabled('workflowForm', true)
-      }
-    })
+    await this.refresh()
+    // In edition mode activate workflow according to its existence
+    if (this.id || this.templateId) {
+      this.hasWorkflow = !_.isNil(this.getObject().workflow)
+      this.setFormDisabled('workflowForm', !this.hasWorkflow)
+    } else {
+      // In creation mode disabled by default
+      this.setFormDisabled('workflowForm', true)
+    }
     this.$on('applied', this.doClose)
   },
   beforeDestroy() {

@@ -61,20 +61,22 @@ let eventsMixin = {
       // will be shared by all caller otherwise
       let schema = _.cloneDeep(baseSchema)
       // Then add step interaction
-      const options = step.interaction.map(option => { return { label: option.value, value: option } })
-      schema.properties['interaction'] = {
-        type: 'object',
-        field: {
-          component: 'form/KSelectField',
-          label: step.title,
-          helper: step.description,
-          options
+      if (step.interaction) {
+        const options = step.interaction.map(option => { return { label: option.value, value: option } })
+        schema.properties['interaction'] = {
+          type: 'object',
+          field: {
+            component: 'form/KSelectField',
+            label: step.title,
+            helper: step.description,
+            options
+          }
         }
+        if (options.length > 0) {
+          schema.properties['interaction'].default = options[0].value
+        }
+        schema.required.push('interaction')
       }
-      if (options.length > 0) {
-        schema.properties['interaction'].default = options[0].value
-      }
-      schema.required.push('interaction')
       // Add a comment entry
       schema.properties['comment'] = {
         type: 'string', 

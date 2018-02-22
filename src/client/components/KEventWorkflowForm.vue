@@ -148,7 +148,7 @@ export default {
         this.$nextTick().then(_ => {
           // Force form refresh to default values
           let form = this.getForm('previewForm')
-          form.build().then(_ => form.reset())
+          form.build().then(_ => form.clear())
         })
       } else {
         // Otherwise simply fill the step form
@@ -208,6 +208,9 @@ export default {
       // Restore step form when editing
       this.restoreStep()
     },
+    clear () {
+      this.fill({ workflow: [this.generateStep()] })
+    },
     validate () {
       // Apply current form changes when editing
       let isValid = this.applyStepChanges()
@@ -223,7 +226,7 @@ export default {
     // Load the required components
     this.$options.components['k-form'] = this.$load('form/KForm')
     // Initialize step data on creation so that local ref to form can be resolved
-    this.steps = [ this.generateStep() ]
+    this.steps = [this.generateStep()]
     this.currentStep = this.steps[0].name
   }
 }

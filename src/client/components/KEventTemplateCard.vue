@@ -29,6 +29,12 @@ export default {
           route: { name: 'edit-event-template', params: { contextId: this.contextId } }
         })
       }
+      if (this.$can('update', 'event-templates', this.contextId, this.item)) {
+        this.registerPaneAction({ 
+          name: 'copy-event-template', label: 'Copy', icon: 'content_copy',
+          route: { name: 'create-event-template', params: { contextId: this.contextId, templateId: this.item._id } }
+        })
+      }
       if (this.$can('remove', 'event-templates', this.contextId, this.item)) {
         this.registerMenuAction({ 
           name: 'remove-event-template', label: 'Remove', icon: 'remove_circle', handler: this.removeEventTemplate
