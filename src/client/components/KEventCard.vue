@@ -196,7 +196,7 @@ export default {
           this.loadSchema(),
           this.loadRefs()
         ])
-        .then(_ => this.$refs.form.build())
+        .then(() => this.$refs.form.build())
       } else if (this.waitingInteraction(this.participantStep, this.participantState, 'coordinator')) {
         this.participantLabel = 'Waiting for coordinator feedback'
       }

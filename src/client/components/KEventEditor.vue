@@ -81,7 +81,7 @@ export default {
       }
     },
     doClose () {
-      this.$refs.modal.close(_ => this.$router.push({ name: 'events-activity' }))
+      this.$refs.modal.close(() => this.$router.push({ name: 'events-activity' }))
     }
   },
   created () {

@@ -145,10 +145,10 @@ export default {
       if (this.preview) {
         this.previewSchema = this.generateSchemaForStep(this.getCurrentStep(), this.previewSchemaBase)
         // We need to force a refresh so that the schema is correctly transfered to child component by Vuejs
-        this.$nextTick().then(_ => {
+        this.$nextTick().then(() => {
           // Force form refresh to default values
           let form = this.getForm('previewForm')
-          form.build().then(_ => form.clear())
+          form.build().then(() => form.clear())
         })
       } else {
         // Otherwise simply fill the step form
@@ -192,7 +192,7 @@ export default {
         this.loadPreviewSchema(),
         this.loadRefs()
       ])
-      .then(_ => {
+      .then(() => {
         return Promise.all([
           this.getForm('stepForm').build(),
           this.getForm('previewForm').build()
