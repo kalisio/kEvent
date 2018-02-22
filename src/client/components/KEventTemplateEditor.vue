@@ -84,8 +84,6 @@ export default {
     this.$options.components['k-event-workflow-form'] = this.$load('KEventWorkflowForm')
     // On creation check whether we copy or create a new template
     if (this.templateId) {
-      // FIXME.
-      this.id = null
       this.template = await this.$api.getService('event-templates').get(this.templateId)
     }
     // Default state

@@ -3,10 +3,10 @@
     <q-icon slot="card-icon" :name="icon.name" :color="icon.color"></q-icon>
     <div slot="card-content">
       <div v-if="isParticipant">
-        {{participantLabel}}</br></br>
+        {{participantLabel}}<br /><br />
       </div>
       <div v-if="comment">
-        <k-text-area class="light-paragraph" :length="20" :text="comment" /></br>
+        <k-text-area class="light-paragraph" :length="20" :text="comment" /><br />
       </div>
       <div v-if="isCoordinator">
         {{coordinatorLabel}}
@@ -100,7 +100,7 @@ export default {
       if (this.$can('update', 'events', this.contextId, this.item)) {
         this.registerPaneAction({ 
           name: 'edit-event', label: 'Edit', icon: 'description',
-          route: { name: 'edit-event', params: { contextId: this.contextId } }
+          route: { name: 'edit-event', params: { contextId: this.contextId, id: this.item._id } }
         })
       }
       if (this.item.hasWorkflow && this.$can('read', 'events', this.contextId, this.item)) {
@@ -135,7 +135,7 @@ export default {
       if (this.$can('update', 'events', this.contextId, this.item)) {
         this.registerPaneAction({ 
           name: 'add-media', label: 'Add a photo', icon: 'add_a_photo',
-          route: { name: 'add-media', params: { contextId: this.contextId } }
+          route: { name: 'add-media', params: { contextId: this.contextId, id: this.item._id } }
         })
       }
     },
