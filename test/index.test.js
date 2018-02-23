@@ -340,11 +340,6 @@ describe('kEvent', () => {
 
   // Cleanup
   after(() => {
-    userService.Model.drop()
-    orgService.Model.drop()
-    eventService.Model.drop()
-    eventTemplateService.Model.drop()
-    eventLogService.Model.drop()
     app.db.instance.dropDatabase()
   })
 })
