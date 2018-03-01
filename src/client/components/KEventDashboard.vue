@@ -10,7 +10,7 @@
         </q-item>
         <q-item>
           <q-item-main>
-            <k-grid service="events" :renderer="renderer" :contextId="org._id" />
+            <k-grid service="events" :renderer="renderer" :contextId="org._id" :filter-query="searchQuery" />
           </q-item-main>
         </q-item>
       </q-list>
@@ -60,6 +60,7 @@ export default {
     refreshActivity () {
       this.clearActivity()
       this.setTitle('Dashboard')
+      this.setSearchBar('name')
       this.refreshCollection()
     }
   },
