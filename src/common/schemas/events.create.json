@@ -53,7 +53,9 @@
         "baseQuery": {
           "$select": ["_id", "profile.name"]
         },
-        "icon": "perm_identity"
+        "icon": {
+          "name": "person"
+        }
       },
       {
         "service": "groups",
@@ -61,7 +63,9 @@
         "baseQuery": {
           "$select": ["_id", "name"]
         },
-        "icon": "group"
+        "icon": {
+          "name": "group_work"
+        }
       },
       {
         "service": "tags",
@@ -69,7 +73,9 @@
         "baseQuery": {
           "scope": "members"
         },
-        "icon": "label"
+        "icon": {
+          "name": "label"
+        }
       }],
       "field": {
         "component": "form/KItemField",
@@ -88,7 +94,9 @@
         "baseQuery": {
           "$select": ["_id", "profile.name"]
         },
-        "icon": "perm_identity"
+        "icon": {
+          "name": "person"
+        } 
       },
       {
         "service": "groups",
@@ -96,7 +104,9 @@
         "baseQuery": {
           "$select": ["_id", "name"]
         },
-        "icon": "group"
+        "icon": { 
+          "name": "group_work"
+        }
       },
       {
         "service": "tags",
@@ -104,7 +114,9 @@
         "baseQuery": {
           "scope": "members"
         },
-        "icon": "label"
+        "icon": {
+          "name": "label"
+        }
       }],
       "field": {
         "component": "form/KItemField",
