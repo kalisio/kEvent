@@ -12,19 +12,29 @@
         {{coordinatorLabel}}
       </div>
     </div>
-    <k-modal ref="modal" v-if="hasParticipantInteraction" :title="title" :toolbar="toolbar" :buttons="buttons" :route="false" >
+    <k-modal ref="followUpModal" v-if="hasParticipantInteraction" :title="followUpTitle" :toolbar="followUpToolbar" :buttons="followUpButtons" :route="false" >
       <div slot="modal-content">
         <k-form ref="form" :schema="schema"/>
       </div>
     </k-modal>
     <k-uploader ref="uploader" :resource="item._id" :options="uploaderOptions()"/>
+    <k-modal ref="mediaModal" :title="mediaTitle" :toolbar="mediaToolbar" :buttons="mediaButtons" :route="false">
+      <div slot="modal-content" style="max-width: 50vw;">
+        <q-carousel arrows dots fullscreen infinite @slide="onViewMedia" class="text-white bg-black">
+          <div v-for="(attachment, index) in item.attachments" :key="attachment._id" slot="slide" class="no-padding row flex-center">
+            <div>
+              <img v-if="medias[index]" style="width: 100%; height: auto;" :src="medias[index]">
+            </div>
+          </div>
+        </q-carousel>
+      </div>
+    </k-modal>
   </k-card>
 </template>
 
 <script>
 import _ from 'lodash'
-import sift from 'sift'
-import { Events, QIcon, Dialog } from 'quasar'
+import { Events, QIcon, QCarousel, Dialog } from 'quasar'
 import { mixins as kCoreMixins } from 'kCore/client'
 import { errors } from 'kMap/common'
 import mixins from '../mixins'
@@ -39,7 +49,8 @@ export default {
     mixins.eventLogs
   ],
   components: {
-    QIcon
+    QIcon,
+    QCarousel
   },
   computed: {
     icon () {
@@ -48,8 +59,11 @@ export default {
     comment () {
       return this.getComment(this.participantState)
     },
-    title () {
+    followUpTitle () {
       return this.participantStep.title ? this.participantStep.title : 'Enter your choice'
+    },
+    mediaTitle () {
+      return 'Browse media for ' + this.item.name
     },
     hasParticipantInteraction () {
       return this.waitingInteraction(this.participantStep, this.participantState, 'participant')
@@ -62,16 +76,23 @@ export default {
       participantLabel: '',
       nbParticipantsWaitingCoordination: 0,
       coordinatorLabel: '',
-      toolbar: [{ 
+      followUpToolbar: [{ 
         name: 'close', 
         icon: 'close', 
-        handler: () => this.$refs.modal.close()
+        handler: () => this.$refs.followUpModal.close()
       }],
-      buttons: [{
+      followUpButtons: [{
         name: 'Save',
         color: 'primary',
         handler: (event, done) => this.logParticipantState(event, done),
-      }]
+      }],
+      mediaToolbar: [{ 
+        name: 'close', 
+        icon: 'close', 
+        handler: () => this.$refs.mediaModal.close()
+      }],
+      mediaButtons: [],
+      medias: []
     }
   },
   methods: {
@@ -138,9 +159,25 @@ export default {
           name: 'add-media', label: 'Add a photo', icon: 'add_a_photo', handler: this.uploadMedia
         })
       }
+      if (this.item.attachments && (this.item.attachments.length > 0) && this.$can('read', 'events', this.contextId, this.item)) {
+        this.registerPaneAction({ 
+          name: 'browse-media', label: 'Browse media', icon: 'photo_library', handler: this.browseMedia
+        })
+      }
     },
     uploadMedia () {
       this.$refs.uploader.open(this.item.attachments || [])
+    },
+    browseMedia () {
+      this.$refs.mediaModal.open()
+    },
+    onViewMedia (index, direction) {
+      // Download image the first time
+      if (!this.medias[index]) {
+        const attachment = this.item.attachments[index]
+        this.$api.getService('storage').get(attachment._id)
+        .then(data => this.$set(this.medias, index, data.uri))
+      }
     },
     removeEvent (event) {
       Dialog.create({
@@ -160,7 +197,7 @@ export default {
     },
     followUp () {
       if (this.hasParticipantInteraction) {
-        this.$refs.modal.open()
+        this.$refs.followUpModal.open()
       } else if (this.isCoordinator) {
         this.$router.push({ name: 'event-activity', params: { id: this.item._id, contextId: this.contextId } })
       }
