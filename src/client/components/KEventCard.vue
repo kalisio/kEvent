@@ -17,6 +17,7 @@
         <k-form ref="form" :schema="schema"/>
       </div>
     </k-modal>
+    <k-uploader ref="uploader" :resource="item._id" :options="uploaderOptions()"/>
   </k-card>
 </template>
 
@@ -134,10 +135,12 @@ export default {
       }
       if (this.$can('update', 'events', this.contextId, this.item)) {
         this.registerPaneAction({ 
-          name: 'add-media', label: 'Add a photo', icon: 'add_a_photo',
-          route: { name: 'add-media', params: { contextId: this.contextId, id: this.item._id } }
+          name: 'add-media', label: 'Add a photo', icon: 'add_a_photo', handler: this.uploadMedia
         })
       }
+    },
+    uploadMedia () {
+      this.$refs.uploader.open(this.item.attachments || [])
     },
     removeEvent (event) {
       Dialog.create({
@@ -273,6 +276,17 @@ export default {
     async logParticipantState (event, done) {
       await this.logStep(this.$refs.form, this.participantStep, this.participantState)
       done()
+    },
+    uploaderOptions () {
+      return {
+        service: 'storage',
+        acceptedFiles: 'image/*',
+        multiple: true,
+        maxFilesize: 2,
+        autoProcessQueue: true,
+        resourcesService: 'events',
+        storagePath: '<%= id %>/<%= file.name %>'
+      }
     }
   },
   created () {
@@ -281,6 +295,7 @@ export default {
     this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-text-area'] = this.$load('frame/KTextArea')
     this.$options.components['k-form'] = this.$load('form/KForm')
+    this.$options.components['k-uploader'] = this.$load('input/KUploader')
     // Required alias for the event logs mixin
     this.event = this.item
     // Set the required actor

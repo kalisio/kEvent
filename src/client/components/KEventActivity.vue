@@ -149,16 +149,14 @@ export default {
       this.refreshEvent()
       // Fab actions
       this.registerFabAction({ 
-        name: 'browse-media', label: 'Browse media', icon: 'collections', 
-        route: { name: 'browse-media', params: { contextId: this.contextId, id: this.id } } 
+        name: 'browse-media', label: 'Browse media', icon: 'photo_library', handler: this.browseMedia
       })
       this.registerFabAction({ 
         name: 'edit-event', label: 'Event properties', icon: 'description', 
         route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', id: this.id } } 
       })
       this.registerFabAction({ 
-        name: 'toggle-pane', label: this.getPaneLabel(), icon: 'toc',
-        handler: this.togglePane 
+        name: 'toggle-pane', label: this.getPaneLabel(), icon: 'toc', handler: this.togglePane
       })
       this.refreshCollection()
     },
