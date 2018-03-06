@@ -22,7 +22,7 @@ module.exports = {
     update: [ sendNotifications('Updated') ],
     patch: [ sendNotifications('Updated') ],
     // Because the notification ID is based on created/updated time we need to update it even on remove
-    remove: [ setNow('updatedAt'), sendNotifications('Closed') ]
+    remove: [ setNow('updatedAt'), sendNotifications('Closed'), hooks.removeAttachments('attachments') ]
   },
 
   error: {

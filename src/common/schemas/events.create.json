@@ -124,6 +124,21 @@
         "helper": "Select event coordinators (other than yourself)"
       }
     },
+    "attachments": { 
+      "type": "array",
+      "field": {
+        "component": "form/KAttachmentField",
+        "label": "Attachments",
+        "helper": "Select your attachments",
+        "service": "storage",
+        "acceptedFiles": "image/*",
+        "multiple": true,
+        "maxFilesize": 2,
+        "autoProcessQueue": false,
+        "resourcesService": "events",
+        "storagePath": "<%= id %>/<%= file.name %>"
+      }
+    },
     "hasWorkflow": {
       "type": "boolean", 
       "default": true,
