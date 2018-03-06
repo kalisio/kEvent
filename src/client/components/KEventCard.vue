@@ -21,9 +21,11 @@
     <k-modal ref="mediaModal" :title="mediaTitle" :toolbar="mediaToolbar" :buttons="mediaButtons" :route="false">
       <div slot="modal-content" style="max-width: 50vw;">
         <q-carousel arrows dots fullscreen infinite @slide="onViewMedia" class="text-white bg-black">
-          <div v-for="(attachment, index) in item.attachments" :key="attachment._id" slot="slide" class="no-padding row flex-center">
-            <div>
-              <img v-if="medias[index]" style="width: 100%; height: auto;" :src="medias[index]">
+          <div v-for="(attachment, index) in item.attachments" :key="attachment._id" slot="slide" class="no-padding flex-center row">
+            <img v-if="medias[index]" style="width: 100%; height: auto;" :src="medias[index]">
+            <div v-if="!medias[index]">
+              <span style="font-size: 2em;">Loading...&nbsp;</span>
+              <q-spinner-cube size="4em"/>
             </div>
           </div>
         </q-carousel>
@@ -34,7 +36,7 @@
 
 <script>
 import _ from 'lodash'
-import { Events, QIcon, QCarousel, Dialog } from 'quasar'
+import { Events, QIcon, QCarousel, QSpinnerCube, Dialog } from 'quasar'
 import { mixins as kCoreMixins } from 'kCore/client'
 import { errors } from 'kMap/common'
 import mixins from '../mixins'
@@ -50,7 +52,8 @@ export default {
   ],
   components: {
     QIcon,
-    QCarousel
+    QCarousel,
+    QSpinnerCube
   },
   computed: {
     icon () {
@@ -169,6 +172,8 @@ export default {
       this.$refs.uploader.open(this.item.attachments || [])
     },
     browseMedia () {
+      // Quasar does not send the silde event on first display
+      this.onViewMedia(0)
       this.$refs.mediaModal.open()
     },
     onViewMedia (index, direction) {
