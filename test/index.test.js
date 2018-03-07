@@ -86,6 +86,8 @@ describe('kEvent', () => {
     authorisationService = app.getService('authorisations')
     expect(authorisationService).toExist()
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('creates a test user', () => {
     return userService.create({ email: 'test@test.org', name: 'test-user' }, { checkAuthorisation: true })
