@@ -17,26 +17,14 @@
         <k-form ref="form" :schema="schema"/>
       </div>
     </k-modal>
-    <k-uploader ref="uploader" :resource="item._id" :options="uploaderOptions()"/>
-    <k-modal ref="mediaModal" :title="mediaTitle" :toolbar="mediaToolbar" :buttons="mediaButtons" :route="false">
-      <div slot="modal-content" style="max-width: 50vw;">
-        <q-carousel arrows dots fullscreen infinite @slide="onViewMedia" class="text-white bg-black">
-          <div v-for="(attachment, index) in item.attachments" :key="attachment._id" slot="slide" class="no-padding flex-center row">
-            <img v-if="medias[index]" style="width: 100%; height: auto;" :src="medias[index]">
-            <div v-if="!medias[index]">
-              <span style="font-size: 2em;">Loading...&nbsp;</span>
-              <q-spinner-cube size="4em"/>
-            </div>
-          </div>
-        </q-carousel>
-      </div>
-    </k-modal>
+    <k-uploader ref="uploader" :contextId="contextId" :resource="item._id" :options="uploaderOptions()"/>
+    <k-media-browser ref="mediaBrowser" :contextId="contextId"/>
   </k-card>
 </template>
 
 <script>
 import _ from 'lodash'
-import { Events, QIcon, QCarousel, QSpinnerCube, Dialog } from 'quasar'
+import { Events, QIcon, Dialog } from 'quasar'
 import { mixins as kCoreMixins } from 'kCore/client'
 import { errors } from 'kMap/common'
 import mixins from '../mixins'
@@ -51,9 +39,7 @@ export default {
     mixins.eventLogs
   ],
   components: {
-    QIcon,
-    QCarousel,
-    QSpinnerCube
+    QIcon
   },
   computed: {
     icon () {
@@ -64,9 +50,6 @@ export default {
     },
     followUpTitle () {
       return this.participantStep.title ? this.participantStep.title : 'Enter your choice'
-    },
-    mediaTitle () {
-      return 'Browse media for ' + this.item.name
     },
     hasParticipantInteraction () {
       return this.waitingInteraction(this.participantStep, this.participantState, 'participant')
@@ -88,14 +71,7 @@ export default {
         name: 'Save',
         color: 'primary',
         handler: (event, done) => this.logParticipantState(event, done),
-      }],
-      mediaToolbar: [{ 
-        name: 'close', 
-        icon: 'close', 
-        handler: () => this.$refs.mediaModal.close()
-      }],
-      mediaButtons: [],
-      medias: []
+      }]
     }
   },
   methods: {
@@ -162,27 +138,17 @@ export default {
           name: 'add-media', label: 'Add a photo', icon: 'add_a_photo', handler: this.uploadMedia
         })
       }
-      if (this.item.attachments && (this.item.attachments.length > 0) && this.$can('read', 'events', this.contextId, this.item)) {
+      if (this.$can('read', 'events', this.contextId, this.item)) {
         this.registerPaneAction({ 
           name: 'browse-media', label: 'Browse media', icon: 'photo_library', handler: this.browseMedia
         })
       }
     },
     uploadMedia () {
-      this.$refs.uploader.open(this.item.attachments || [])
+      this.$refs.uploader.open(this.item.attachments)
     },
     browseMedia () {
-      // Quasar does not send the silde event on first display
-      this.onViewMedia(0)
-      this.$refs.mediaModal.open()
-    },
-    onViewMedia (index, direction) {
-      // Download image the first time
-      if (!this.medias[index]) {
-        const attachment = this.item.attachments[index]
-        this.$api.getService('storage').get(attachment._id)
-        .then(data => this.$set(this.medias, index, data.uri))
-      }
+      this.$refs.mediaBrowser.open(this.item.attachments)
     },
     removeEvent (event) {
       Dialog.create({
@@ -338,6 +304,7 @@ export default {
     this.$options.components['k-text-area'] = this.$load('frame/KTextArea')
     this.$options.components['k-form'] = this.$load('form/KForm')
     this.$options.components['k-uploader'] = this.$load('input/KUploader')
+    this.$options.components['k-media-browser'] = this.$load('media/KMediaBrowser')
     // Required alias for the event logs mixin
     this.event = this.item
     // Set the required actor

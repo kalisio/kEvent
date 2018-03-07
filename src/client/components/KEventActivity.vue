@@ -5,27 +5,25 @@
       <div class="row full-width">
         <div class="col-3 full-height" v-if="pane">
           <q-scroll-area :style="paneStyle">
-            
-              <template v-for="actor in filteredItems">
-                <div class="row justify-between no-wrap" style="overflow: auto" :key="actor._id">
-                  <div class="col-auto self-center">
-                    <q-btn v-if="actor.icon" flat round small color="primary" @click="onStateClicked(actor)">
-                      <q-icon :name="actor.icon.name"  :color="actor.icon.color" />
-                    </q-btn>
-                    {{actor.participant.name}}
-                  </div>
-                  <k-text-area v-if="actor.comment" style="flex-shrink: 0" class="col-auto light-paragraph self-center" :length="20" :text="actor.comment" />
-                  <div class="col-auto self-center">
-                    <q-btn v-if="canFollowUp(actor)" flat round small color="primary" @click="onFollowUpClicked(actor)">
-                      <q-icon name="message" color="red" />
-                    </q-btn>
-                    <q-btn flat round small color="primary" @click="onZoomClicked(actor)">
-                      <q-icon name="remove_red_eye" />
-                    </q-btn>
-                  </div>
+            <template v-for="actor in filteredItems">
+              <div class="row justify-between no-wrap" style="overflow: auto" :key="actor._id">
+                <div class="col-auto self-center">
+                  <q-btn v-if="actor.icon" flat round small color="primary" @click="onStateClicked(actor)">
+                    <q-icon :name="actor.icon.name"  :color="actor.icon.color" />
+                  </q-btn>
+                  {{actor.participant.name}}
                 </div>
-              </template>
-            
+                <k-text-area v-if="actor.comment" style="flex-shrink: 0" class="col-auto light-paragraph self-center" :length="20" :text="actor.comment" />
+                <div class="col-auto self-center">
+                  <q-btn v-if="canFollowUp(actor)" flat round small color="primary" @click="onFollowUpClicked(actor)">
+                    <q-icon name="message" color="red" />
+                  </q-btn>
+                  <q-btn flat round small color="primary" @click="onZoomClicked(actor)">
+                    <q-icon name="remove_red_eye" />
+                  </q-btn>
+                </div>
+              </div>
+            </template>
           </q-scroll-area>
         </div>      
         <div class="col-auto full-height">
@@ -34,6 +32,8 @@
           </div>
         </div>
       </div>
+      <k-uploader ref="uploader" :contextId="contextId" :resource="id" :options="uploaderOptions()"/>
+      <k-media-browser ref="mediaBrowser" :contextId="contextId"/>
       <div>
         <router-view service="events" :router="router()"></router-view>
       </div>
@@ -144,21 +144,36 @@ export default {
         marker.addTo(this.map)
       }
     },
-    refreshActivity () {
+    async refreshActivity () {
       this.clearActivity()
-      this.refreshEvent()
+      await this.refreshEvent()
       // Fab actions
-      this.registerFabAction({ 
-        name: 'browse-media', label: 'Browse media', icon: 'photo_library', handler: this.browseMedia
-      })
-      this.registerFabAction({ 
-        name: 'edit-event', label: 'Event properties', icon: 'description', 
-        route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', id: this.id } } 
-      })
+      if (this.$can('update', 'events', this.contextId, this.event)) {
+        this.registerFabAction({ 
+          name: 'add-media', label: 'Add a photo', icon: 'add_a_photo', handler: this.uploadMedia
+        })
+      }
+      if (this.$can('read', 'events', this.contextId, this.event)) {
+        this.registerFabAction({ 
+          name: 'browse-media', label: 'Browse media', icon: 'photo_library', handler: this.browseMedia
+        })
+      }
+      if (this.$can('update', 'events', this.contextId, this.event)) {
+        this.registerFabAction({ 
+          name: 'edit-event', label: 'Edit', icon: 'description',
+          route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', id: this.id } }
+        })
+      }
       this.registerFabAction({ 
         name: 'toggle-pane', label: this.getPaneLabel(), icon: 'toc', handler: this.togglePane
       })
       this.refreshCollection()
+    },
+    uploadMedia () {
+      this.$refs.uploader.open(this.event.attachments)
+    },
+    browseMedia () {
+      this.$refs.mediaBrowser.open(this.event.attachments)
     },
     getPointMarker (feature, latlng) {
       const icon = feature.icon //this.getIcon(feature, this.getWorkflowStep(feature))
@@ -295,11 +310,24 @@ export default {
     onMapResized (size) {
       // Avoid to refresh the layout when leaving the component
       if (this.observe) this.refreshMap()
+    },
+    uploaderOptions () {
+      return {
+        service: 'storage',
+        acceptedFiles: 'image/*',
+        multiple: true,
+        maxFilesize: 2,
+        autoProcessQueue: true,
+        resourcesService: 'events',
+        storagePath: '<%= id %>/<%= file.name %>'
+      }
     }
   },
   created () {
     // Load the required components
     this.$options.components['k-text-area'] = this.$load('frame/KTextArea')
+    this.$options.components['k-uploader'] = this.$load('input/KUploader')
+    this.$options.components['k-media-browser'] = this.$load('media/KMediaBrowser')
     // Enable the observers in order to refresh the layout
     this.observe = true
   },  
