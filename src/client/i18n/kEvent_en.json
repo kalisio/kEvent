@@ -35,5 +35,12 @@
     "COPY_LABEL": "Copy",
     "REMOVE_DIALOG_TITLE": "Remove the template {{template}} ?",
     "REMOVE_DIALOG_MESSAGE": "Are you sure you want to remove the template <b>{{template}}</b> ?"
+  },
+  "KEventNotifications": {
+    "CREATE": "New",
+    "UPDATE": "Updated",
+    "ADD_MEDIA": "New media",
+    "REMOVE_MEDIA": "Removed media",
+    "REMOVE": "Closed"
   }
 }

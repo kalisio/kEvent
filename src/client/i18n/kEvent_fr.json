@@ -35,5 +35,12 @@
     "COPY_LABEL": "Copier",
     "REMOVE_DIALOG_TITLE": "Supprimer le modèle {{template}} ?",
     "REMOVE_DIALOG_MESSAGE": "Etes vous sûr de vouloir supprimer le modèle <b>{{template}}</b> ?"
+  },
+  "KEventNotifications": {
+    "CREATE": "Nouveau",
+    "UPDATE": "Mis à jour",
+    "ADD_MEDIA": "Nouveau media",
+    "REMOVE_MEDIA": "Media supprimé",
+    "REMOVE": "Clôturé"
   }
 }
