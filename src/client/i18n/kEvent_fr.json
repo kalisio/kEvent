@@ -1,15 +1,39 @@
 {
   "EVENTS_LABEL": "Evénements",
   "EVENT_TEMPLATES_LABEL": "Modèles",
+  "REMOVE_LABEL": "Supprimer",
+  "EDIT_LABEL": "Editer",
   "KEventActivity": {
   },
   "KEventsActivity": {
     "EVENTS_LABEL": "$t(EVENTS_LABEL)",
     "EVENT_TEMPLATES_LABEL": "$t(EVENT_TEMPLATES_LABEL)"
   },
+  "KEventCard": {
+    "REMOVE_LABEL": "$t(REMOVE_LABEL)",
+    "EDIT_LABEL": "$t(EDIT_LABEL)",
+    "FOLLOW_UP": "Suivre",
+    "ADD_MEDIA_LABEL": "Ajouter un média",
+    "BROWSE_MEDIA_LABEL": "Parcourir les médias",
+    "REMOVE_DIALOG_TITLE": "Supprimer l'événement {{event}} ?",
+    "REMOVE_DIALOG_MESSAGE": "Etes vous sûr de vouloir supprimer l'événement <b>{{event}}</b> ?",
+    "ACTION_REQUIRED_WARNING": "Action requise",
+    "WAITING_COORDINATION_WARNING": "En attente du coordinateur",
+    "WAITING_FOR_PARTICIPANT_LABEL": "Le coordinateur est en attente de votre action",
+    "WAITING_FOR_COORDINATOR_LABEL": "En attente du coordinateur",
+    "PARTICPANTS_AWAITING_LABEL": "{{number}} participants en attente de coordination",
+    "NO_PARTICPANTS_AWAITING_LABEL": "Aucun participant en attente de coordination"     
+  },
   "KEventTemplatesActivity": {
     "EVENTS_LABEL": "$t(EVENTS_LABEL)",
     "EVENT_TEMPLATES_LABEL": "$t(EVENT_TEMPLATES_LABEL)",
     "CREATE_TEMPLATE_LABEL": "Créer un modèle"
+  },
+  "KEventTemplateCard": {
+    "REMOVE_LABEL": "$t(REMOVE_LABEL)",
+    "EDIT_LABEL": "$t(EDIT_LABEL)",
+    "COPY_LABEL": "Copier",
+    "REMOVE_DIALOG_TITLE": "Supprimer le modèle {{template}} ?",
+    "REMOVE_DIALOG_MESSAGE": "Etes vous sûr de vouloir supprimer le modèle <b>{{template}}</b> ?"
   }
 }

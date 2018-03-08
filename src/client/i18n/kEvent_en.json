@@ -1,15 +1,39 @@
 {
   "EVENTS_LABEL": "Events",
   "EVENT_TEMPLATES_LABEL": "Templates",
+  "REMOVE_LABEL": "Remove",
+  "EDIT_LABEL": "Edit",
   "KEventActivity": {
   },
   "KEventsActivity": {
     "EVENTS_LABEL": "$t(EVENTS_LABEL)",
     "EVENT_TEMPLATES_LABEL": "$t(EVENT_TEMPLATES_LABEL)"
   },
+  "KEventCard": {
+    "REMOVE_LABEL": "$t(REMOVE_LABEL)",
+    "EDIT_LABEL": "$t(EDIT_LABEL)",
+    "FOLLOW_UP": "Follow up",
+    "ADD_MEDIA_LABEL": "Add media",
+    "BROWSE_MEDIA_LABEL": "Browse media",
+    "REMOVE_DIALOG_TITLE": "Remove the event {{event}} ?",
+    "REMOVE_DIALOG_MESSAGE": "Are you sure you want to remove the event <b>{{event}}</b> ?",
+    "ACTION_REQUIRED_LABEL": "Action required",
+    "WAITING_COORDINATION_LABEL": "Waiting coordination",
+    "WAITING_FOR_PARTICIPANT_LABEL": "Coordinator is waiting for your input",
+    "WAITING_FOR_COORDINATOR_LABEL": "Waiting for coordinator feedback",
+    "PARTICPANTS_AWAITING_LABEL": "participants awaiting coordination",
+    "NO_PARTICPANTS_AWAITING_LABEL": "No participants awaiting coordination" 
+  },
   "KEventTemplatesActivity": {
     "EVENTS_LABEL": "$t(EVENTS_LABEL)",
     "EVENT_TEMPLATES_LABEL": "$t(EVENT_TEMPLATES_LABEL)",
     "CREATE_TEMPLATE_LABEL": "Create a template"
+  },
+  "KEventTemplateCard": {
+    "REMOVE_LABEL": "$t(REMOVE_LABEL)",
+    "EDIT_LABEL": "$t(EDIT_LABEL)",
+    "COPY_LABEL": "Copy",
+    "REMOVE_DIALOG_TITLE": "Remove the template {{template}} ?",
+    "REMOVE_DIALOG_MESSAGE": "Are you sure you want to remove the template <b>{{template}}</b> ?"
   }
 }

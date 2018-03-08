@@ -25,26 +25,26 @@ export default {
       this.clearActions()
       if (this.$can('update', 'event-templates', this.contextId, this.item)) {
         this.registerPaneAction({ 
-          name: 'edit-event-template', label: 'Edit', icon: 'description',
+          name: 'edit-event-template', label: this.$t('KEventTemplateCard.EDIT_LABEL'), icon: 'description',
           route: { name: 'edit-event-template', params: { contextId: this.contextId, id: this.item._id } }
         })
       }
       if (this.$can('update', 'event-templates', this.contextId, this.item)) {
         this.registerPaneAction({ 
-          name: 'copy-event-template', label: 'Copy', icon: 'content_copy',
+          name: 'copy-event-template', label: this.$t('KEventTemplateCard.COPY_LABEL'), icon: 'content_copy',
           route: { name: 'create-event-template', params: { contextId: this.contextId, templateId: this.item._id } }
         })
       }
       if (this.$can('remove', 'event-templates', this.contextId, this.item)) {
         this.registerMenuAction({ 
-          name: 'remove-event-template', label: 'Remove', icon: 'remove_circle', handler: this.removeEventTemplate
+          name: 'remove-event-template', label: this.$t('KEventTemplateCard.REMOVE_LABEL'), icon: 'remove_circle', handler: this.removeEventTemplate
         })
       }
     },
     removeEventTemplate (template) {
       Dialog.create({
-        title: 'Remove <b>' + template.name + '</b> ?',
-        message: 'Are you sure you want to remove <b>' + template.name + '</b> ?',
+        title: this.$t('KEventTemplateCard.REMOVE_DIALOG_TITLE', { template: template.name }),
+        message: this.$t('KEventTemplateCard.REMOVE_DIALOG_MESSAGE', { template: template.name }),
         buttons: [
           {
             label: 'Ok',

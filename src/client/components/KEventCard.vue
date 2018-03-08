@@ -95,12 +95,12 @@ export default {
       this.clearActions()
       if (this.$can('remove', 'events', this.contextId, this.item)) {
         this.registerMenuAction({ 
-          name: 'remove-event', label: 'Remove', icon: 'remove_circle', handler: this.removeEvent
+          name: 'remove-event', label: this.$t('KEventCard.REMOVE_LABEL'), icon: 'remove_circle', handler: this.removeEvent
         })
       }
       if (this.$can('update', 'events', this.contextId, this.item)) {
         this.registerPaneAction({ 
-          name: 'edit-event', label: 'Edit', icon: 'description',
+          name: 'edit-event', label: this.$t('KEventCard.EDIT_LABEL'), icon: 'description',
           route: { name: 'edit-event', params: { contextId: this.contextId, id: this.item._id } }
         })
       }
@@ -117,30 +117,30 @@ export default {
         if (hasFollowUp) {
           if (this.isParticipant) {
             if (this.waitingInteraction(this.participantStep, this.participantState, 'participant')) {
-              warning = 'Action required'
+              warning = this.$('KCardEvent.ACTION_REQUIRED_WARNING')
             } else if (this.waitingInteraction(this.participantStep, this.participantState, 'coordinator')) {
-              warning = 'Waiting coordination'
+              warning = this.$('KCardEvent.WAITING_COORDINATION_WARNING')
             }
           }
           // Participant warning if any overrides coordinator warning
           if (!warning && this.isCoordinator) {
             if (this.nbParticipantsWaitingCoordination > 0) {
-              warning = 'Action required'
+              warning = this.$('KCardEvent.ACTION_REQUIRED_WARNING')
             }
           }
           this.registerPaneAction({ 
-            name: 'follow-up', label: 'Follow up', icon: 'message', handler: this.followUp, warning
+            name: 'follow-up', label: this.$t('KEventCard.FOLLOW_UP_LABEL'), icon: 'message', handler: this.followUp, warning
           })
         }
       }
       if (this.$can('update', 'events', this.contextId, this.item)) {
         this.registerPaneAction({ 
-          name: 'add-media', label: 'Add a photo', icon: 'add_a_photo', handler: this.uploadMedia
+          name: 'add-media', label: this.$t('KEventCard.ADD_MEDIA_LABEL'), icon: 'add_a_photo', handler: this.uploadMedia
         })
       }
       if (this.$can('read', 'events', this.contextId, this.item)) {
         this.registerPaneAction({ 
-          name: 'browse-media', label: 'Browse media', icon: 'photo_library', handler: this.browseMedia
+          name: 'browse-media', label: this.$t('KEventCard.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
         })
       }
     },
@@ -152,8 +152,8 @@ export default {
     },
     removeEvent (event) {
       Dialog.create({
-        title: 'Remove \'' + event.name + '\' ?',
-        message: 'Are you sure you want to remove the event <b>' + event.name + '</b> ?',
+        title: this.$t('KEventCard.REMOVE_DIALOG_TITLE', { event: event.name }),
+        message: this.$t('KEventCard.REMOVE_DIALOG_TITLE', { event: event.name }),
         buttons: [
           'Cancel',
           {
@@ -201,7 +201,7 @@ export default {
       this.refreshActions()
       this.participantLabel = ''
       if (this.waitingInteraction(this.participantStep, this.participantState, 'participant')) {
-        this.participantLabel = 'Coordinator is waiting for your input'
+        this.participantLabel = this.$t('KEventCard.WAITING_FOR_PARTICIPANT_LABEL')
         // We can then load the schema and local refs in parallel
         Promise.all([
           this.loadSchema(),
@@ -209,7 +209,7 @@ export default {
         ])
         .then(() => this.$refs.form.build())
       } else if (this.waitingInteraction(this.participantStep, this.participantState, 'coordinator')) {
-        this.participantLabel = 'Waiting for coordinator feedback'
+        this.participantLabel = this.$t('KEventCard.WAITING_FOR_COORDINATOR_LABEL')
       }
     },
     subscribeParticipantLog () {
@@ -241,9 +241,9 @@ export default {
       this.refreshActions()
       // Then label 
       if (this.nbParticipantsWaitingCoordination > 0) {
-        this.coordinatorLabel = this.nbParticipantsWaitingCoordination + ' participants awaiting coordination'
+        this.coordinatorLabel = this.$t('KEventCard.PARTICPANTS_AWAITING_LABEL', { number: this.nbParticipantsWaitingCoordination })
       } else {
-        this.coordinatorLabel = 'No participants awaiting coordination'
+        this.coordinatorLabel = this.$t('KEventCard.NO_PARTICPANTS_AWAITING_LABEL')
       }
     },
     subscribeCoordinatorLog () {
