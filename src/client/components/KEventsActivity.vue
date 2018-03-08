@@ -52,13 +52,13 @@ export default {
       this.setTitle(this.$store.get('context.name'))
       // Tabbar actions
       this.registerTabAction({ 
-        name: 'events', label: 'Events', icon: 'whatshot',
+        name: 'events', label: this.$t('KEventsActivity.EVENTS_LABEL'), icon: 'whatshot',
         route: { name: 'events-activity', params: { contextId: this.contextId } },
         default: true
       })
       if (this.$can('create', 'event-templates', this.contextId)) {
         this.registerTabAction({ 
-          name: 'event-templates', label: 'Templates', icon: 'widgets',
+          name: 'event-templates', label: this.$t('KEventsActivity.EVENT_TEMPLATES_LABEL'), icon: 'widgets',
           route: { name: 'event-templates-activity', params: { contextId: this.contextId } } 
         })
       }

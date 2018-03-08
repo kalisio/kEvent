@@ -1,1 +1,15 @@
-{}
+{
+  "EVENTS_LABEL": "Events",
+  "EVENT_TEMPLATES_LABEL": "Templates",
+  "KEventActivity": {
+  },
+  "KEventsActivity": {
+    "EVENTS_LABEL": "$t(EVENTS_LABEL)",
+    "EVENT_TEMPLATES_LABEL": "$t(EVENT_TEMPLATES_LABEL)"
+  },
+  "KEventTemplatesActivity": {
+    "EVENTS_LABEL": "$t(EVENTS_LABEL)",
+    "EVENT_TEMPLATES_LABEL": "$t(EVENT_TEMPLATES_LABEL)",
+    "CREATE_TEMPLATE_LABEL": "Create a template"
+  }
+}
