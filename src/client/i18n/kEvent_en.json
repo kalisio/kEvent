@@ -60,5 +60,12 @@
   "KEventTemplateEditor": {
     "ADD_WORKFLOW_LABEL": "Add a workflow ?",
     "WORKFLOW_HELPER_LABEL": "Manage below the different steps of the workflow"
+  },
+  "KEventNotifications": {
+    "CREATE": "New",
+    "UPDATE": "Updated",
+    "ADD_MEDIA": "New media",
+    "REMOVE_MEDIA": "Removed media",
+    "REMOVE": "Closed"
   }
 }

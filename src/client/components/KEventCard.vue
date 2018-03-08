@@ -160,7 +160,7 @@ export default {
             label: 'Ok',
             handler: () => {
               let eventsService = this.$api.getService('events', this.contextId)
-              eventsService.remove(event._id)
+              eventsService.remove(event._id, { query: { notification: this.$t('KEventNotifications.REMOVE') } })
             }
           }
         ]

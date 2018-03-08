@@ -68,5 +68,12 @@
   "KEventTemplateEditor": {
     "ADD_WORKFLOW_LABEL": "Ajouter un processus ?",
     "WORKFLOW_HELPER_LABEL": "Gérer ci-dessous les différentes étapes du processus"
+  },
+  "KEventNotifications": {
+    "CREATE": "Nouveau",
+    "UPDATE": "Mis à jour",
+    "ADD_MEDIA": "Nouveau media",
+    "REMOVE_MEDIA": "Media supprimé",
+    "REMOVE": "Clôturé"
   }
 }

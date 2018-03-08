@@ -10,13 +10,15 @@
 import _ from 'lodash'
 import { mixins } from 'kCore/client'
 
+const editorMixin = mixins.baseEditor(['eventForm'])
+
 export default {
   name: 'k-event-editor',
   mixins: [
     mixins.service,
     mixins.objectProxy,
     mixins.schemaProxy,
-    mixins.baseEditor(['eventForm']),
+    editorMixin,
     mixins.refsResolver(['eventForm'])
   ],
   props: {
@@ -69,6 +71,16 @@ export default {
         }
         return this.schema
       })
+    },
+    getBaseQuery () {
+      // Overriden to handle notification messages
+      let query = editorMixin.methods.getBaseQuery.call(this)
+      if (this.getMode() === 'create') {
+        query.notification = this.$t('KEventNotifications.CREATE')
+      } else if (this.getMode() === 'update') {
+        query.notification = this.$t('KEventNotifications.UPDATE')
+      }
+      return query
     },
     onFieldChanged (field, value) {
       // Setup workflow depending on field state
