@@ -7,19 +7,29 @@
       </div>
       <div class="row justify-end">
         <q-btn class="col-1" v-show="index > 0" flat color="primary" icon="navigate_before" @click="onPreviousStep(index)">
-          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">Previous step</q-tooltip>
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
+            {{$t('KEventWorkflowForm.PREVIOUS_STEP_BUTTON')}}
+          </q-tooltip>
         </q-btn>
         <q-btn class="col-1" v-show="!preview" flat color="primary" icon="playlist_add" @click="onAddStep(index)">
-          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">Add a new step</q-tooltip>
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
+            {{$t('KEventWorkflowForm.ADD_STEP_BUTTON')}}
+          </q-tooltip>
         </q-btn>
         <q-btn class="col-1" v-show="!preview && (steps.length > 1)" flat color="primary" icon="delete_sweep" @click="onRemoveStep(index)">
-          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">Remove current step</q-tooltip>
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
+            {{$t('KEventWorkflowForm.REMOVE_STEP_BUTTON')}}
+          </q-tooltip>
         </q-btn>
         <q-btn class="col-1" flat color="primary" :icon="preview ? 'edit' : 'play_arrow'" @click="onPreviewOrEdit">
-          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">{{!preview ? 'Preview workflow' : 'Edit workflow'}}</q-tooltip>
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
+            {{$t(!preview ? 'KEventWorkflowForm.PREVIEW_WORKFLOW_BUTTON': 'KEventWorkflowForm.EDIT_WORKFLOW_BUTTON')}}
+          </q-tooltip>
         </q-btn>
         <q-btn class="col-1" v-show="index < (steps.length - 1)" flat color="primary" icon="navigate_next" @click="onNextStep(index)">
-          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">Next step</q-tooltip>
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
+            {{$t('KEventWorkflowForm.NEXT_STEP_BUTTON')}}
+          </q-tooltip>
         </q-btn>
       </div>
     </q-step>

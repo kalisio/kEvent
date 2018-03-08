@@ -10,8 +10,7 @@
       "minLength": 1,
       "field": {
         "component": "form/KTextField",
-        "label": "Name",
-        "helper": "Enter the name of this template"
+        "helper": "schemas.EVENT_TEMPLATES_NAME_FIELD_HELPER"
       }
     },
     "icon": {
@@ -19,16 +18,14 @@
       "default": { "name": "mode_edit", "color": "dark" },
       "field": {
         "component": "form/KIconField",
-        "label": "Icon",
-        "helper": "Select an icon to represent this template"
+        "helper": "schemas.EVENT_TEMPLATES_ICON_FIELD_HELPER"
       }
     },
     "description": {
       "type": "string", 
       "field": {
         "component": "form/KTextareaField",
-        "label": "Description",
-        "helper": "Enter a description of this template"
+        "helper": "schemas.EVENT_TEMPLATES_DESCRIPTION_FIELD_HELPER"
       }
     }
   },

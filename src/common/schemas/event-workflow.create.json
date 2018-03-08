@@ -11,8 +11,7 @@
       "default": "New step",
       "field": {
         "component": "form/KTextField",
-        "label": "Step title",
-        "helper": "Enter the title for this step"
+        "helper": "schemas.EVENT_WORKFLOW_TITLE_FIELD_HELPER"
       }
     },
     "icon": {
@@ -20,8 +19,7 @@
       "default": { "name": "check", "color": "dark" },
       "field": {
         "component": "form/KIconField",
-        "label": "Step icon",
-        "helper": "Select step icon"
+        "helper": "schemas.EVENT_WORKFLOW_ICON_FIELD_HELPER"
       }
     },
     "description": {
@@ -29,8 +27,7 @@
       "default": "Step content",
       "field": {
         "component": "form/KTextareaField",
-        "label": "Step description",
-        "helper": "Enter the step description"
+        "helper": "schemas.EVENT_WORKFLOW_DESCRIPTION_FIELD_HELPER"
       }
     },
     "interaction": {
@@ -39,8 +36,7 @@
       "minItems": 2,
       "field": {
         "component": "form/KChipsWithIconField",
-        "label": "Step interaction",
-        "helper": "Enter the step interaction values",
+        "helper": "schemas.EVENT_WORKFLOW_INTERACTION_FIELD_HELPER",
         "icon" : {
           "name" : "label",
           "color" : "red"
@@ -52,8 +48,7 @@
       "uniqueItems": true,
       "field": {
         "component": "form/KSelectField",
-        "label": "Workflow end",
-        "helper": "Enter the interaction values ending the workflow",
+        "helper": "schemas.EVENT_WORKFLOW_END_FIELD_HELPER",
         "multiple": true,
         "chips": true,
         "options": []
@@ -64,8 +59,7 @@
       "default": "participant",
       "field": {
         "component": "form/KSelectField",
-        "label": "Stakeholder",
-        "helper": "Select the stakeholder",
+        "helper": "schemas.EVENT_WORKFLOW_STAKEHOLDER_FIELD_HELPER",
         "options": [
           { "label": "Participant", "value": "participant", "color": "yellow" },
           { "label": "Coordinator", "value": "coordinator", "color": "grey" }

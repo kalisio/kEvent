@@ -3,6 +3,27 @@
   "EVENT_TEMPLATES_LABEL": "Templates",
   "REMOVE_LABEL": "Remove",
   "EDIT_LABEL": "Edit",
+  "schemas": {
+    "EVENT_TEMPLATES_CREATE_TITLE": "Create a new event template ?",
+    "EVENT_TEMPLATES_NAME_FIELD_HELPER": "Enter the name of this template",
+    "EVENT_TEMPLATES_ICON_FIELD_HELPER": "Select an icon to represent this template",
+    "EVENT_TEMPLATES_DESCRIPTION_FIELD_HELPER": "Enter a description of this template",
+    "EVENT_WORKFLOW_TITLE_FIELD_HELPER": "Enter the title for this step",
+    "EVENT_WORKFLOW_ICON_FIELD_HELPER": "Select the step icon",
+    "EVENT_WORKFLOW_DESCRIPTION_FIELD_HELPER": "Enter the step description",
+    "EVENT_WORKFLOW_INTERACTION_FIELD_HELPER": "Enter the step interaction values",
+    "EVENT_WORKFLOW_END_FIELD_HELPER": "Enter the interaction values ending the workflow",
+    "EVENT_WORKFLOW_STAKEHOLDER_FIELD_HELPER": "Select the stakeholder",
+    "EVENTS_CREATE_TITLE": "Create a new event ?",
+    "EVENTS_NAME_FIELD_HELPER": "Enter the name of this event",
+    "EVENTS_DESCRIPTION_FIELD_HELPER": "Enter a description of this event",
+    "EVENTS_LOCATION_FIELD_HELPER": "Enter the location of this event",
+    "EVENTS_EXPIRE_AT_FIELD_HELPER": "Enter the expiration date for this event",
+    "EVENTS_PARTICIPANTS_FIELD_HELPER": "Select event participants",
+    "EVENTS_COORDINATORS_FIELD_HELPER": "Select event coordinators (other than yourself)",
+    "EVENTS_ATTACHMENTS_FIELD_HELPER": "Select media to attach",
+    "EVENTS_HAS_WORKFLOW_FIELD_HELPER": "Activate workflow for this event"
+  },
   "KEventActivity": {
   },
   "KEventsActivity": {
@@ -35,5 +56,9 @@
     "COPY_LABEL": "Copy",
     "REMOVE_DIALOG_TITLE": "Remove the template {{template}} ?",
     "REMOVE_DIALOG_MESSAGE": "Are you sure you want to remove the template <b>{{template}}</b> ?"
+  },
+  "KEventTemplateEditor": {
+    "ADD_WORKFLOW_LABEL": "Add a workflow ?",
+    "WORKFLOW_HELPER_LABEL": "Manage below the different steps of the workflow"
   }
 }

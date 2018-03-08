@@ -2,12 +2,11 @@
   <k-modal ref="modal" :title="editorTitle" :toolbar="toolbar" :buttons="buttons" :route="true">
     <div slot="modal-content" class="column xs-gutter">
       <k-form ref="templateForm" :schema="schema" />
-      </br>
+      <br />
       <p class="col-10 caption pull-left">
         <q-toggle icon="fa-retweet" v-model="hasWorkflow" @change="onWorkflow"/>
-        <strong v-show="!hasWorkflow">Add a workflow to this template</strong>
-        <strong v-show="hasWorkflow">Workflow</strong>
-        <span v-show="hasWorkflow">: manage below the different steps each participant of the event will have to fulfill.</span>
+        <strong v-show="!hasWorkflow">{{$t('KEventTemplateEditor.ADD_WORKFLOW_LABEL')}}</strong>
+        <span v-show="hasWorkflow">{{$t('KEventTemplateEditor.WORKFLOW_HELPER_LABEL')}}</span>
       </p>
       <k-event-workflow-form v-show="hasWorkflow" ref="workflowForm" schemaName="event-workflow" :id="id" />
     </div>

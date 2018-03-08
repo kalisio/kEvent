@@ -3,6 +3,27 @@
   "EVENT_TEMPLATES_LABEL": "Modèles",
   "REMOVE_LABEL": "Supprimer",
   "EDIT_LABEL": "Editer",
+  "schemas": {
+    "EVENT_TEMPLATES_CREATE_TITLE": "Créer un nouveau modèle d'évènement ?",
+    "EVENT_TEMPLATES_NAME_FIELD_HELPER": "Saisissez le nom du modèle",
+    "EVENT_TEMPLATES_ICON_FIELD_HELPER": "Selectionnez une icon pour représenter le modèle",
+    "EVENT_TEMPLATES_DESCRIPTION_FIELD_HELPER": "Saisissez une description du modèle",
+    "EVENT_WORKFLOW_TITLE_FIELD_HELPER": "Saisissez le nom de cette étape",
+    "EVENT_WORKFLOW_ICON_FIELD_HELPER": "Selectionnez une icone pour représenter cette étape",
+    "EVENT_WORKFLOW_DESCRIPTION_FIELD_HELPER": "Saisissez la description de cette étape",
+    "EVENT_WORKFLOW_INTERACTION_FIELD_HELPER": "Saisissez les intéractions de cette étape",
+    "EVENT_WORKFLOW_END_FIELD_HELPER": "Sélectionnez l'intéraction qui donne lieu à la fin du processus",
+    "EVENT_WORKFLOW_STAKEHOLDER_FIELD_HELPER": "Sélectionnez la partie prenante",
+    "EVENTS_CREATE_TITLE": "Créer un nouvel événement ?",
+    "EVENTS_NAME_FIELD_HELPER": "Saisissez le nom de l'événement",
+    "EVENTS_DESCRIPTION_FIELD_HELPER": "Saisissez une description de l'événement",
+    "EVENTS_LOCATION_FIELD_HELPER": "Saisissez le lieu de l'événement",
+    "EVENTS_EXPIRE_AT_FIELD_HELPER": "Saisissez la date d'expiration de l'événement",
+    "EVENTS_PARTICIPANTS_FIELD_HELPER": "Saisissez les participants à l'événement",
+    "EVENTS_COORDINATORS_FIELD_HELPER": "Saisissez les coordinateurs de l'événement (autre que vous)",
+    "EVENTS_ATTACHMENTS_FIELD_HELPER": "Selectionnez des médias à attacher à l'événement",
+    "EVENTS_HAS_WORKFLOW_FIELD_HELPER": "Associer un processus à l'événement"
+  },
   "KEventActivity": {
   },
   "KEventsActivity": {
@@ -35,5 +56,17 @@
     "COPY_LABEL": "Copier",
     "REMOVE_DIALOG_TITLE": "Supprimer le modèle {{template}} ?",
     "REMOVE_DIALOG_MESSAGE": "Etes vous sûr de vouloir supprimer le modèle <b>{{template}}</b> ?"
+  },
+  "KEventWorkflowForm": {
+    "ADD_STEP_BUTTON": "Ajouter une étape",
+    "REMOVE_STEP_BUTTON": "Supprimer l'étape courante",
+    "PREVIOUS_STEP_BUTTON": "Etape précédente",
+    "NEXT_STEP_BUTTON": "Etape suivante",
+    "PREVIEW_WORKFLOW_BUTTON": "Prévisualiser le processus",
+    "EDIT_WORKFLOW_BUTTON": "Editer le processus"
+  },
+  "KEventTemplateEditor": {
+    "ADD_WORKFLOW_LABEL": "Ajouter un processus ?",
+    "WORKFLOW_HELPER_LABEL": "Gérer ci-dessous les différentes étapes du processus"
   }
 }
