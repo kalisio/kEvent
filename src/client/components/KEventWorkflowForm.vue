@@ -230,6 +230,11 @@ export default {
           workflow: this.steps
         }
       }
+    },
+    async apply (object) {
+      object.workflow = this.steps
+    },
+    submitted (object) {
     }
   },
   created () {

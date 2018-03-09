@@ -117,15 +117,15 @@ export default {
         if (hasFollowUp) {
           if (this.isParticipant) {
             if (this.waitingInteraction(this.participantStep, this.participantState, 'participant')) {
-              warning = this.$('KCardEvent.ACTION_REQUIRED_WARNING')
+              warning = this.$t('KCardEvent.ACTION_REQUIRED_WARNING')
             } else if (this.waitingInteraction(this.participantStep, this.participantState, 'coordinator')) {
-              warning = this.$('KCardEvent.WAITING_COORDINATION_WARNING')
+              warning = this.$t('KCardEvent.WAITING_COORDINATION_WARNING')
             }
           }
           // Participant warning if any overrides coordinator warning
           if (!warning && this.isCoordinator) {
             if (this.nbParticipantsWaitingCoordination > 0) {
-              warning = this.$('KCardEvent.ACTION_REQUIRED_WARNING')
+              warning = this.$t('KCardEvent.ACTION_REQUIRED_WARNING')
             }
           }
           this.registerPaneAction({ 
