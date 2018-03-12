@@ -10,6 +10,7 @@
       </div>
       <div v-if="isCoordinator">
         {{coordinatorLabel}}
+        {{window.navigationApps}}
       </div>
     </div>
     <k-modal ref="followUpModal" v-if="hasParticipantInteraction" :title="followUpTitle" :toolbar="followUpToolbar" :buttons="followUpButtons" :route="false" >
@@ -26,6 +27,7 @@
 import _ from 'lodash'
 import { Events, QIcon, Dialog } from 'quasar'
 import { mixins as kCoreMixins } from 'kCore/client'
+import { mixins as kMapMixins } from 'kMap/client'
 import { errors } from 'kMap/common'
 import mixins from '../mixins'
 
@@ -36,6 +38,7 @@ export default {
     kCoreMixins.service,
     kCoreMixins.schemaProxy,
     kCoreMixins.refsResolver(['form']),
+    kMapMixins.navigator,
     mixins.eventLogs
   ],
   components: {
@@ -143,12 +146,22 @@ export default {
           name: 'browse-media', label: this.$t('KEventCard.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
         })
       }
+      if (this.canNavigate() && !_.isEmpty(this.item.location)) {
+        this.registerPaneAction({ 
+          name: 'navigate', label: this.$t('KEventCard.NAVIGATE_LABEL'), icon: 'navigation', handler: this.launchNavigation
+        })
+      }
     },
     uploadMedia () {
       this.$refs.uploader.open(this.item.attachments)
     },
     browseMedia () {
       this.$refs.mediaBrowser.open(this.item.attachments)
+    },
+    launchNavigation () {
+      let longitude = this.item.location.longitude
+      let latitude = this.item.location.latitude
+      this.navigate(longitude, latitude)
     },
     removeEvent (event) {
       Dialog.create({
