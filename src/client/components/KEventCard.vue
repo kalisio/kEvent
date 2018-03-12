@@ -10,7 +10,6 @@
       </div>
       <div v-if="isCoordinator">
         {{coordinatorLabel}}
-        {{window.navigationApps}}
       </div>
     </div>
     <k-modal ref="followUpModal" v-if="hasParticipantInteraction" :title="followUpTitle" :toolbar="followUpToolbar" :buttons="followUpButtons" :route="false" >
