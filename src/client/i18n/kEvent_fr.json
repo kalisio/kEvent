@@ -33,7 +33,7 @@
   "KEventCard": {
     "REMOVE_LABEL": "$t(REMOVE_LABEL)",
     "EDIT_LABEL": "$t(EDIT_LABEL)",
-    "FOLLOW_UP": "Suivre",
+    "FOLLOW_UP_LABEL": "Suivre",
     "ADD_MEDIA_LABEL": "Ajouter un média",
     "BROWSE_MEDIA_LABEL": "Parcourir les médias",
     "NAVIGATE_LABEL": "Naviguer",
