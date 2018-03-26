@@ -93,7 +93,7 @@ describe('kEvent', () => {
     return userService.create({ email: 'test@test.org', name: 'test-user' }, { checkAuthorisation: true })
     .then(user => {
       userObject = user
-      return userService.find({ query: { 'profile.name': 'test-user' }, checkAuthorisation: true })
+      return userService.find({ query: { 'profile.name': 'test-user' }, checkAuthorisation: true, user: userObject })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -104,7 +104,7 @@ describe('kEvent', () => {
     return userService.create({ email: 'manager@test.org', name: 'org-manager' }, { checkAuthorisation: true })
     .then(user => {
       orgManagerObject = user
-      return userService.find({ query: { 'profile.name': 'org-manager' }, checkAuthorisation: true })
+      return userService.find({ query: { 'profile.name': 'org-manager' }, checkAuthorisation: true, user: orgManagerObject })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -131,7 +131,7 @@ describe('kEvent', () => {
     return userService.create({ email: 'user@test.org', name: 'org-user' }, { checkAuthorisation: true })
     .then(user => {
       orgUserObject = user
-      return userService.find({ query: { 'profile.name': 'org-user' }, checkAuthorisation: true })
+      return userService.find({ query: { 'profile.name': 'org-user' }, checkAuthorisation: true, user: orgUserObject })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -149,7 +149,7 @@ describe('kEvent', () => {
     })
     .then(authorisation => {
       expect(authorisation).toExist()
-      return userService.find({ query: { 'profile.name': orgUserObject.name }, checkAuthorisation: true })
+      return userService.find({ query: { 'profile.name': orgUserObject.name }, checkAuthorisation: true, user: orgManagerObject })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -230,7 +230,7 @@ describe('kEvent', () => {
     })
     .then(authorisation => {
       expect(authorisation).toExist()
-      return userService.find({ query: { 'profile.name': userObject.name }, checkAuthorisation: true })
+      return userService.find({ query: { 'profile.name': userObject.name }, checkAuthorisation: true, user: orgManagerObject })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
