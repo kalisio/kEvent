@@ -26,7 +26,7 @@ export default {
       if (this.$can('update', 'event-templates', this.contextId, this.item)) {
         this.registerPaneAction({ 
           name: 'edit-event-template', label: this.$t('KEventTemplateCard.EDIT_LABEL'), icon: 'description',
-          route: { name: 'edit-event-template', params: { contextId: this.contextId, id: this.item._id } }
+          route: { name: 'edit-event-template', params: { contextId: this.contextId, objectId: this.item._id } }
         })
       }
       if (this.$can('update', 'event-templates', this.contextId, this.item)) {

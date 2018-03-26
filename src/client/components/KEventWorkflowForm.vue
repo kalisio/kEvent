@@ -65,7 +65,7 @@ export default {
     mixins.eventLogs
   ],
   props: {
-    id: {
+    objectId: {
       type: String,
       default: ''
     }

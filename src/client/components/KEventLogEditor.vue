@@ -21,7 +21,7 @@ export default {
     mixins.eventLogs
   ],
   props: {
-    id: {
+    objectId: {
       type: String,
       required: true
     },
@@ -94,12 +94,12 @@ export default {
     this.$options.components['k-form'] = this.$load('form/KForm')
     // Retrieve source log/event
     /*this.state = await this.loadService().get(this.logId)
-    this.event = await this.$api.getService('events', this.contextId).get(this.id)
+    this.event = await this.$api.getService('events', this.contextId).get(this.objectId)
     */
     this.loadService().get(this.logId)
     .then(state => {
       this.state = state
-      return this.$api.getService('events', this.contextId).get(this.id)
+      return this.$api.getService('events', this.contextId).get(this.objectId)
     })
     .then(event => {
       this.event = event

@@ -8,7 +8,7 @@
         <strong v-show="!hasWorkflow">{{$t('KEventTemplateEditor.ADD_WORKFLOW_LABEL')}}</strong>
         <span v-show="hasWorkflow">{{$t('KEventTemplateEditor.WORKFLOW_HELPER_LABEL')}}</span>
       </p>
-      <k-event-workflow-form v-show="hasWorkflow" ref="workflowForm" schemaName="event-workflow" :id="id" />
+      <k-event-workflow-form v-show="hasWorkflow" ref="workflowForm" schemaName="event-workflow" :objectId="objectId" />
     </div>
   </k-modal>
 </template>
@@ -59,7 +59,7 @@ export default {
         // Setup hasWorkflow tag
         this._object.hasWorkflow = !_.isNil(this.template.workflow)
         return Promise.resolve(this._object)
-      } else if (this.id) {
+      } else if (this.objectId) {
         // Otherwise proceed as usual to load the event object
         return mixins.objectProxy.methods.loadObject.call(this)
       }
@@ -88,7 +88,7 @@ export default {
     // Default state
     await this.refresh()
     // In edition mode activate workflow according to its existence
-    if (this.id || this.templateId) {
+    if (this.objectId || this.templateId) {
       this.hasWorkflow = !_.isNil(this.getObject().workflow)
       this.setFormDisabled('workflowForm', !this.hasWorkflow)
     } else {

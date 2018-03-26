@@ -1,7 +1,7 @@
 <template>
   <k-modal ref="modal" :title="editorTitle" :toolbar="toolbar" :buttons="buttons" :route="true">
     <div slot="modal-content" class="column xs-gutter">
-      <k-form ref="eventForm" :contextId="contextId" :id="id" :schema="schema" @field-changed="onFieldChanged" />
+      <k-form ref="eventForm" :contextId="contextId" :objectId="objectId" :schema="schema" @field-changed="onFieldChanged" />
     </div>
   </k-modal>
 </template>

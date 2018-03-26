@@ -103,7 +103,7 @@ export default {
       if (this.$can('update', 'events', this.contextId, this.item)) {
         this.registerPaneAction({ 
           name: 'edit-event', label: this.$t('KEventCard.EDIT_LABEL'), icon: 'description',
-          route: { name: 'edit-event', params: { contextId: this.contextId, id: this.item._id } }
+          route: { name: 'edit-event', params: { contextId: this.contextId, objectId: this.item._id } }
         })
       }
       if (this.item.hasWorkflow && this.$can('read', 'events', this.contextId, this.item)) {
@@ -182,7 +182,7 @@ export default {
       if (this.hasParticipantInteraction) {
         this.$refs.followUpModal.open()
       } else if (this.isCoordinator) {
-        this.$router.push({ name: 'event-activity', params: { id: this.item._id, contextId: this.contextId } })
+        this.$router.push({ name: 'event-activity', params: { objectId: this.item._id, contextId: this.contextId } })
       }
     },
     refreshParticipantState (logs) {

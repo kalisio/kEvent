@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-window-resize-observable @resize="onWindowResized" />
-    <div v-if="id !== ''" class="column justify-center full-width">
+    <div v-if="objectId !== ''" class="column justify-center full-width">
       <div class="row full-width">
         <div class="col-3 full-height" v-if="pane">
           <q-scroll-area :style="paneStyle">
@@ -32,7 +32,7 @@
           </div>
         </div>
       </div>
-      <k-uploader ref="uploader" :contextId="contextId" :resource="id" :options="uploaderOptions()"/>
+      <k-uploader ref="uploader" :contextId="contextId" :resource="objectId" :options="uploaderOptions()"/>
       <k-media-browser ref="mediaBrowser" :contextId="contextId"/>
       <div>
         <router-view service="events" :router="router()"></router-view>
@@ -72,7 +72,7 @@ export default {
       type: String,
       required: true
     },
-    id: {
+    objectId: {
       type: String,
       required: true
     }
@@ -114,18 +114,18 @@ export default {
   methods: {
     router () {
       return { 
-        onApply: { name: 'event-activity', params: { contextId: this.contextId, id: this.id } },
-        onDismiss: { name: 'event-activity', params: { contextId: this.contextId, id: this.id } }
+        onApply: { name: 'event-activity', params: { contextId: this.contextId, objectId: this.objectId } },
+        onDismiss: { name: 'event-activity', params: { contextId: this.contextId, objectId: this.objectId } }
       }
     },
     loadService () {
       return this.$api.getService('event-logs')
     },
     getCollectionBaseQuery () {
-      return { lastInEvent: true, event: this.id }
+      return { lastInEvent: true, event: this.objectId }
     },
     async refreshEvent () {
-      this.event = await this.$api.getService('events', this.contextId).get(this.id)
+      this.event = await this.$api.getService('events', this.contextId).get(this.objectId)
       this.setTitle(this.event.name)
       // Located event ?
       if (this.event.location && this.event.location.longitude && this.event.location.latitude) {
@@ -161,7 +161,7 @@ export default {
       if (this.$can('update', 'events', this.contextId, this.event)) {
         this.registerFabAction({ 
           name: 'edit-event', label: 'Edit', icon: 'description',
-          route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', id: this.id } }
+          route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', objectId: this.objectId } }
         })
       }
       this.registerFabAction({ 
