@@ -287,6 +287,8 @@ describe('kEvent', () => {
       done()
     })
   })
+  // Let enough time to process
+  .timeout(10000)
 
   it('event coordinators can add attachments to events', () => {
     const content = Buffer.from('some buffered data')
@@ -374,6 +376,8 @@ describe('kEvent', () => {
       done()
     })
   })
+  // Let enough time to process
+  .timeout(10000)
 
   it('removes test user', () => {
     return userService.remove(userObject._id, { user: userObject, checkAuthorisation: true })
@@ -384,6 +388,8 @@ describe('kEvent', () => {
       expect(users.data.length === 0).beTrue()
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('removes org user', () => {
     return userService.remove(orgUserObject._id, { user: orgUserObject, checkAuthorisation: true })
@@ -394,6 +400,8 @@ describe('kEvent', () => {
       expect(users.data.length === 0).beTrue()
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('removes org', () => {
     return orgService.remove(orgObject._id, { user: orgManagerObject, checkAuthorisation: true })
@@ -404,6 +412,8 @@ describe('kEvent', () => {
       expect(orgs.data.length === 0).beTrue()
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('removes org manager', () => {
     return userService.remove(orgManagerObject._id, { user: orgManagerObject, checkAuthorisation: true })
@@ -414,6 +424,8 @@ describe('kEvent', () => {
       expect(users.data.length === 0).beTrue()
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   // Cleanup
   after(() => {

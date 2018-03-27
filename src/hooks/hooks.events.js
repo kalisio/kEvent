@@ -51,7 +51,7 @@ export async function sendEventNotifications (hook) {
     participants.forEach(participant => {
       let participantService = participant.service
       if (hook.service.context) {
-        participantService = (typeof hook.service.context === 'object' ? hook.service.context._id.toString() : hook.service.context) + '/' + participantService
+        participantService = hook.service.getContextId() + '/' + participantService
       }
       publishPromises.push(pusherService.create({
         action: 'message',
