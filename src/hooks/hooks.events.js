@@ -44,42 +44,44 @@ export async function sendEventNotifications (hook) {
 
   let pusherService = hook.app.getService('pusher')
   if (!pusherService) return hook
-  const notification = hook.params.notification || ''
-  const participants = hook.result.participants || []
-  let publishPromises = []
-  participants.forEach(participant => {
-    let participantService = participant.service
-    if (hook.service.context) {
-      participantService = (typeof hook.service.context === 'object' ? hook.service.context._id.toString() : hook.service.context) + '/' + participantService
+  const notification = hook.params.notification
+  if (notification) {
+    const participants = hook.result.participants || []
+    let publishPromises = []
+    participants.forEach(participant => {
+      let participantService = participant.service
+      if (hook.service.context) {
+        participantService = (typeof hook.service.context === 'object' ? hook.service.context._id.toString() : hook.service.context) + '/' + participantService
+      }
+      publishPromises.push(pusherService.create({
+        action: 'message',
+        // The notification contains the event title + a given prefix
+        message: {
+          title: hook.result.name,
+          body: notification,
+          createdAt: hook.result.createdAt,
+          updatedAt: hook.result.updatedAt,
+          // Custom vibration pattern
+          vibration: [500, 1000, 500, 500, 500, 500],
+          sound: 'default'
+        },
+        pushObject: participant._id.toString(),
+        pushObjectService: participantService
+      }))
+    })
+    // We'd like to be tolerant here because the participants might have be removed from the system while the event is still alive
+    //let results = await Promise.all(publishPromises)
+    let results = []
+    for (let i = 0; i < publishPromises.length; i++) {
+      try {
+        let result = await publishPromises[i]
+        results.push(result)
+      } catch (error) {
+        logger.error(error.message, error)
+      }
     }
-    publishPromises.push(pusherService.create({
-      action: 'message',
-      // The notification contains the event title + a given prefix
-      message: {
-        title: hook.result.name,
-        body: notification,
-        createdAt: hook.result.createdAt,
-        updatedAt: hook.result.updatedAt,
-        // Custom vibration pattern
-        vibration: [500, 1000, 500, 500, 500, 500],
-        sound: 'default'
-      },
-      pushObject: participant._id.toString(),
-      pushObjectService: participantService
-    }))
-  })
-  // We'd like to be tolerant here because the participants might have be removed from the system while the event is still alive
-  //let results = await Promise.all(publishPromises)
-  let results = []
-  for (let i = 0; i < publishPromises.length; i++) {
-    try {
-      let result = await publishPromises[i]
-      results.push(result)
-    } catch (error) {
-      logger.error(error.message, error)
-    }
+    debug('Published event notifications on ' + results.length + ' topics/users for event ' + hook.result._id.toString())
   }
-  debug('Published event notifications on ' + results.length + ' topics/users for event ' + hook.result._id.toString())
   return hook
 }
 
