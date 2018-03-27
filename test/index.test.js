@@ -100,6 +100,8 @@ describe('kEvent', () => {
       expect(users.data.length > 0).beTrue()
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('creates a org manager', () => {
     return userService.create({ email: 'manager@test.org', name: 'org-manager' }, { checkAuthorisation: true })
@@ -111,6 +113,8 @@ describe('kEvent', () => {
       expect(users.data.length > 0).beTrue()
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('creates the org', () => {
     return orgService.create({ name: 'test-org' }, { user: orgManagerObject, checkAuthorisation: true })
@@ -130,6 +134,8 @@ describe('kEvent', () => {
       expect(eventLogService).toExist()
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('creates a org user', () => {
     return userService.create({ email: 'user@test.org', name: 'org-user' }, { checkAuthorisation: true })
@@ -251,6 +257,8 @@ describe('kEvent', () => {
       expect(userObject.organisations[0].permissions).to.deep.equal('member')
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('members cannot access events when they are not participants', () => {
     return eventService.find({ query: {}, user: userObject, checkAuthorisation: true })
