@@ -8,7 +8,8 @@ import event, { hooks, permissions } from '../src'
 
 describe('kEvent', () => {
   let app, userService, userObject, orgManagerObject, orgObject, orgUserObject, orgService,
-      authorisationService, devicesService, pusherService, sns, eventService, eventObject, eventTemplateService, eventLogService
+      authorisationService, devicesService, pusherService, sns,
+      storageService, storageObject, eventService, eventObject, eventTemplateService, eventLogService
   const device = {
     registrationId: 'myfakeId',
     platform: 'ANDROID'
@@ -115,6 +116,9 @@ describe('kEvent', () => {
     return orgService.create({ name: 'test-org' }, { user: orgManagerObject, checkAuthorisation: true })
     .then(org => {
       orgObject = org
+      // This should create a service for organisation storage
+      storageService = app.getService('storage', org)
+      expect(storageService).toExist()
       // This should create a service for organisation events
       eventService = app.getService('events', org)
       expect(eventService).toExist()
@@ -188,7 +192,15 @@ describe('kEvent', () => {
   })
 
   it('org manager can create events', (done) => {
-    eventService.create({ title: 'event', participants: [{ _id: orgUserObject._id, service: 'members' }] }, { user: orgManagerObject, checkAuthorisation: true })
+    eventService.create({
+      title: 'event',
+      participants: [{ _id: orgUserObject._id, service: 'members' }]
+    },
+    {
+      notification: 'event created',
+      user: orgManagerObject,
+      checkAuthorisation: true
+    })
     .then(event => {
       eventObject = event
       return eventService.find({ query: { title: 'event' }, user: orgManagerObject, checkAuthorisation: true })
@@ -248,7 +260,13 @@ describe('kEvent', () => {
   })
 
   it('event coordinators can update events', () => {
-    return eventService.patch(eventObject._id, { title: 'updated event',  }, { user: orgManagerObject, checkAuthorisation: true })
+    return eventService.patch(eventObject._id, {
+      title: 'updated event'
+    }, {
+      notification: 'event updated',
+      user: orgManagerObject,
+      checkAuthorisation: true
+    })
     .then(event => {
       eventObject = event
       return eventService.find({ query: { title: 'updated event' }, user: orgManagerObject, checkAuthorisation: true })
@@ -261,6 +279,32 @@ describe('kEvent', () => {
       done()
     })
   })
+
+  it('event coordinators can add attachments to events', () => {
+    const content = Buffer.from('some buffered data')
+    return storageService.create({
+      id: 'buffer.txt',
+      contentType: 'text/plain',
+      buffer: content,
+      resource: eventObject._id.toString(),
+      resourcesService: 'events'
+    })
+    .then(object => {
+      storageObject = object
+      expect(storageObject.size).to.equal(content.length)
+      return eventService.find({ query: { title: 'updated event' }, user: orgManagerObject, checkAuthorisation: true })
+    })
+    .then(events => {
+      expect(events.data.length > 0).beTrue()
+      eventObject = events.data[0]
+      expect(eventObject.attachments).toExist()
+      expect(eventObject.attachments.length > 0).beTrue()
+      expect(eventObject.attachments[0]._id).to.equal(storageObject._id)
+      return storageService.get('buffer.txt')
+    })
+  })
+  // Let enough time to process
+  .timeout(10000)
 
   it('members can access events when they are participants', () => {
     return eventService.find({ query: {}, user: orgUserObject, checkAuthorisation: true })
@@ -299,6 +343,29 @@ describe('kEvent', () => {
   })
   // Let enough time to process
   .timeout(10000)
+
+  it('event coordinators can remove events', () => {
+    return eventService.remove(eventObject._id, {
+      notification: 'event removed',
+      user: orgManagerObject,
+      checkAuthorisation: true
+    })
+    .then(event => {
+      eventObject = event
+      return eventService.find({ query: { title: 'updated event' }, user: orgManagerObject, checkAuthorisation: true })
+    })
+    .then(events => {
+      expect(events.data.length === 0).beTrue()
+      return storageService.get('buffer.txt')
+    })
+    .catch(error => {
+      expect(error).toExist()
+    })
+    sns.once('messageSent', (endpointArn, messageId) => {
+      expect(orgUserObject.devices[0].arn).to.equal(endpointArn)
+      done()
+    })
+  })
 
   it('removes test user', () => {
     return userService.remove(userObject._id, { user: userObject, checkAuthorisation: true })
