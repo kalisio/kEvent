@@ -1,5 +1,5 @@
 <template>
-  <k-modal ref="modal" :title="editorTitle" :toolbar="toolbar" :buttons="buttons" :route="true">
+  <k-modal ref="modal" :title="editorTitle" :toolbar="toolbar()" :buttons="buttons" :route="true">
     <div slot="modal-content" class="column xs-gutter">
       <k-form ref="eventForm" :contextId="contextId" :objectId="objectId" :schema="schema" @field-changed="onFieldChanged" />
     </div>
@@ -30,18 +30,16 @@ export default {
   computed: {
     buttons () {
       return [
-        { name: this.applyButton, color: 'primary', handler: (event, done) => this.apply(event, done) }
-      ]
-    }
-  },
-  data () {
-    return {
-      toolbar: [
-        { name: 'Close', icon: 'close', handler: () => this.doClose() }
+        { name: 'apply-button', label: this.applyButton, color: 'primary', handler: (event, done) => this.apply(event, done) }
       ]
     }
   },
   methods: {
+    toolbar () {
+      return [
+        { name: 'close-action', label: this.$t('KEventEditor.CLOSE_ACTION'), icon: 'close', handler: () => this.doClose() }
+      ]
+    },
     loadObject () {
       // When a template is provided use it as reference for object
       if (this.template) {

@@ -42,13 +42,15 @@ export default {
   data () {
     return {
       step: {},
-      toolbar: [{ 
-        name: 'close', 
+      toolbar: [{
+        name: 'close-action',
+        label: this.$t('KEventLogEditor.CLOSE_ACTION'),
         icon: 'close', 
         handler: () => this.$refs.modal.close(this.router ? _ => this.$router.push(this.router.onDismiss) : null) 
       }],
       buttons: [{
-        name: 'Save',
+        name: 'save-button',
+        label: this.$t('KEventLogEditor.SAVE_BUTTON'),
         color: 'primary',
         handler: (event, done) => this.logCoordinatorState(event, done),
       }]

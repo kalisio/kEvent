@@ -3,6 +3,8 @@
   "EVENT_TEMPLATES_LABEL": "Modèles",
   "REMOVE_LABEL": "Supprimer",
   "EDIT_LABEL": "Editer",
+  "CLOSE_LABEL": "Fermer",
+  "SAVE_LABEL": "Enregistrer",
   "schemas": {
     "EVENT_TEMPLATES_CREATE_TITLE": "Créer un nouveau modèle d'évènement ?",
     "EVENT_TEMPLATES_NAME_FIELD_HELPER": "Saisissez le nom du modèle",
@@ -44,7 +46,9 @@
     "WAITING_FOR_PARTICIPANT_LABEL": "Le coordinateur est en attente de votre action",
     "WAITING_FOR_COORDINATOR_LABEL": "En attente du coordinateur",
     "PARTICPANTS_AWAITING_LABEL": "{{number}} participants en attente de coordination",
-    "NO_PARTICPANTS_AWAITING_LABEL": "Aucun participant en attente de coordination"     
+    "NO_PARTICPANTS_AWAITING_LABEL": "Aucun participant en attente de coordination",
+    "FOLLOWUP_MODAL_CLOSE_ACTION": "$t(CLOSE_LABEL)",
+    "FOLLOWUP_MODAL_SAVE_BUTTON": "$t(SAVE_LABEL)"   
   },
   "KEventTemplatesActivity": {
     "EVENTS_LABEL": "$t(EVENTS_LABEL)",
@@ -68,7 +72,8 @@
   },
   "KEventTemplateEditor": {
     "ADD_WORKFLOW_LABEL": "Ajouter un processus ?",
-    "WORKFLOW_HELPER_LABEL": "Gérer ci-dessous les différentes étapes du processus"
+    "WORKFLOW_HELPER_LABEL": "Gérer ci-dessous les différentes étapes du processus",
+    "CLOSE_ACTION":  "$t(CLOSE_LABEL)"
   },
   "KEventNotifications": {
     "CREATE": "Nouveau",
@@ -76,5 +81,12 @@
     "ADD_MEDIA": "Nouveau media",
     "REMOVE_MEDIA": "Media supprimé",
     "REMOVE": "Clôturé"
+  },
+  "KEventEditor": {
+    "CLOSE_ACTION": "$t(CLOSE_LABEL)"
+  },
+  "KEventLogEditor": {
+    "CLOSE_ACTION": "$t(CLOSE_LABEL)",
+    "SAVE_BUTTON": "$t(SAVE_LABEL)"
   }
 }

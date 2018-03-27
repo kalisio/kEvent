@@ -3,6 +3,8 @@
   "EVENT_TEMPLATES_LABEL": "Templates",
   "REMOVE_LABEL": "Remove",
   "EDIT_LABEL": "Edit",
+  "CLOSE_LABEL": "Close",
+  "SAVE_LABEL": "Save",
   "schemas": {
     "EVENT_TEMPLATES_CREATE_TITLE": "Create a new event template ?",
     "EVENT_TEMPLATES_NAME_FIELD_HELPER": "Enter the name of this template",
@@ -44,7 +46,9 @@
     "WAITING_FOR_PARTICIPANT_LABEL": "Coordinator is waiting for your input",
     "WAITING_FOR_COORDINATOR_LABEL": "Waiting for coordinator feedback",
     "PARTICPANTS_AWAITING_LABEL": "{{number}} participants awaiting coordination",
-    "NO_PARTICPANTS_AWAITING_LABEL": "No participants awaiting coordination" 
+    "NO_PARTICPANTS_AWAITING_LABEL": "No participants awaiting coordination",
+    "FOLLOWUP_MODAL_CLOSE_ACTION": "$t(CLOSE_LABEL)",
+    "FOLLOWUP_MODAL_SAVE_BUTTON": "$t(SAVE_LABEL)"
   },
   "KEventTemplatesActivity": {
     "EVENTS_LABEL": "$t(EVENTS_LABEL)",
@@ -60,7 +64,8 @@
   },
   "KEventTemplateEditor": {
     "ADD_WORKFLOW_LABEL": "Add a workflow ?",
-    "WORKFLOW_HELPER_LABEL": "Manage below the different steps of the workflow"
+    "WORKFLOW_HELPER_LABEL": "Manage below the different steps of the workflow",
+    "CLOSE_ACTION":  "$t(CLOSE_LABEL)"
   },
   "KEventNotifications": {
     "CREATE": "New",
@@ -68,5 +73,12 @@
     "ADD_MEDIA": "New media",
     "REMOVE_MEDIA": "Removed media",
     "REMOVE": "Closed"
+  },
+  "KEventEditor": {
+    "CLOSE_ACTION": "$t(CLOSE_LABEL)"
+  },
+  "KEventLogEditor": {
+    "CLOSE_ACTION": "$t(CLOSE_LABEL)",
+    "SAVE_BUTTON": "$t(SAVE_LABEL)"
   }
 }

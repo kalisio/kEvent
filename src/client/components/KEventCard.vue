@@ -12,7 +12,7 @@
         {{coordinatorLabel}}
       </div>
     </div>
-    <k-modal ref="followUpModal" v-if="hasParticipantInteraction" :title="followUpTitle" :toolbar="followUpToolbar" :buttons="followUpButtons" :route="false" >
+    <k-modal ref="followUpModal" v-if="hasParticipantInteraction" :title="followUpTitle" :toolbar="getFollowUpToolbar()" :buttons="getFollowUpButtons()" :route="false" >
       <div slot="modal-content">
         <k-form ref="form" :schema="schema"/>
       </div>
@@ -63,20 +63,26 @@ export default {
       participantState: {},
       participantLabel: '',
       nbParticipantsWaitingCoordination: 0,
-      coordinatorLabel: '',
-      followUpToolbar: [{ 
-        name: 'close', 
-        icon: 'close', 
-        handler: () => this.$refs.followUpModal.close()
-      }],
-      followUpButtons: [{
-        name: 'Save',
-        color: 'primary',
-        handler: (event, done) => this.logParticipantState(event, done),
-      }]
+      coordinatorLabel: ''
     }
   },
   methods: {
+    getFollowuUpToolbar () {
+      return [{ 
+        name: 'close-action',
+        label: this.$t('KEventCard.FOLLOWUP_MODAL_CLOSE_ACTION'),
+        icon: 'close', 
+        handler: () => this.$refs.followUpModal.close()
+      }]
+    },
+    getFollowuUpButtons () {
+      return [{
+        name: 'save-button',
+        lable: this.$t('KEventCard.FOLLOWUP_MODAL_SAVE_BUTTON'),
+        color: 'primary',
+        handler: (event, done) => this.logParticipantState(event, done),
+      }]
+    },
     loadService () {
       return this._service = this.$api.getService('event-logs', this.contextId)
     },
