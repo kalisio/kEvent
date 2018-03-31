@@ -173,14 +173,14 @@ export default {
         title: this.$t('KEventCard.REMOVE_DIALOG_TITLE', { event: event.name }),
         message: this.$t('KEventCard.REMOVE_DIALOG_TITLE', { event: event.name }),
         buttons: [
-          'Cancel',
           {
             label: 'Ok',
             handler: () => {
               let eventsService = this.$api.getService('events', this.contextId)
               eventsService.remove(event._id, { query: { notification: this.$t('KEventNotifications.REMOVE') } })
             }
-          }
+          },
+          'Cancel'
         ]
       })
     },
