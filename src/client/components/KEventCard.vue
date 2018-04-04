@@ -78,8 +78,7 @@ export default {
     getFollowUpButtons () {
       return [{
         name: 'save-button',
-        lable: this.$t('KEventCard.FOLLOWUP_MODAL_SAVE_BUTTON'),
-        color: 'primary',
+        label: this.$t('KEventCard.FOLLOWUP_MODAL_SAVE_BUTTON'),
         handler: (event, done) => this.logParticipantState(event, done),
       }]
     },
