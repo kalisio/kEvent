@@ -80,5 +80,8 @@
   "KEventLogEditor": {
     "CLOSE_ACTION": "$t(CLOSE_LABEL)",
     "SAVE_BUTTON": "$t(SAVE_LABEL)"
+  },
+  "KEventDashboard": {
+    "DASHBOARD": "Dashboard"
   }
 }

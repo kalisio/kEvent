@@ -59,7 +59,7 @@ export default {
     },
     refreshActivity () {
       this.clearActivity()
-      this.setTitle('Dashboard')
+      this.setTitle(this.$t('KEventDashboard.DASHBOARD'))
       this.setSearchBar('name')
       this.refreshCollection()
     }
