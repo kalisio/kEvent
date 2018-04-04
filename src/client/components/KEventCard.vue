@@ -67,7 +67,7 @@ export default {
     }
   },
   methods: {
-    getFollowuUpToolbar () {
+    getFollowUpToolbar () {
       return [{ 
         name: 'close-action',
         label: this.$t('KEventCard.FOLLOWUP_MODAL_CLOSE_ACTION'),
@@ -75,7 +75,7 @@ export default {
         handler: () => this.$refs.followUpModal.close()
       }]
     },
-    getFollowuUpButtons () {
+    getFollowUpButtons () {
       return [{
         name: 'save-button',
         lable: this.$t('KEventCard.FOLLOWUP_MODAL_SAVE_BUTTON'),
