@@ -1,5 +1,5 @@
 <template>
-  <k-modal ref="modal" :title="title" :toolbar="toolbar" :buttons="buttons" :route="router ? true : false" >
+  <k-modal ref="modal" :title="title" :toolbar="toolbar()" :buttons="buttons()" :route="router ? true : false" >
     <div slot="modal-content">
       <k-form ref="form" :schema="schema"/>
     </div>
@@ -41,22 +41,26 @@ export default {
   },
   data () {
     return {
-      step: {},
-      toolbar: [{
+      step: {}
+    }
+  },
+  methods: {
+    toolbar () {
+      return [{
         name: 'close-action',
         label: this.$t('KEventLogEditor.CLOSE_ACTION'),
         icon: 'close', 
         handler: () => this.$refs.modal.close(this.router ? _ => this.$router.push(this.router.onDismiss) : null) 
-      }],
-      buttons: [{
+      }]
+    },
+    buttons () {
+      return [{
         name: 'save-button',
         label: this.$t('KEventLogEditor.SAVE_BUTTON'),
         color: 'primary',
         handler: (event, done) => this.logCoordinatorState(event, done),
       }]
-    }
-  },
-  methods: {
+    },
     loadService () {
       return this._service = this.$api.getService('event-logs', this.contextId)
     },
