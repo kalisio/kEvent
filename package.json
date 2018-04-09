@@ -63,7 +63,7 @@
     "feathers-hooks-common": "^3.0.0",
     "lodash": "^4.17.4",
     "loglevel": "^1.6.0",
-    "quasar-extras": "1.0.0",
+    "quasar-extras": "0.0.8",
     "quasar-framework": "0.14.7",
     "vue": "2.5.15",
     "vue-avatar": "^2.1.1",
