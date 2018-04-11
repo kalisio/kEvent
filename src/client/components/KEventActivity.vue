@@ -150,17 +150,17 @@ export default {
       // Fab actions
       if (this.$can('update', 'events', this.contextId, this.event)) {
         this.registerFabAction({ 
-          name: 'add-media', label: 'Add a photo', icon: 'add_a_photo', handler: this.uploadMedia
+          name: 'add-media', label: this.$t('KEventActivity.ADD_MEDIA_LABEL'), icon: 'add_a_photo', handler: this.uploadMedia
         })
       }
       if (this.$can('read', 'events', this.contextId, this.event)) {
         this.registerFabAction({ 
-          name: 'browse-media', label: 'Browse media', icon: 'photo_library', handler: this.browseMedia
+          name: 'browse-media', label: this.$t('KEventActivity.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
         })
       }
       if (this.$can('update', 'events', this.contextId, this.event)) {
         this.registerFabAction({ 
-          name: 'edit-event', label: 'Edit', icon: 'description',
+          name: 'edit-event', label: this.$t('KEventActivity.EDIT_LABEL'), icon: 'description',
           route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', objectId: this.objectId } }
         })
       }
@@ -230,18 +230,18 @@ export default {
       // Default content is participant name
       let tooltip = L.tooltip({ permanent: true }, layer)
       const step = this.getWorkflowStep(feature)
-      const name = _.get(feature, 'participant.name', 'Unamed')
+      const name = _.get(feature, 'participant.name', this.$t('KEventActivity.UNAMED'))
       // Check for any interaction to be performed
       if (this.waitingInteraction(step, feature, 'coordinator')) {
-        return tooltip.setContent('<b>' + name + '<br>Action required' + '</b>')
+        return tooltip.setContent('<b>' + name + '<br>' + this.$t('KEventActivity.ACTION_REQUIRED') + '</b>')
       } else if (this.waitingInteraction(step, feature, 'participant')) {
-        return tooltip.setContent('<b>' + name + '<br>Awaiting information' + '</b>')
+        return tooltip.setContent('<b>' + name + '<br>' + this.$t('KEventActivity.AWAITING_INFORMATION') + '</b>')
       } else {
         return tooltip.setContent('<b>' + name + '</b>')
       }
     },
     getPaneLabel () {
-      return this.pane === false ? 'View actors pane' : 'Hide actors pane'
+      return this.pane === false ? this.$t('KEventActivity.SHOW_PANE_LABEL') : this.$t('KEventActivity.HIDE_PANE_LABEL')
     },
     togglePane () {
       this.pane = !this.pane
