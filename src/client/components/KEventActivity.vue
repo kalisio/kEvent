@@ -42,8 +42,10 @@
 </template>
 
 <script>
-import { Events, QWindowResizeObservable, QResizeObservable, QScrollArea, QBtn, QIcon, dom } from 'quasar'
-import { Store, mixins as kCoreMixins, utils as kCoreUtils } from 'kCore/client'
+import _ from 'lodash'
+import L from 'leaflet'
+import { QWindowResizeObservable, QResizeObservable, QScrollArea, QBtn, QIcon, dom } from 'quasar'
+import { mixins as kCoreMixins, utils as kCoreUtils } from 'kCore/client'
 import { mixins as kMapMixins } from 'kMap/client'
 import mixins from '../mixins'
 
@@ -101,19 +103,19 @@ export default {
       },
       filter: null,
       pane: true,
-      actorRenderer: { 
-        component: 'KActorCard', 
+      actorRenderer: {
+        component: 'KActorCard',
         props: {
           options: {
             layout: 'col-12'
           }
-        } 
+        }
       }
     }
   },
   methods: {
     router () {
-      return { 
+      return {
         onApply: { name: 'event-activity', params: { contextId: this.contextId, objectId: this.objectId } },
         onDismiss: { name: 'event-activity', params: { contextId: this.contextId, objectId: this.objectId } }
       }
@@ -132,7 +134,7 @@ export default {
         // Recenter map
         this.center(this.event.location.longitude, this.event.location.latitude, 15)
         // And add event marker
-        let marker = L.marker([this.event.location.latitude, this.event.location.longitude],{
+        let marker = L.marker([this.event.location.latitude, this.event.location.longitude], {
           icon: L.icon.fontAwesome({
             iconClasses: 'fa ' + this.event.icon.name || 'fa-circle',
             markerColor: kCoreUtils.Colors[this.event.icon.color || 'blue'],
@@ -149,22 +151,24 @@ export default {
       await this.refreshEvent()
       // Fab actions
       if (this.$can('update', 'events', this.contextId, this.event)) {
-        this.registerFabAction({ 
+        this.registerFabAction({
           name: 'add-media', label: this.$t('KEventActivity.ADD_MEDIA_LABEL'), icon: 'add_a_photo', handler: this.uploadMedia
         })
       }
       if (this.$can('read', 'events', this.contextId, this.event)) {
-        this.registerFabAction({ 
+        this.registerFabAction({
           name: 'browse-media', label: this.$t('KEventActivity.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
         })
       }
       if (this.$can('update', 'events', this.contextId, this.event)) {
-        this.registerFabAction({ 
-          name: 'edit-event', label: this.$t('KEventActivity.EDIT_LABEL'), icon: 'description',
+        this.registerFabAction({
+          name: 'edit-event',
+          label: this.$t('KEventActivity.EDIT_LABEL'),
+          icon: 'description',
           route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', objectId: this.objectId } }
         })
       }
-      this.registerFabAction({ 
+      this.registerFabAction({
         name: 'toggle-pane', label: this.getPaneLabel(), icon: 'toc', handler: this.togglePane
       })
       this.refreshCollection()
@@ -176,7 +180,7 @@ export default {
       this.$refs.mediaBrowser.open(this.event.attachments)
     },
     getPointMarker (feature, latlng) {
-      const icon = feature.icon //this.getIcon(feature, this.getWorkflowStep(feature))
+      const icon = feature.icon // this.getIcon(feature, this.getWorkflowStep(feature))
       return this.createMarkerFromStyle(latlng, {
         icon: {
           type: 'icon.fontAwesome',
@@ -190,14 +194,14 @@ export default {
     },
     filterItem (item) {
       // Is there any filter active ?
-      if (! this.filter) return true
+      if (!this.filter) return true
       // Is it the same step ?
       if (item.step !== this.filter.step) return false
       // Is it the same interaction ?
       if (item.interaction) {
         if (item.interaction.value === this.filter.interaction) return true
         return false
-      } 
+      }
       if (item.previous && item.previous.interaction) {
         if (item.previous.interaction.value === this.filter.interaction) return true
         return false
@@ -271,7 +275,7 @@ export default {
         if (layer.feature && layer.feature._id === actor._id) {
           let feature = layer.feature
           if (feature.geometry && feature.geometry.coordinates) this.center(feature.geometry.coordinates[0], feature.geometry.coordinates[1])
-        } 
+        }
       })
     },
     onFollowUpClicked (actor) {
@@ -279,10 +283,10 @@ export default {
     },
     onStateClicked (actor) {
       // If a filter is alredy active then clear it
-      if (! this.filter) {
+      if (!this.filter) {
         // Defines the filter to the actor's state
         this.filter = {
-          'step' : this.getWorkflowStep(actor).name,
+          'step': this.getWorkflowStep(actor).name,
           'interaction': undefined
         }
         if (actor.interaction) this.filter.interaction = actor.interaction.value
@@ -330,22 +334,21 @@ export default {
     this.$options.components['k-media-browser'] = this.$load('media/KMediaBrowser')
     // Enable the observers in order to refresh the layout
     this.observe = true
-  },  
+  },
   mounted () {
     this.setupMap()
     this.addCollectionLayer('Actors', { spiderfyDistanceMultiplier: 5.0 })
     // Setup event connections
-    //this.$on('popupopen', this.onPopupOpen)
+    // this.$on('popupopen', this.onPopupOpen)
     this.$on('click', this.onFeatureClicked)
     this.$on('collection-refreshed', this.onCollectionRefreshed)
-    
   },
   beforeDestroy () {
     // No need to refresh the layout when leaving the component
     this.observe = false
     this.removeCollectionLayer('Actors')
     // Remove event connections
-    //this.$off('popupopen', this.onPopupOpen)
+    // this.$off('popupopen', this.onPopupOpen)
     this.$off('click', this.onFeatureClicked)
     this.$off('collection-refreshed', this.onCollectionRefreshed)
   }

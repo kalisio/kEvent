@@ -96,7 +96,7 @@ export default {
       // Apply current changes when editing
       // If not possible the current form is invalid so do nothing
       if (!this.applyStepChanges()) return
-      
+
       this.steps.push(this.generateStep())
       this.currentStep = this.steps[index + 1].name
       this.restoreStep()
@@ -143,7 +143,7 @@ export default {
     },
     applyStepChanges () {
       if (this.preview) return false
-      
+
       let form = this.getForm('stepForm').validate()
       if (form.isValid) {
         _.assign(this.getCurrentStep(), form.values)
@@ -224,8 +224,8 @@ export default {
     validate () {
       // Apply current form changes when editing
       let isValid = this.applyStepChanges()
-      return { 
-        isValid, 
+      return {
+        isValid,
         values: {
           workflow: this.steps
         }

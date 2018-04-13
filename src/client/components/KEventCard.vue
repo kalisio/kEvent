@@ -68,10 +68,10 @@ export default {
   },
   methods: {
     getFollowUpToolbar () {
-      return [{ 
+      return [{
         name: 'close-action',
         label: this.$t('KEventCard.FOLLOWUP_MODAL_CLOSE_ACTION'),
-        icon: 'close', 
+        icon: 'close',
         handler: () => this.$refs.followUpModal.close()
       }]
     },
@@ -79,11 +79,12 @@ export default {
       return [{
         name: 'save-button',
         label: this.$t('KEventCard.FOLLOWUP_MODAL_SAVE_BUTTON'),
-        handler: (event, done) => this.logParticipantState(event, done),
+        handler: (event, done) => this.logParticipantState(event, done)
       }]
     },
     loadService () {
-      return this._service = this.$api.getService('event-logs', this.contextId)
+      this._service = this.$api.getService('event-logs', this.contextId)
+      return this._service
     },
     getSchemaName () {
       return 'event-logs.create'
@@ -101,13 +102,15 @@ export default {
       // Item actions
       this.clearActions()
       if (this.$can('remove', 'events', this.contextId, this.item)) {
-        this.registerMenuAction({ 
+        this.registerMenuAction({
           name: 'remove-event', label: this.$t('KEventCard.REMOVE_LABEL'), icon: 'remove_circle', handler: this.removeEvent
         })
       }
       if (this.$can('update', 'events', this.contextId, this.item)) {
-        this.registerPaneAction({ 
-          name: 'edit-event', label: this.$t('KEventCard.EDIT_LABEL'), icon: 'description',
+        this.registerPaneAction({
+          name: 'edit-event',
+          label: this.$t('KEventCard.EDIT_LABEL'),
+          icon: 'description',
           route: { name: 'edit-event', params: { contextId: this.contextId, objectId: this.item._id } }
         })
       }
@@ -135,23 +138,23 @@ export default {
               warning = this.$t('KEventCard.ACTION_REQUIRED_WARNING')
             }
           }
-          this.registerPaneAction({ 
+          this.registerPaneAction({
             name: 'follow-up', label: this.$t('KEventCard.FOLLOW_UP_LABEL'), icon: 'message', handler: this.followUp, warning
           })
         }
       }
       if (this.$can('update', 'events', this.contextId, this.item)) {
-        this.registerPaneAction({ 
+        this.registerPaneAction({
           name: 'add-media', label: this.$t('KEventCard.ADD_MEDIA_LABEL'), icon: 'add_a_photo', handler: this.uploadMedia
         })
       }
       if (this.$can('read', 'events', this.contextId, this.item)) {
-        this.registerPaneAction({ 
+        this.registerPaneAction({
           name: 'browse-media', label: this.$t('KEventCard.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
         })
       }
       if (this.canNavigate() && !_.isEmpty(this.item.location)) {
-        this.registerPaneAction({ 
+        this.registerPaneAction({
           name: 'navigate', label: this.$t('KEventCard.NAVIGATE_LABEL'), icon: 'navigation', handler: this.launchNavigation
         })
       }
@@ -235,7 +238,8 @@ export default {
       this.participantLogListener = this.loadService().find({
         rx: {
           listStrategy: 'always'
-        }, query: {
+        },
+        query: {
           $sort: { _id: -1 },
           $limit: 1,
           participant: this.userId,
@@ -256,7 +260,7 @@ export default {
       this.nbParticipantsWaitingCoordination = logs.data.filter(log => (log.stakeholder === 'coordinator') && !this.hasInteraction(log)).length
       // Update actions according to user state
       this.refreshActions()
-      // Then label 
+      // Then label
       if (this.nbParticipantsWaitingCoordination > 0) {
         this.coordinatorLabel = this.$t('KEventCard.PARTICPANTS_AWAITING_LABEL', { number: this.nbParticipantsWaitingCoordination })
       } else {
@@ -269,7 +273,8 @@ export default {
       this.coordinatorLogListener = this.loadService().find({
         rx: {
           listStrategy: 'always'
-        }, query: {
+        },
+        query: {
           event: this.item._id,
           lastInEvent: true
         }
@@ -332,7 +337,7 @@ export default {
     Events.$on('user-position-changed', this.refreshOnGeolocation)
     Events.$on('error', this.refreshOnGeolocation)
   },
-  beforeDestroy() {
+  beforeDestroy () {
     Events.$off('user-position-changed', this.refreshOnGeolocation)
     Events.$off('error', this.refreshOnGeolocation)
     this.unsubscribeParticipantLog()

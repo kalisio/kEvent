@@ -7,8 +7,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
-import sift from 'sift'
 import { mixins as kCoreMixins } from 'kCore/client'
 import mixins from '../mixins'
 
@@ -49,8 +47,8 @@ export default {
       return [{
         name: 'close-action',
         label: this.$t('KEventLogEditor.CLOSE_ACTION'),
-        icon: 'close', 
-        handler: () => this.$refs.modal.close(this.router ? _ => this.$router.push(this.router.onDismiss) : null) 
+        icon: 'close',
+        handler: () => this.$refs.modal.close(this.router ? _ => this.$router.push(this.router.onDismiss) : null)
       }]
     },
     buttons () {
@@ -58,11 +56,12 @@ export default {
         name: 'save-button',
         label: this.$t('KEventLogEditor.SAVE_BUTTON'),
         color: 'primary',
-        handler: (event, done) => this.logCoordinatorState(event, done),
+        handler: (event, done) => this.logCoordinatorState(event, done)
       }]
     },
     loadService () {
-      return this._service = this.$api.getService('event-logs', this.contextId)
+      this._service = this.$api.getService('event-logs', this.contextId)
+      return this._service
     },
     getSchemaName () {
       return 'event-logs.create'
@@ -90,7 +89,7 @@ export default {
     async logCoordinatorState (event, done) {
       await this.logStep(this.$refs.form, this.step, this.state)
       done()
-      this.$refs.modal.close(this.router ? _ => this.$router.push(this.router.onApply) : null) 
+      this.$refs.modal.close(this.router ? _ => this.$router.push(this.router.onApply) : null)
     }
 
   },
@@ -99,7 +98,7 @@ export default {
     this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-form'] = this.$load('form/KForm')
     // Retrieve source log/event
-    /*this.state = await this.loadService().get(this.logId)
+    /* this.state = await this.loadService().get(this.logId)
     this.event = await this.$api.getService('events', this.contextId).get(this.objectId)
     */
     this.loadService().get(this.logId)

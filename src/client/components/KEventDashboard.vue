@@ -41,17 +41,17 @@ export default {
   ],
   data () {
     return {
-      renderer: { 
-        component: 'KEventCard', 
+      renderer: {
+        component: 'KEventCard',
         props: {
           options: {
           }
-        } 
+        }
       }
     }
   },
   methods: {
-     loadService () {
+    loadService () {
       return this.$api.getService('organisations')
     },
     getCollectionBaseQuery () {
