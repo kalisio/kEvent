@@ -22,7 +22,7 @@
 import { QList, QItem, QItemMain, QItemSide, QItemSeparator } from 'quasar'
 import { mixins as kCoreMixins } from 'kCore/client'
 import { mixins as kMapMixins } from 'kMap/client'
-import Avatar from 'vue-avatar/dist/Avatar'
+import { Avatar } from 'vue-avatar'
 
 export default {
   name: 'k-event-dashboard',
@@ -41,17 +41,17 @@ export default {
   ],
   data () {
     return {
-      renderer: { 
-        component: 'KEventCard', 
+      renderer: {
+        component: 'KEventCard',
         props: {
           options: {
           }
-        } 
+        }
       }
     }
   },
   methods: {
-     loadService () {
+    loadService () {
       return this.$api.getService('organisations')
     },
     getCollectionBaseQuery () {

@@ -1,15 +1,14 @@
-import request from 'superagent'
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import core, { kalisio, hooks as coreHooks, permissions as corePermissions } from 'kCore'
 import team, { permissions as teamPermissions, hooks as teamHooks } from 'kTeam'
-import notify, { hooks as notifyHooks, permissions as notifyPermissions } from 'kNotify'
+import notify, { hooks as notifyHooks } from 'kNotify'
 import event, { hooks, permissions } from '../src'
 
 describe('kEvent', () => {
   let app, userService, userObject, orgManagerObject, orgObject, orgUserObject, orgService,
-      authorisationService, devicesService, pusherService, sns,
-      storageService, storageObject, eventService, eventObject, eventTemplateService, eventLogService
+    authorisationService, devicesService, pusherService, sns,
+    storageService, storageObject, eventService, eventObject, eventTemplateService, eventLogService
   const device = {
     registrationId: 'myfakeId',
     platform: 'ANDROID'
@@ -27,7 +26,7 @@ describe('kEvent', () => {
     corePermissions.defineAbilities.registerHook(teamPermissions.defineGroupAbilities)
     // Then rules for events
     corePermissions.defineAbilities.registerHook(permissions.defineEventAbilities)
-    
+
     app = kalisio()
     // Register authorisation hook
     app.hooks({
@@ -202,11 +201,11 @@ describe('kEvent', () => {
       title: 'event',
       participants: [{ _id: orgUserObject._id, service: 'members' }]
     },
-    {
-      notification: 'event created',
-      user: orgManagerObject,
-      checkAuthorisation: true
-    })
+      {
+        notification: 'event created',
+        user: orgManagerObject,
+        checkAuthorisation: true
+      })
     .then(event => {
       eventObject = event
       return eventService.find({ query: { title: 'event' }, user: orgManagerObject, checkAuthorisation: true })
@@ -267,8 +266,8 @@ describe('kEvent', () => {
     })
   })
 
-  it('event coordinators can update events', () => {
-    return eventService.patch(eventObject._id, {
+  it('event coordinators can update events', (done) => {
+    eventService.patch(eventObject._id, {
       title: 'updated event'
     }, {
       notification: 'event updated',
@@ -354,8 +353,8 @@ describe('kEvent', () => {
   // Let enough time to process
   .timeout(10000)
 
-  it('event coordinators can remove events', () => {
-    return eventService.remove(eventObject._id, {
+  it('event coordinators can remove events', (done) => {
+    eventService.remove(eventObject._id, {
       notification: 'event removed',
       user: orgManagerObject,
       checkAuthorisation: true

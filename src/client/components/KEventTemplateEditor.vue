@@ -99,7 +99,7 @@ export default {
     }
     this.$on('applied', this.doClose)
   },
-  beforeDestroy() {
+  beforeDestroy () {
     this.$off('applied', this.doClose)
   }
 }

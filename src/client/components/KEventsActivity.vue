@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { Store, mixins as kCoreMixins } from 'kCore/client'
+import { mixins as kCoreMixins } from 'kCore/client'
 import { mixins as kMapMixins } from 'kMap/client'
 
 export default {
@@ -31,18 +31,18 @@ export default {
   },
   data () {
     return {
-      renderer: { 
-        component: 'KEventCard', 
+      renderer: {
+        component: 'KEventCard',
         props: {
           options: {
           }
-        } 
+        }
       }
     }
   },
   methods: {
     router () {
-      return { 
+      return {
         onApply: { name: 'events-activity', params: { contextId: this.contextId } },
         onDismiss: { name: 'events-activity', params: { contextId: this.contextId } }
       }
@@ -51,25 +51,31 @@ export default {
       this.clearActivity()
       this.setTitle(this.$store.get('context.name'))
       // Tabbar actions
-      this.registerTabAction({ 
-        name: 'events', label: this.$t('KEventsActivity.EVENTS_LABEL'), icon: 'whatshot',
+      this.registerTabAction({
+        name: 'events',
+        label: this.$t('KEventsActivity.EVENTS_LABEL'),
+        icon: 'whatshot',
         route: { name: 'events-activity', params: { contextId: this.contextId } },
         default: true
       })
       if (this.$can('create', 'event-templates', this.contextId)) {
-        this.registerTabAction({ 
-          name: 'event-templates', label: this.$t('KEventsActivity.EVENT_TEMPLATES_LABEL'), icon: 'widgets',
-          route: { name: 'event-templates-activity', params: { contextId: this.contextId } } 
+        this.registerTabAction({
+          name: 'event-templates',
+          label: this.$t('KEventsActivity.EVENT_TEMPLATES_LABEL'),
+          icon: 'widgets',
+          route: { name: 'event-templates-activity', params: { contextId: this.contextId } }
         })
       }
       // Fab actions
       if (this.$can('create', 'events', this.contextId)) {
         const eventTemplatesService = this.$api.getService('event-templates')
-        eventTemplatesService.find({ $select: ["name", "icon"] })
+        eventTemplatesService.find({ $select: ['name', 'icon'] })
         .then(templates => {
           templates.data.forEach(template => {
-            this.registerFabAction({ 
-              name: 'create-' + template.name, label: template.name, icon: template.icon.name, 
+            this.registerFabAction({
+              name: 'create-' + template.name,
+              label: template.name,
+              icon: template.icon.name,
               route: { name: 'create-event', params: { contextId: this.contextId, templateId: template._id } }
             })
           })

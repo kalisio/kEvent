@@ -105,13 +105,12 @@ export default {
         this.template = template
         this.refresh()
       })
-    }
-    else {
+    } else {
       this.refresh()
     }
     this.$on('applied', this.doClose)
   },
-  beforeDestroy() {
+  beforeDestroy () {
     this.$off('applied', this.doClose)
   }
 }
