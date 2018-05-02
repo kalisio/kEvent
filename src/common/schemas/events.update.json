@@ -19,6 +19,23 @@
         "component": "form/KTextareaField",
         "helper": "schemas.EVENTS_DESCRIPTION_FIELD_HELPER"
       }
+    },
+    "location": {
+      "type": "object", 
+      "field": {
+        "component": "KLocationField",
+        "helper": "schemas.EVENTS_LOCATION_FIELD_HELPER"
+      }
+    },
+    "expireAt": {
+      "type": "string", 
+      "format": "date-time",
+      "field": {
+        "component": "form/KDatetimeField",
+        "helper": "schemas.EVENTS_EXPIRE_AT_FIELD_HELPER",
+        "type": "datetime",
+        "defaultOffset": 604800
+      }
     }
   },
   "required": ["name", "description"]

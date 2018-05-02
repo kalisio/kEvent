@@ -282,11 +282,14 @@ export default {
       this.doFollowUp(actor._id)
     },
     onStateClicked (actor) {
+      const step = this.getWorkflowStep(actor)
+      // Not applicable when no workflow
+      if (!step) return
       // If a filter is alredy active then clear it
       if (!this.filter) {
         // Defines the filter to the actor's state
         this.filter = {
-          'step': this.getWorkflowStep(actor).name,
+          'step': step.name,
           'interaction': undefined
         }
         if (actor.interaction) this.filter.interaction = actor.interaction.value
@@ -298,7 +301,7 @@ export default {
     },
     onCollectionRefreshed () {
       this.items.forEach((item) => {
-        item.icon = this.getIcon(item, this.getWorkflowStep(item))
+        item.icon = this.getIcon(item, this.getWorkflowStep(item) || {}) // Will default to evnt icon when no workflow
         item.comment = this.getComment(item)
       })
       this.refreshLayer()

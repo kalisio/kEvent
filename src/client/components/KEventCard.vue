@@ -114,15 +114,18 @@ export default {
           route: { name: 'edit-event', params: { contextId: this.contextId, objectId: this.item._id } }
         })
       }
-      if (this.item.hasWorkflow && this.$can('read', 'events', this.contextId, this.item)) {
+      if (this.$can('read', 'events', this.contextId, this.item)) {
         let hasFollowUp = false
         let warning = ''
         if (this.isParticipant) {
-          hasFollowUp = (this.waitingInteraction(this.participantStep, this.participantState, 'participant') ||
+          hasFollowUp = this.item.hasWorkflow &&
+                        (this.waitingInteraction(this.participantStep, this.participantState, 'participant') ||
                          this.waitingInteraction(this.participantStep, this.participantState, 'coordinator'))
         }
         if (this.isCoordinator) {
-          hasFollowUp = true
+          // If we'd like to always have a map even when no workflow available switch this value to true
+          // Otherwise use the workflow flag
+          hasFollowUp = true // this.item.hasWorkflow
         }
         if (hasFollowUp) {
           if (this.isParticipant) {
@@ -153,7 +156,8 @@ export default {
           name: 'browse-media', label: this.$t('KEventCard.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
         })
       }
-      if (this.canNavigate() && !_.isEmpty(this.item.location)) {
+      if (this.canNavigate() && !_.isEmpty(this.item.location) &&
+          !_.isNil(this.item.location.longitude) && !_.isNil(this.item.location.latitude)) {
         this.registerPaneAction({
           name: 'navigate', label: this.$t('KEventCard.NAVIGATE_LABEL'), icon: 'navigation', handler: this.launchNavigation
         })
