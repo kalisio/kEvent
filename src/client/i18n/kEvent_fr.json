@@ -41,6 +41,8 @@
     "EVENT_TEMPLATES_LABEL": "$t(EVENT_TEMPLATES_LABEL)"
   },
   "KEventCard": {
+    "CREATED_AT_LABEL": "Créé le",
+    "UPDATED_AT_LABEL": "Mis à jour le",
     "REMOVE_LABEL": "$t(REMOVE_LABEL)",
     "EDIT_LABEL": "$t(EDIT_LABEL)",
     "FOLLOW_UP_LABEL": "Suivre",

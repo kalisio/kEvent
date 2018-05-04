@@ -2,14 +2,18 @@
   <k-card v-bind="$props" :itemActions="actions">
     <q-icon slot="card-icon" :name="icon.name" :color="icon.color"></q-icon>
     <div slot="card-content">
-      <div v-if="isParticipant">
+      <div v-if="participantLabel">
         {{participantLabel}}<br /><br />
       </div>
-      <div v-if="comment">
+      <span v-if="comment">
         <k-text-area class="light-paragraph" :length="20" :text="comment" /><br />
+      </span>
+      <div v-if="coordinatorLabel">
+        {{coordinatorLabel}}<br /><br />
       </div>
-      <div v-if="isCoordinator">
-        {{coordinatorLabel}}
+      <div v-if="createdAt || updatedAt">
+        <cite v-if="createdAt">{{$t('KEventCard.CREATED_AT_LABEL')}} {{createdAt.toLocaleString()}}</cite><br />
+        <cite v-if="updatedAt">{{$t('KEventCard.UPDATED_AT_LABEL')}} {{updatedAt.toLocaleString()}}</cite>
       </div>
     </div>
     <k-modal ref="followUpModal" v-if="hasParticipantInteraction" :title="followUpTitle" :toolbar="getFollowUpToolbar()" :buttons="getFollowUpButtons()" :route="false" >
@@ -49,6 +53,12 @@ export default {
     },
     comment () {
       return this.getComment(this.participantState)
+    },
+    createdAt () {
+      return this.item ? new Date(this.item.createdAt) : null
+    },
+    updatedAt () {
+      return this.item ? new Date(this.item.updatedAt) : null
     },
     followUpTitle () {
       return this.participantStep.title ? this.participantStep.title : 'Enter your choice'
