@@ -22,7 +22,8 @@
     "EVENTS_LOCATION_FIELD_HELPER": "Enter the location of this event",
     "EVENTS_EXPIRE_AT_FIELD_HELPER": "Enter the expiration date for this event",
     "EVENTS_PARTICIPANTS_FIELD_HELPER": "Select event participants",
-    "EVENTS_COORDINATORS_FIELD_HELPER": "Select event coordinators (other than yourself)",
+    "EVENTS_COORDINATORS_FIELD_CREATE_HELPER": "Select event coordinators (other than yourself)",
+    "EVENTS_COORDINATORS_FIELD_UPDATE_HELPER": "Select event coordinators",
     "EVENTS_ATTACHMENTS_FIELD_HELPER": "Select media to attach",
     "EVENTS_HAS_WORKFLOW_FIELD_HELPER": "Activate workflow for this event"
   },

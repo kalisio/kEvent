@@ -47,8 +47,9 @@
       "services": [{
         "service": "members",
         "field": "profile.name",
+        "subfield": "email",
         "baseQuery": {
-          "$select": ["_id", "profile.name"]
+          "$select": ["_id", "email", "profile.name"]
         },
         "icon": {
           "name": "person"
@@ -87,8 +88,9 @@
       "services": [{
         "service": "members",
         "field": "profile.name",
+        "subfield": "email",
         "baseQuery": {
-          "$select": ["_id", "profile.name"]
+          "$select": ["_id", "email", "profile.name"]
         },
         "icon": {
           "name": "person"
@@ -116,7 +118,7 @@
       }],
       "field": {
         "component": "form/KItemField",
-        "helper": "schemas.EVENTS_COORDINATORS_FIELD_HELPER"
+        "helper": "schemas.EVENTS_COORDINATORS_FIELD_CREATE_HELPER"
       }
     },
     "attachments": { 
