@@ -70,14 +70,18 @@ export default {
         return this.schema
       })
     },
-    getBaseQuery () {
+    getBaseQuery (object) {
       // Overriden to handle notification messages
       let query = editorMixin.methods.getBaseQuery.call(this)
-      if (this.getMode() === 'create') {
-        query.notification = this.$t('KEventNotifications.CREATE')
-      } else if (this.getMode() === 'update') {
-        query.notification = this.$t('KEventNotifications.UPDATE')
+      let notification = _.get(object, 'notification', true)
+      if (notification) {
+        if (this.getMode() === 'create') {
+          query.notification = this.$t('KEventNotifications.CREATE')
+        } else if (this.getMode() === 'update') {
+          query.notification = this.$t('KEventNotifications.UPDATE')
+        }
       }
+      _.unset(object, 'notification')
       return query
     },
     onFieldChanged (field, value) {

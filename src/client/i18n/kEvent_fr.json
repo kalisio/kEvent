@@ -22,9 +22,12 @@
     "EVENTS_LOCATION_FIELD_HELPER": "Saisissez le lieu de l'événement",
     "EVENTS_EXPIRE_AT_FIELD_HELPER": "Saisissez la date d'expiration de l'événement",
     "EVENTS_PARTICIPANTS_FIELD_HELPER": "Saisissez les participants à l'événement",
-    "EVENTS_COORDINATORS_FIELD_HELPER": "Saisissez les coordinateurs de l'événement (autres que vous)",
+    "EVENTS_COORDINATORS_FIELD_CREATE_HELPER": "Saisissez les coordinateurs de l'événement (autres que vous)",
+    "EVENTS_COORDINATORS_FIELD_UPDATE_HELPER": "Saisissez les coordinateurs de l'événement",
     "EVENTS_ATTACHMENTS_FIELD_HELPER": "Selectionnez des médias à attacher à l'événement",
-    "EVENTS_HAS_WORKFLOW_FIELD_HELPER": "Associer un processus à l'événement"
+    "EVENTS_HAS_WORKFLOW_FIELD_HELPER": "Associer un processus à l'événement",
+    "EVENTS_NOTIFICATION_FIELD_CREATE_HELPER": "Notifier les participants de la création",
+    "EVENTS_NOTIFICATION_FIELD_UPDATE_HELPER": "Notifier les participants de la mise à jour"
   },
   "KEventActivity": {
     "ADD_MEDIA_LABEL": "Ajouter un média",
