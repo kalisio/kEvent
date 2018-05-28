@@ -118,8 +118,18 @@
         "component": "form/KItemField",
         "helper": "schemas.EVENTS_COORDINATORS_FIELD_UPDATE_HELPER"
       }
+    },
+    "notification": {
+      "type": "boolean",
+      "default": true,
+      "field": {
+        "component": "form/KToggleField",
+        "helper": "schemas.EVENTS_NOTIFICATION_FIELD_UPDATE_HELPER",
+        "checked-icon": "notifications",
+        "unchecked-icon": "notifications_off"
+      }
     }
   },
-  "required": ["name", "description"]
+  "required": ["name", "description", "location", "expireAt", "participants", "coordinators", "notification"]
 }
 

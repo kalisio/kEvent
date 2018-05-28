@@ -143,8 +143,18 @@
         "helper": "schemas.EVENTS_HAS_WORKFLOW_FIELD_HELPER",
         "icon": "fa-retweet"
       }
+    },
+    "notification": {
+      "type": "boolean",
+      "default": true,
+      "field": {
+        "component": "form/KToggleField",
+        "helper": "schemas.EVENTS_NOTIFICATION_FIELD_CREATE_HELPER",
+        "checked-icon": "notifications",
+        "unchecked-icon": "notifications_off"
+      }
     }
   },
-  "required": ["name", "description", "participants", "coordinators", "hasWorkflow"]
+  "required": ["name", "description", "location", "expireAt", "participants", "coordinators", "hasWorkflow", "notification"]
 }
 
