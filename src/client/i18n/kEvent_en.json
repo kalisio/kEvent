@@ -83,8 +83,7 @@
   "KEventNotifications": {
     "CREATE": "New",
     "UPDATE": "Updated",
-    "ADD_MEDIA": "New media",
-    "REMOVE_MEDIA": "Removed media",
+    "UPDATE_MEDIA": "Media updated",
     "REMOVE": "Closed"
   },
   "KEventEditor": {

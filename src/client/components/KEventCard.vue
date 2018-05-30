@@ -21,7 +21,7 @@
         <k-form ref="form" :schema="schema"/>
       </div>
     </k-modal>
-    <k-uploader ref="uploader" :contextId="contextId" :resource="item._id" :options="uploaderOptions()"/>
+    <k-uploader ref="uploader" :contextId="contextId" :resource="item._id" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
     <k-media-browser ref="mediaBrowser" :contextId="contextId"/>
   </k-card>
 </template>
@@ -330,6 +330,11 @@ export default {
         autoProcessQueue: true,
         resourcesService: 'events',
         storagePath: '<%= id %>/<%= file.name %>'
+      }
+    },
+    uploaderQuery () {
+      return {
+        notification: this.$t('KEventNotifications.UPDATE_MEDIA')
       }
     }
   },

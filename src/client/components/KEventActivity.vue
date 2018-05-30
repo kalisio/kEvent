@@ -32,7 +32,7 @@
           </div>
         </div>
       </div>
-      <k-uploader ref="uploader" :contextId="contextId" :resource="objectId" :options="uploaderOptions()"/>
+      <k-uploader ref="uploader" :contextId="contextId" :resource="objectId" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
       <k-media-browser ref="mediaBrowser" :contextId="contextId"/>
       <div>
         <router-view service="events" :router="router()"></router-view>
@@ -327,6 +327,11 @@ export default {
         autoProcessQueue: true,
         resourcesService: 'events',
         storagePath: '<%= id %>/<%= file.name %>'
+      }
+    },
+    uploaderQuery () {
+      return {
+        notification: this.$t('KEventNotifications.UPDATE_MEDIA')
       }
     }
   },
