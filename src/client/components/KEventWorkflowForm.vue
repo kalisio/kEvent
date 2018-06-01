@@ -1,7 +1,7 @@
 <template>
   <q-stepper flat ref="stepper" v-model="currentStep" color="primary" contractable @step="onStepSelected">
     <q-step v-for="(step, index) in steps" :key="step.name + '_' + index" :name="step.name" :order="index" :title="step.title" :icon="step.icon.name" :active-icon="preview ? step.icon.name : 'edit'" :done-icon="step.icon.name">
-      <k-form ref="stepForm" v-show="!preview" :schema="schema" @field-changed="onFieldChanged"/>
+      <k-form ref="stepForm" v-show="!preview" :schema="schema" @form-ready="fillStepForm" @field-changed="onStepFieldChanged"/>
       <div v-show="preview">
         <k-form ref="previewForm" :schema="previewSchema"/>
       </div>
@@ -42,15 +42,6 @@ import { mixins as kCoreMixins } from 'kCore/client'
 import mixins from '../mixins'
 import { QStepper, QStep, QBtn, QTooltip, Events, uid } from 'quasar'
 
-const defaultStep = {
-  title: 'New step',
-  icon: { name: 'check', color: 'dark' },
-  description: 'Step content',
-  interaction: [],
-  end: [],
-  stakeholder: 'participant'
-}
-
 export default {
   name: 'k-event-workflow-form',
   components: {
@@ -83,7 +74,7 @@ export default {
       return this.$refs[form][0]
     },
     generateStep () {
-      let newStep = _.cloneDeep(defaultStep)
+      let newStep = _.cloneDeep(this.defaultStep)
       // We generate a UID so that we can identify each step uniquely,
       // indeed titles might be similar
       newStep.name = uid().toString()
@@ -117,26 +108,35 @@ export default {
     },
     onPreviousStep (index) {
       // Apply current form changes when editing
-      this.applyStepChanges()
+      // If not possible the current form is invalid so do nothing
+      if (!this.applyStepChanges()) return
       this.currentStep = this.steps[index - 1].name
       this.restoreStep()
     },
     onNextStep (index) {
       // Apply current form changes when editing
-      this.applyStepChanges()
+      // If not possible the current form is invalid so do nothing
+      if (!this.applyStepChanges()) return
       this.currentStep = this.steps[index + 1].name
       // Restore step form when editing
       this.restoreStep()
     },
     onStepSelected (step) {
       // Apply current form changes when editing
-      this.applyStepChanges()
+      // If not possible the current form is invalid so do nothing
+      // FIXME: when called the step has already been changed in model
+      // so that current step is not the right one anymore
+      // For now we don't validate
+      //if (!this.applyStepChanges()) return
       // Restore step form when editing
       this.restoreStep()
     },
     onPreviewOrEdit () {
       // Apply current form changes before previewing
-      this.applyStepChanges()
+      if (!this.preview) {
+        // If not possible the current form is invalid so do nothing
+        if (!this.applyStepChanges()) return
+      }
       this.preview = !this.preview
       // Restore step form when editing
       this.restoreStep()
@@ -162,9 +162,7 @@ export default {
         })
       } else {
         // Otherwise simply fill the step form
-        let form = this.getForm('stepForm')
-        form.fill(this.getCurrentStep())
-        this.setupEndField()
+        this.fillStepForm()
       }
     },
     loadPreviewSchema () {
@@ -179,11 +177,18 @@ export default {
         throw error
       })
     },
-    onFieldChanged (field, value) {
+    onStepFieldChanged (field, value) {
       // Setup workflow ending values selector depending on interaction field state
       if (field === 'interaction') {
         this.setupEndField()
       }
+    },
+    fillStepForm () {
+      let form = this.getForm('stepForm')
+      // Skip validation so that place holder can be seen
+      // Validation occur on add, next or previous step
+      form.fill(this.getCurrentStep(), true)
+      this.setupEndField()
     },
     setupEndField () {
       let form = this.getForm('stepForm')
@@ -195,7 +200,7 @@ export default {
     build () {
       // Because our step form is under a v-if caused by the Quasar stepper
       // it is destroyed/recreated by Vue so that we need to restore the refs each time it is build
-      this.setRefs(['stepForm', 'previewForm'])
+      this.setRefs(['stepForm'])
       // Build the internal form
       return Promise.all([
         this.loadSchema(),
@@ -238,6 +243,14 @@ export default {
     }
   },
   created () {
+    this.defaultStep = {
+      title: '',
+      icon: { name: 'check', color: 'dark' },
+      description: '',
+      interaction: [],
+      end: [],
+      stakeholder: 'participant'
+    }
     // Load the required components
     this.$options.components['k-form'] = this.$load('form/KForm')
     // Initialize step data on creation so that local ref to form can be resolved

@@ -6,8 +6,7 @@
   "properties": {
     "name": {
       "type": "string", 
-      "minLength": 1,
-      "default": "New event",
+      "minLength": 3,
       "field": {
         "component": "form/KTextField",
         "label": "Name",

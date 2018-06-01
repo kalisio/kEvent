@@ -10,6 +10,9 @@
     "EVENT_TEMPLATES_NAME_FIELD_HELPER": "Enter the name of this template",
     "EVENT_TEMPLATES_ICON_FIELD_HELPER": "Select an icon to represent this template",
     "EVENT_TEMPLATES_DESCRIPTION_FIELD_HELPER": "Enter a description of this template",
+    "EVENTS_TEMPLATES_PARTICIPANTS_FIELD_HELPER": "Select event participants",
+    "EVENTS_TEMPLATES_COORDINATORS_FIELD_CREATE_HELPER": "Select event coordinators (other than yourself)",
+    "EVENTS_TEMPLATES_COORDINATORS_FIELD_UPDATE_HELPER": "Select event coordinators",
     "EVENT_WORKFLOW_TITLE_FIELD_HELPER": "Enter the title for this step",
     "EVENT_WORKFLOW_ICON_FIELD_HELPER": "Select the step icon",
     "EVENT_WORKFLOW_DESCRIPTION_FIELD_HELPER": "Enter the step description",
@@ -76,6 +79,11 @@
     "REMOVE_DIALOG_MESSAGE": "Are you sure you want to remove the template <b>{{template}}</b> ?"
   },
   "KEventTemplateEditor": {
+    "ADD_WORKFLOW_LABEL": "Add a workflow ?",
+    "WORKFLOW_HELPER_LABEL": "Manage below the different steps of the workflow",
+    "CLOSE_ACTION":  "$t(CLOSE_LABEL)"
+  },
+  "KEventWorkflowForm": {
     "ADD_WORKFLOW_LABEL": "Add a workflow ?",
     "WORKFLOW_HELPER_LABEL": "Manage below the different steps of the workflow",
     "CLOSE_ACTION":  "$t(CLOSE_LABEL)"

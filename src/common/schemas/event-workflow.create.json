@@ -7,8 +7,7 @@
   "properties": {
     "title": {
       "type": "string", 
-      "minLength": 1,
-      "default": "New step",
+      "minLength": 3,
       "field": {
         "component": "form/KTextField",
         "helper": "schemas.EVENT_WORKFLOW_TITLE_FIELD_HELPER"
@@ -24,7 +23,6 @@
     },
     "description": {
       "type": "string", 
-      "default": "Step content",
       "field": {
         "component": "form/KTextareaField",
         "helper": "schemas.EVENT_WORKFLOW_DESCRIPTION_FIELD_HELPER"

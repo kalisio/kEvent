@@ -7,7 +7,7 @@
   "properties": {
     "title": {
       "type": "string", 
-      "minLength": 1,
+      "minLength": 3,
       "field": {
         "component": "form/KTextField",
         "helper": "schemas.EVENT_WORKFLOW_TITLE_FIELD_HELPER"

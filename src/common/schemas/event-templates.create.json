@@ -7,8 +7,7 @@
   "properties": {
     "name": {
       "type": "string", 
-      "minLength": 1,
-      "default": "New template",
+      "minLength": 3,
       "field": {
         "component": "form/KTextField",
         "helper": "schemas.EVENT_TEMPLATES_NAME_FIELD_HELPER"
@@ -66,7 +65,7 @@
       }],
       "field": {
         "component": "form/KItemField",
-        "helper": "schemas.EVENTS_PARTICIPANTS_FIELD_HELPER"
+        "helper": "schemas.EVENTS_TEMPLATES_PARTICIPANTS_FIELD_HELPER"
       }
     },
     "coordinators": { 
@@ -107,7 +106,7 @@
       }],
       "field": {
         "component": "form/KItemField",
-        "helper": "schemas.EVENTS_COORDINATORS_FIELD_CREATE_HELPER"
+        "helper": "schemas.EVENTS_TEMPLATES_COORDINATORS_FIELD_CREATE_HELPER"
       }
     }
   },

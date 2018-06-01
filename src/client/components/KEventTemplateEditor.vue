@@ -76,27 +76,37 @@ export default {
     },
     doClose () {
       this.$refs.modal.close(() => this.$router.push({ name: 'event-templates-activity' }))
+    },
+    initialize () {
+      this.refresh()
+      .then(() => {
+        // In edition mode activate workflow according to its existence
+        if (this.objectId || this.templateId) {
+          this.hasWorkflow = !_.isNil(this.getObject().workflow)
+          this.setFormDisabled('workflowForm', !this.hasWorkflow)
+        } else {
+          // In creation mode disabled by default
+          this.setFormDisabled('workflowForm', true)
+        }
+      })
     }
   },
-  async created () {
+  created () {
     // Load the required components
     this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-form'] = this.$load('form/KForm')
     this.$options.components['k-event-workflow-form'] = this.$load('KEventWorkflowForm')
     // On creation check whether we copy or create a new template
     if (this.templateId) {
-      this.template = await this.$api.getService('event-templates').get(this.templateId)
-    }
-    // Default state
-    await this.refresh()
-    // In edition mode activate workflow according to its existence
-    if (this.objectId || this.templateId) {
-      this.hasWorkflow = !_.isNil(this.getObject().workflow)
-      this.setFormDisabled('workflowForm', !this.hasWorkflow)
+      this.$api.getService('event-templates').get(this.templateId)
+      .then((template) => {
+        this.template = template
+        this.initialize()
+      })
     } else {
-      // In creation mode disabled by default
-      this.setFormDisabled('workflowForm', true)
+      this.initialize()
     }
+    
     this.$on('applied', this.doClose)
   },
   beforeDestroy () {
