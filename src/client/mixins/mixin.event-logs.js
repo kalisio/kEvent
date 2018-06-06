@@ -99,7 +99,7 @@ let eventsMixin = {
         field: {
           component: 'form/KTextareaField',
           label: 'Comment',
-          helper: 'Enter your comment for this step'
+          helper: this.$t('schemas.EVENTS_LOG_COMMENT')
         }
       }
       schema.required.push('comment')

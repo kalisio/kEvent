@@ -30,7 +30,8 @@
     "EVENTS_ATTACHMENTS_FIELD_HELPER": "Selectionnez des médias à attacher à l'événement",
     "EVENTS_HAS_WORKFLOW_FIELD_HELPER": "Associer un processus à l'événement",
     "EVENTS_NOTIFICATION_FIELD_CREATE_HELPER": "Notifier les participants de la création",
-    "EVENTS_NOTIFICATION_FIELD_UPDATE_HELPER": "Notifier les participants de la mise à jour"
+    "EVENTS_NOTIFICATION_FIELD_UPDATE_HELPER": "Notifier les participants de la mise à jour",
+    "EVENTS_LOG_COMMENT": "Saisissez votre commentaire pour cette étape"
   },
   "KEventActivity": {
     "ADD_MEDIA_LABEL": "Ajouter un média",
