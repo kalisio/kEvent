@@ -58,8 +58,8 @@
         "component": "form/KSelectField",
         "helper": "schemas.EVENT_WORKFLOW_STAKEHOLDER_FIELD_HELPER",
         "options": [
-          { "label": "Participant", "value": "participant", "color": "yellow" },
-          { "label": "Coordinator", "value": "coordinator", "color": "grey" }
+          { "label": "schemas.EVENT_WORKFLOW_PARTICIPANT_LABEL", "value": "participant", "color": "yellow" },
+          { "label": "schemas.EVENT_WORKFLOW_COORDINATOR_LABEL", "value": "coordinator", "color": "grey" }
         ]
       }
     }
