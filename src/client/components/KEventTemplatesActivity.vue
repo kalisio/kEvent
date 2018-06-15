@@ -23,13 +23,13 @@ export default {
       default: ''
     }
   },
-  computed: {
-    baseQuery () {
-      return {}
-    }
-  },
   data () {
     return {
+      baseQuery: {
+        $sort: {
+          'name': 1
+        }
+      },
       renderer: {
         component: 'KEventTemplateCard',
         props: {

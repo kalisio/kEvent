@@ -24,13 +24,13 @@ export default {
       default: ''
     }
   },
-  computed: {
-    baseQuery () {
-      return {}
-    }
-  },
   data () {
     return {
+      baseQuery: {
+        $sort: {
+          'updatedAt': -1
+        }
+      },
       renderer: {
         component: 'KEventCard',
         props: {
