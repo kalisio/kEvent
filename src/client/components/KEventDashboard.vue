@@ -10,7 +10,7 @@
         </q-item>
         <q-item>
           <q-item-main>
-            <k-grid service="events" :renderer="renderer" :contextId="org._id" :filter-query="searchQuery" />
+            <k-grid service="events" :renderer="renderer" :contextId="org._id" :base-query="baseQuery" :filter-query="searchQuery" />
           </q-item-main>
         </q-item>
       </q-list>
@@ -41,6 +41,11 @@ export default {
   ],
   data () {
     return {
+      baseQuery: {
+        $sort: {
+          'updatedAt': -1
+        }
+      },
       renderer: {
         component: 'KEventCard',
         props: {
