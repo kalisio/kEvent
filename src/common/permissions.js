@@ -23,7 +23,7 @@ export function defineEventAbilities (subject, can, cannot) {
           }
           if (subject.groups) {
             subject.groups.forEach(group => {
-              if (group._id && (group.context.toString() === organisation._id.toString())) {
+              if (group._id && group.context && (group.context.toString() === organisation._id.toString())) {
                 can('read', 'events', { context: organisation._id, 'participants._id': group._id })
                 can('all', 'events', { context: organisation._id, 'coordinators._id': group._id })
               }
@@ -31,7 +31,7 @@ export function defineEventAbilities (subject, can, cannot) {
           }
           if (subject.tags) {
             subject.tags.forEach(tag => {
-              if (tag._id && (tag.context.toString() === organisation._id.toString())) {
+              if (tag._id && tag.context && (tag.context.toString() === organisation._id.toString())) {
                 can('read', 'events', { context: organisation._id, 'participants._id': tag._id })
                 can('all', 'events', { context: organisation._id, 'coordinators._id': tag._id })
               }
