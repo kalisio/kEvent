@@ -1,6 +1,9 @@
 import path from 'path'
+import makeDebug from 'debug'
 const modelsPath = path.join(__dirname, '..', 'models')
 const servicesPath = path.join(__dirname, '..', 'services')
+
+const debug = makeDebug('kalisio:kEvent:services')
 
 export function createEventService(organisation, db) {
   const app = this
@@ -11,6 +14,7 @@ export function createEventService(organisation, db) {
     context: organisation,
     db
   })
+  debug('Events service created for organisation ' + organisation.name)
 }
 
 export function removeEventService(organisation) {
@@ -26,6 +30,7 @@ export function createEventTemplateService(organisation, db) {
     context: organisation,
     db
   })
+  debug('Event templates service created for organisation ' + organisation.name)
 }
 
 export function removeEventTemplateService(organisation) {
@@ -41,6 +46,7 @@ export function createEventLogService(organisation, db) {
     context: organisation,
     db
   })
+  debug('Event logs service created for organisation ' + organisation.name)
 }
 
 export function removeEventLogService(organisation) {
