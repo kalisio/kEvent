@@ -65,11 +65,10 @@
     "lib": "lib"
   },
   "dependencies": {
+    "@feathersjs/authentication": "^2.1.7",
+    "@feathersjs/errors": "^3.3.0",
+    "@feathersjs/feathers": "^3.1.7",
     "debug": "^2.6.4",
-    "feathers": "^2.1.4",
-    "feathers-authentication": "^1.2.2",
-    "feathers-errors": "^2.6.3",
-    "feathers-hooks": "^2.0.1",
     "feathers-hooks-common": "^3.0.0",
     "lodash": "^4.17.4",
     "loglevel": "^1.6.0",
