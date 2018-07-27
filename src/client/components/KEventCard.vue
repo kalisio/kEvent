@@ -55,10 +55,10 @@ export default {
       return this.getComment(this.participantState)
     },
     createdAt () {
-      return this.item ? new Date(this.item.createdAt) : null
+      return this.item.createdAt ? new Date(this.item.createdAt) : null
     },
     updatedAt () {
-      return this.item ? new Date(this.item.updatedAt) : null
+      return this.item.updatedAt ? new Date(this.item.updatedAt) : null
     },
     followUpTitle () {
       return this.participantStep.title ? this.participantStep.title : 'Enter your choice'
