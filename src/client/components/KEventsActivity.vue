@@ -47,7 +47,7 @@ export default {
         onDismiss: { name: 'events-activity', params: { contextId: this.contextId } }
       }
     },
-    refreshActivity () {
+    async refreshActivity () {
       this.clearActivity()
       this.setTitle(this.$store.get('context.name'))
       // Tabbar actions
@@ -69,12 +69,20 @@ export default {
       // Fab actions
       if (this.$can('create', 'events', this.contextId)) {
         const eventTemplatesService = this.$api.getService('event-templates')
-        eventTemplatesService.find({ 
-          query: { $limit: 50 },
-          $select: ['name', 'icon'] 
+        let response = await eventTemplatesService.find({ 
+          query: { $limit: 0 },
         })
-        .then(templates => {
-          templates.data.forEach(template => {
+        const batchSize = 50
+        let batchCount = Math.floor(response.total, batchSize)
+        let remainder = response.total % batchSize
+        if (remainder > 0 ) batchCount++
+        let offset = 0
+        for (let i = 0;i < batchCount;i++) {
+          response = await eventTemplatesService.find({ 
+            query: { $skip: offset, $limit: batchSize },
+            $select: ['name', 'icon'] 
+          })
+          response.data.forEach(template => {
             this.registerFabAction({
               name: 'create-' + template.name,
               label: template.name,
@@ -82,7 +90,8 @@ export default {
               route: { name: 'create-event', params: { contextId: this.contextId, templateId: template._id } }
             })
           })
-        })
+          offset = offset + batchSize
+        }
       }
     }
   },
