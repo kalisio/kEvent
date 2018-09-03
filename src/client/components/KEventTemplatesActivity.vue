@@ -3,7 +3,7 @@
     <!-- 
       Templates collection
      -->
-    <k-grid service="event-templates" :base-query="baseQuery" :renderer="renderer" :contextId="contextId" />
+    <k-grid service="event-templates" :base-query="baseQuery" :filter-query="searchQuery" :renderer="renderer" :contextId="contextId" />
     <!-- 
       Router view to enable routing to modals
      -->
@@ -49,6 +49,8 @@ export default {
     refreshActivity () {
       this.clearActivity()
       this.setTitle(this.$store.get('context.name'))
+      // Search bar
+      this.setSearchBar('name')
       // Tabbar actions
       this.registerTabAction({
         name: 'events',
