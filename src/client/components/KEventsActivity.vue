@@ -86,7 +86,7 @@ export default {
           })
           response.data.forEach(template => {
             this.registerFabAction({
-              name: 'create-' + template.name,
+              name: 'create-' + template._id,
               label: template.name,
               icon: template.icon.name,
               route: { name: 'create-event', params: { contextId: this.contextId, templateId: template._id } }
