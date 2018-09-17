@@ -81,12 +81,15 @@
     "REMOVE_DIALOG_TITLE": "Remove the template {{template}} ?",
     "REMOVE_DIALOG_MESSAGE": "Are you sure you want to remove the template <b>{{template}}</b> ?"
   },
-  "KEventTemplateEditor": {
-    "ADD_WORKFLOW_LABEL": "Add a workflow ?",
-    "WORKFLOW_HELPER_LABEL": "Manage below the different steps of the workflow",
-    "CLOSE_ACTION":  "$t(CLOSE_LABEL)"
-  },
   "KEventWorkflowForm": {
+    "ADD_STEP_BUTTON": "Add a step",
+    "REMOVE_STEP_BUTTON": "Remove current step",
+    "PREVIOUS_STEP_BUTTON": "Previous step",
+    "NEXT_STEP_BUTTON": "Next step",
+    "PREVIEW_WORKFLOW_BUTTON": "Preview workflow",
+    "EDIT_WORKFLOW_BUTTON": "Edit workflow"
+  },
+  "KEventTemplateEditor": {
     "ADD_WORKFLOW_LABEL": "Add a workflow ?",
     "WORKFLOW_HELPER_LABEL": "Manage below the different steps of the workflow",
     "CLOSE_ACTION":  "$t(CLOSE_LABEL)"
