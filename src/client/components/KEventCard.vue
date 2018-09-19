@@ -222,8 +222,8 @@ export default {
         // When no workflow to be fulfilled
         if (_.isEmpty(this.participantStep)) return
         // When participant has just fullfilled a step we need to initiate the next one (if any) by a log acting as a read receipt
-        // We know this when we get a different step from the current state
-        if (this.participantState.step !== this.participantStep.name) {
+        // We know this when we get a higher step in workflow from the current state
+        if (this.isBeforeInWorkflow(this.participantState.step, this.participantStep.name)) {
           let log = this.createParticipantLog(this.participantStep, this.participantState)
           this.serviceCreate(log)
           // Real-time event should trigger a new refresh for current state
@@ -249,10 +249,8 @@ export default {
     subscribeParticipantLog () {
       // Remove previous listener if any
       this.unsubscribeParticipantLog()
-      this.participantLogListener = this.loadService().find({
-        rx: {
-          listStrategy: 'always'
-        },
+      this.participantLogListener = this.loadService().watch({ listStrategy: 'always' })
+      .find({
         query: {
           $sort: { _id: -1 },
           $limit: 1,
@@ -284,10 +282,8 @@ export default {
     subscribeCoordinatorLog () {
       // Remove previous listener if any
       this.unsubscribeCoordinatorLog()
-      this.coordinatorLogListener = this.loadService().find({
-        rx: {
-          listStrategy: 'always'
-        },
+      this.coordinatorLogListener = this.loadService().watch({ listStrategy: 'always' })
+      .find({
         query: {
           event: this.item._id,
           lastInEvent: true

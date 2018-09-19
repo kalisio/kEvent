@@ -22,6 +22,12 @@ let eventsMixin = {
     endWorkflow (step, state) {
       return (this.hasEnd(step) && this.hasInteraction(state) && step.end.includes(state.interaction.value))
     },
+    isBeforeInWorkflow (stateName, stepName) {
+      const stateIndex = this.event.workflow.findIndex(workflowStep => workflowStep.name === stateName)
+      const stepIndex = this.event.workflow.findIndex(workflowStep => workflowStep.name === stepName)
+      
+      return (stepIndex > stateIndex)
+    },
     getWorkflowStep (state = {}) {
       if (_.isNil(this.event.workflow)) return null
 
