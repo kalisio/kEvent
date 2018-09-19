@@ -44,7 +44,11 @@ export function createEventLogService(organisation, db) {
     servicesPath,
     modelsPath,
     context: organisation,
-    db
+    db,
+    paginate: {
+      default: 100,
+      max: 100
+    }
   })
   debug('Event logs service created for organisation ' + organisation.name)
 }
