@@ -4,6 +4,28 @@ import logger from 'winston'
 import { getItems } from 'feathers-hooks-common'
 const debug = makeDebug('kalisio:kEvent:event-logs:hooks')
 
+export async function addLogDefaults (hook) {
+  if (hook.type !== 'before') {
+    throw new Error(`The 'addLogDefaults' hook should only be used as a 'before' hook.`)
+  }
+
+  let participant = hook.data.participant
+  let stakeholder = hook.data.stakeholder
+  const event = hook.data.event
+  const user = hook.params.user
+  // By default we assume the user is the participant
+  if (user) {
+    if (!participant) hook.data.participant = participant = user._id
+    if (!stakeholder) hook.data.stakeholder = stakeholder = 'participant'
+  }
+  hook.data.lastInEvent = true
+  if (participant && event) {
+    debug('Added default log properties for participant ' + hook.data.participant.toString() + ' on event ' + event.toString())
+  }
+  
+  return hook
+}
+
 export async function linkWithPreviousLog (hook) {
   if (hook.type !== 'before') {
     throw new Error(`The 'linkWithPreviousLog' hook should only be used as a 'before' hook.`)
@@ -15,7 +37,7 @@ export async function linkWithPreviousLog (hook) {
   if (event && participant) {
     let previousLogs = await hook.service.find({
       query: {
-        $sort: { _id: -1 },
+        $sort: { createdAt: -1 }, // Sorting by newest ones
         $limit: 1,
         participant,
         event,
@@ -27,7 +49,6 @@ export async function linkWithPreviousLog (hook) {
       let previousLog = previousLogs[0]
       debug('Tagging previous log for participant ' + participant.toString() + ' on event ' + event.toString())
       item.previous = previousLog._id
-      await hook.service.patch(previousLog._id.toString(), { lastInEvent: false })
       // Copy expiry date
       item.expireAt = previousLog.expireAt
     }
@@ -46,23 +67,15 @@ export async function linkWithPreviousLog (hook) {
   return hook
 }
 
-export async function addLogDefaults (hook) {
-  if (hook.type !== 'before') {
-    throw new Error(`The 'addLogDefaults' hook should only be used as a 'before' hook.`)
+export async function updatePreviousLog (hook) {
+  if (hook.type !== 'after') {
+    throw new Error(`The 'updatePreviousLog' hook should only be used as a 'after' hook.`)
   }
 
-  let participant = hook.data.participant
-  let stakeholder = hook.data.stakeholder
-  const event = hook.data.event
-  const user = hook.params.user
-  // By default we assume the user is the participant
-  if (user) {
-    if (!participant) hook.data.participant = participant = user._id
-    if (!stakeholder) hook.data.stakeholder = stakeholder = 'participant'
-  }
-  hook.data.lastInEvent = true
-  if (participant && event) {
-    debug('Added default log properties for participant ' + hook.data.participant.toString() + ' on event ' + event.toString())
+  let item = getItems(hook)
+
+  if (item.previous) {
+    await hook.service.patch(item.previous.toString(), { lastInEvent: false })
   }
   
   return hook

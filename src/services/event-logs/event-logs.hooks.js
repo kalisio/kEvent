@@ -1,6 +1,6 @@
 import { setNow, populate } from 'feathers-hooks-common'
 import { hooks } from 'kCore'
-import { addLogDefaults, sendStateNotifications, linkWithPreviousLog } from '../../hooks'
+import { addLogDefaults, sendStateNotifications, linkWithPreviousLog, updatePreviousLog } from '../../hooks'
 
 const populatePreviousLog = populate({
   schema: hook => {
@@ -39,7 +39,7 @@ module.exports = {
     all: [],
     find: [ populatePreviousLog, populateParticipant ],
     get: [],
-    create: [ sendStateNotifications ],
+    create: [ updatePreviousLog, sendStateNotifications ],
     update: [],
     patch: [],
     remove: []
