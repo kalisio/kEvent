@@ -3,7 +3,7 @@
     <!-- 
       Templates collection
      -->
-    <k-grid service="event-templates" :base-query="baseQuery" :filter-query="searchQuery" :renderer="renderer" :contextId="contextId" />
+    <k-grid service="event-templates" :base-query="baseQuery" :filter-query="searchQuery" :renderer="renderer" :contextId="contextId" :list-strategy="'smart'" />
     <!-- 
       Router view to enable routing to modals
      -->

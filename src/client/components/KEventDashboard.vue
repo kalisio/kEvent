@@ -10,7 +10,7 @@
         </q-item>
         <q-item>
           <q-item-main>
-            <k-grid service="events" :renderer="renderer" :contextId="org._id" :base-query="baseQuery" :filter-query="searchQuery" />
+            <k-grid service="events" :renderer="renderer" :contextId="org._id" :base-query="baseQuery" :filter-query="searchQuery" :list-strategy="'smart'" />
           </q-item-main>
         </q-item>
       </q-list>
