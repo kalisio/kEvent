@@ -5,6 +5,9 @@
   "EDIT_LABEL": "Editer",
   "CLOSE_LABEL": "Fermer",
   "SAVE_LABEL": "Enregistrer",
+  "errors": {
+    "EVENT_LOG_LIMIT": "Trop de participants pour afficher l'ensemble des informations"
+  },
   "schemas": {
     "EVENT_TEMPLATES_CREATE_TITLE": "Créer un nouveau modèle d'évènement ?",
     "EVENT_TEMPLATES_NAME_FIELD_HELPER": "Saisissez le nom du modèle",

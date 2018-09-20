@@ -5,6 +5,9 @@
   "EDIT_LABEL": "Edit",
   "CLOSE_LABEL": "Close",
   "SAVE_LABEL": "Save",
+  "errors": {
+    "EVENT_LOG_LIMIT": "Too much participants to display all of them"
+  },
   "schemas": {
     "EVENT_TEMPLATES_CREATE_TITLE": "Create a new event template ?",
     "EVENT_TEMPLATES_NAME_FIELD_HELPER": "Enter the name of this template",

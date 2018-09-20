@@ -278,6 +278,9 @@ export default {
       } else {
         this.coordinatorLabel = this.$t('KEventCard.NO_PARTICPANTS_AWAITING_LABEL')
       }
+      if (logs.data.length < logs.total) {
+        Events.$emit('error', new Error(this.$t('errors.EVENT_LOG_LIMIT')))
+      }
     },
     subscribeCoordinatorLog () {
       // Remove previous listener if any

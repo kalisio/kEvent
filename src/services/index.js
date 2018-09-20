@@ -46,8 +46,8 @@ export function createEventLogService(organisation, db) {
     context: organisation,
     db,
     paginate: {
-      default: 100,
-      max: 100
+      default: 500,
+      max: 500
     }
   })
   debug('Event logs service created for organisation ' + organisation.name)

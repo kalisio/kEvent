@@ -44,7 +44,7 @@
 <script>
 import _ from 'lodash'
 import L from 'leaflet'
-import { QWindowResizeObservable, QResizeObservable, QScrollArea, QBtn, QIcon, dom } from 'quasar'
+import { Events, QWindowResizeObservable, QResizeObservable, QScrollArea, QBtn, QIcon, dom } from 'quasar'
 import { mixins as kCoreMixins, utils as kCoreUtils } from 'kCore/client'
 import { mixins as kMapMixins } from 'kMap/client'
 import mixins from '../mixins'
@@ -305,6 +305,9 @@ export default {
         item.comment = this.getComment(item)
       })
       this.refreshLayer()
+      if (this.items.length < this.nbTotalItems) {
+        Events.$emit('error', new Error(this.$t('errors.EVENT_LOG_LIMIT')))
+      }
     },
     onWindowResized (size) {
       // Avoid to refresh the layout when leaving the component
