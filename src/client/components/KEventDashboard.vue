@@ -20,8 +20,8 @@
 
 <script>
 import { QList, QItem, QItemMain, QItemSide, QItemSeparator } from 'quasar'
-import { mixins as kCoreMixins } from 'kCore/client'
-import { mixins as kMapMixins } from 'kMap/client'
+import { mixins as kCoreMixins } from '@kalisio/kCore/client'
+import { mixins as kMapMixins } from '@kalisio/kMap/client'
 import { Avatar } from 'vue-avatar'
 
 export default {

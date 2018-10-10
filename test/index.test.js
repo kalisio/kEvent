@@ -1,8 +1,8 @@
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
-import core, { kalisio, hooks as coreHooks, permissions as corePermissions } from 'kCore'
-import team, { permissions as teamPermissions, hooks as teamHooks } from 'kTeam'
-import notify, { hooks as notifyHooks } from 'kNotify'
+import core, { kalisio, hooks as coreHooks, permissions as corePermissions } from '@kalisio/kCore'
+import team, { permissions as teamPermissions, hooks as teamHooks } from '@kalisio/kTeam'
+import notify, { hooks as notifyHooks } from '@kalisio/kNotify'
 import event, { hooks, permissions } from '../src'
 
 describe('kEvent', () => {

@@ -16,12 +16,12 @@ notifications:
 before_script:
 - npm install -g codeclimate-test-reporter
 - git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kCore.git && cd kCore && yarn install && yarn
-  link && cd .. && yarn link kCore
+  link && cd .. && yarn link @kalisio/kCore
 - git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kTeam.git && cd kTeam && yarn install && yarn
-  link && yarn link kCore && cd .. && yarn link kTeam
+  link && yarn link @kalisio/kCore && cd .. && yarn link @kalisio/kTeam
 - git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kNotify.git && cd kNotify && yarn install &&
-  yarn link && yarn link kCore && cd .. && yarn link kNotify
+  yarn link && yarn link @kalisio/kCore && cd .. && yarn link @kalisio/kNotify
 - git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kMap.git && cd kMap && yarn install && yarn
-  link && yarn link kCore && cd .. && yarn link kMap
+  link && yarn link @kalisio/kCore && cd .. && yarn link @kalisio/kMap
 after_script:
 - codeclimate-test-reporter < coverage/lcov.info

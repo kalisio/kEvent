@@ -1,4 +1,4 @@
-import { hooks } from 'kCore'
+import { hooks } from '@kalisio/kCore'
 import { setNow, discard } from 'feathers-hooks-common'
 import { addCreatorAsCoordinator, processNotification, sendEventNotifications } from '../../hooks'
 

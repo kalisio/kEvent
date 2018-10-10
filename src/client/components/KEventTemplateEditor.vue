@@ -16,7 +16,7 @@
 <script>
 import _ from 'lodash'
 import { QToggle } from 'quasar'
-import { mixins } from 'kCore/client'
+import { mixins } from '@kalisio/kCore/client'
 
 export default {
   name: 'k-event-template-editor',

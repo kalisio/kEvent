@@ -1,4 +1,4 @@
-import { mixins } from 'kCore/client'
+import { mixins } from '@kalisio/kCore/client'
 
 let eventsMixin = {
   data () {
