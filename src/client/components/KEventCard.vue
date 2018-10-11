@@ -29,9 +29,9 @@
 <script>
 import _ from 'lodash'
 import { Events, QIcon, Dialog } from 'quasar'
-import { mixins as kCoreMixins } from '@kalisio/kCore/client'
-import { mixins as kMapMixins } from '@kalisio/kMap/client'
-import { errors } from '@kalisio/kMap/common'
+import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
+import { mixins as kMapMixins } from '@kalisio/kdk-map/client'
+import { errors } from '@kalisio/kdk-map/common'
 import mixins from '../mixins'
 
 export default {

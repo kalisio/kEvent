@@ -45,8 +45,8 @@
 import _ from 'lodash'
 import L from 'leaflet'
 import { Events, QWindowResizeObservable, QResizeObservable, QScrollArea, QBtn, QIcon, dom } from 'quasar'
-import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kCore/client'
-import { mixins as kMapMixins } from '@kalisio/kMap/client'
+import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
+import { mixins as kMapMixins } from '@kalisio/kdk-map/client'
 import mixins from '../mixins'
 
 const { offset } = dom

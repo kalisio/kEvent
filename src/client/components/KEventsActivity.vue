@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import { mixins as kCoreMixins } from '@kalisio/kCore/client'
-import { mixins as kMapMixins } from '@kalisio/kMap/client'
+import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
+import { mixins as kMapMixins } from '@kalisio/kdk-map/client'
 
 export default {
   name: 'k-events-activity',

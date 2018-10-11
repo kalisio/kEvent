@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { mixins } from '@kalisio/kCore/client'
+import { mixins } from '@kalisio/kdk-core/client'
 import { Dialog, QIcon } from 'quasar'
 
 export default {

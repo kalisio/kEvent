@@ -8,7 +8,7 @@
 
 <script>
 import _ from 'lodash'
-import { mixins } from '@kalisio/kCore/client'
+import { mixins } from '@kalisio/kdk-core/client'
 
 const editorMixin = mixins.baseEditor(['eventForm'])
 

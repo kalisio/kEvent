@@ -38,7 +38,7 @@
 
 <script>
 import _ from 'lodash'
-import { mixins as kCoreMixins } from '@kalisio/kCore/client'
+import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
 import mixins from '../mixins'
 import { QStepper, QStep, QBtn, QTooltip, Events, uid } from 'quasar'
 

@@ -1,4 +1,4 @@
-import { permissions } from '@kalisio/kCore/common'
+import { permissions } from '@kalisio/kdk-core/common'
 
 // Hook computing event abilities for a given user
 export function defineEventAbilities (subject, can, cannot) {

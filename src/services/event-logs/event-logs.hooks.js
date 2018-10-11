@@ -1,5 +1,5 @@
 import { setNow, populate } from 'feathers-hooks-common'
-import { hooks } from '@kalisio/kCore'
+import { hooks } from '@kalisio/kdk-core'
 import { addLogDefaults, sendStateNotifications, linkWithPreviousLog, updatePreviousLog } from '../../hooks'
 
 const populatePreviousLog = populate({
