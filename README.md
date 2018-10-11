@@ -12,9 +12,9 @@
 ## Installation
 
 ```
-npm install kEvent --save
+npm install @kalisio/kdk-event --save
 // Or with Yarn
-yarn add kEvent
+yarn add @kalisio/kdk-event
 ```
 
 ## Documentation
