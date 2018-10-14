@@ -1,5 +1,6 @@
 import logger from 'winston'
 import _ from 'lodash'
+import { createObjectID } from '@kalisio/kdk-core'
 import makeDebug from 'debug'
 const debug = makeDebug('kalisio:kEvent:events:hooks')
 
@@ -26,7 +27,7 @@ export function addCreatorAsCoordinator (hook) {
     // Add creator as coordinator if not already done
     if (!coordinators.find(coordinator => coordinator._id.toString() === user._id.toString())) {
       coordinators.push({
-        _id: user._id,
+        _id: createObjectID(user._id),
         service: 'members',
         name: user.name
       })
