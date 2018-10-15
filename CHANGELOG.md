@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.0.1](https://github.com/kalisio/kEvent/tree/v1.0.1) (2018-10-15)
+
+[Full Changelog](https://github.com/kalisio/kEvent/compare/v1.0.0...v1.0.1)
+
+**Fixed bugs:**
+
+- Event not available in list after creation [\#40](https://github.com/kalisio/kEvent/issues/40)
+
 ## [v1.0.0](https://github.com/kalisio/kEvent/tree/v1.0.0) (2018-10-11)
 
 [Full Changelog](https://github.com/kalisio/kEvent/compare/e2e8ea7778d1569c02fd2961920b1e85ce7a8b15...v1.0.0)
