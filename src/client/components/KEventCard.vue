@@ -174,13 +174,11 @@ export default {
           name: 'navigate', label: this.$t('KEventCard.NAVIGATE_LABEL'), icon: 'navigation', handler: this.launchNavigation
         })
       }
-      console.log(this)
     },
     uploadMedia () {
       this.$refs.uploader.open(this.item.attachments)
     },
     browseMedia () {
-      console.log(this)
       this.$refs.mediaBrowser.open(this.item.attachments)
     },
     launchNavigation () {
