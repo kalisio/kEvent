@@ -378,8 +378,10 @@ describe('kEvent', () => {
     expect(eventObject.attachments).toExist()
     expect(eventObject.attachments.length > 0).beTrue()
     expect(eventObject.attachments[0]._id).to.equal(storageObject._id)
-    await storageService.get('buffer.txt')
+    let data = await storageService.get('buffer.txt')
+    expect(data.size === 18).beTrue()
   })
+  .timeout(10000)
 
   it('members can access events when they are participants', async () => {
     let events = await eventService.find({ query: {}, user: orgUserObject, checkAuthorisation: true })
