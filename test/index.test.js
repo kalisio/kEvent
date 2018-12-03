@@ -178,7 +178,7 @@ describe('kEvent', () => {
   // Let enough time to process
   .timeout(10000)
 
-  it('org manager can create event templates', () => {
+  it('org manager can create event template', () => {
     return eventTemplateService.create({ title: 'template' }, { user: orgManagerObject, checkAuthorisation: true })
     .then(template => {
       return eventTemplateService.find({ query: { title: 'template' }, user: orgManagerObject, checkAuthorisation: true })
@@ -188,14 +188,21 @@ describe('kEvent', () => {
     })
   })
 
-  it('members cannot access event templates service', (done) => {
+  it('members can access event templates service', () => {
     eventTemplateService.find({ query: {}, user: orgUserObject, checkAuthorisation: true })
+    .then(templates => {
+      expect(templates.data.length > 0).beTrue()
+    })
+  })
+
+  it('members cannot create event template', (done) => {
+    eventTemplateService.create({ title: 'member-template' }, { user: orgUserObject, checkAuthorisation: true })
     .catch(error => {
       expect(error).toExist()
       done()
     })
   })
-
+  
   it('org manager can create events', (done) => {
     eventService.create({
       title: 'event',
@@ -378,53 +385,29 @@ describe('kEvent', () => {
   // Let enough time to process
   .timeout(10000)
 
-  it('removes test user', () => {
-    return userService.remove(userObject._id, { user: userObject, checkAuthorisation: true })
-    .then(user => {
-      return userService.find({ query: { name: userObject.name }, user: userObject, checkAuthorisation: true })
-    })
-    .then(users => {
-      expect(users.data.length === 0).beTrue()
-    })
+  it('removes test user', async () => {
+    await userService.remove(userObject._id, { user: userObject, checkAuthorisation: true })
+    let users = await userService.find({ query: { name: userObject.name }, user: userObject, checkAuthorisation: true })
+    expect(users.data.length === 0).beTrue()
   })
-  // Let enough time to process
-  .timeout(5000)
 
-  it('removes org user', () => {
-    return userService.remove(orgUserObject._id, { user: orgUserObject, checkAuthorisation: true })
-    .then(user => {
-      return userService.find({ query: { name: orgUserObject.name }, user: orgUserObject, checkAuthorisation: true })
-    })
-    .then(users => {
-      expect(users.data.length === 0).beTrue()
-    })
+  it('removes org user', async () => {
+    await userService.remove(orgUserObject._id, { user: orgUserObject, checkAuthorisation: true })
+    let users = await userService.find({ query: { name: orgUserObject.name }, user: orgUserObject, checkAuthorisation: true })
+    expect(users.data.length === 0).beTrue()
   })
-  // Let enough time to process
-  .timeout(5000)
 
-  it('removes org', () => {
-    return orgService.remove(orgObject._id, { user: orgManagerObject, checkAuthorisation: true })
-    .then(org => {
-      return orgService.find({ query: { name: 'test-org' }, user: orgManagerObject, checkAuthorisation: true })
-    })
-    .then(orgs => {
-      expect(orgs.data.length === 0).beTrue()
-    })
+  it('removes org', async () => {
+    await orgService.remove(orgObject._id, { user: orgManagerObject, checkAuthorisation: true })
+    let orgs = await orgService.find({ query: { name: 'test-org' }, user: orgManagerObject, checkAuthorisation: true })
+    expect(orgs.data.length === 0).beTrue()
   })
-  // Let enough time to process
-  .timeout(5000)
 
-  it('removes org manager', () => {
-    return userService.remove(orgManagerObject._id, { user: orgManagerObject, checkAuthorisation: true })
-    .then(user => {
-      return userService.find({ query: { name: orgManagerObject.name }, user: orgManagerObject, checkAuthorisation: true })
-    })
-    .then(users => {
-      expect(users.data.length === 0).beTrue()
-    })
+  it('removes org manager', async () => {
+    await userService.remove(orgManagerObject._id, { user: orgManagerObject, checkAuthorisation: true })
+    let users = await userService.find({ query: { name: orgManagerObject.name }, user: orgManagerObject, checkAuthorisation: true })
+    expect(users.data.length === 0).beTrue()
   })
-  // Let enough time to process
-  .timeout(5000)
 
   // Cleanup
   after(() => {
