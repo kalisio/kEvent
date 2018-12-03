@@ -1,29 +1,31 @@
 <template>
-  <k-card v-bind="$props" :itemActions="actions">
-    <q-icon slot="card-icon" :name="icon.name" :color="icon.color"></q-icon>
-    <div slot="card-content">
-      <div v-if="participantLabel">
-        {{participantLabel}}<br /><br />
+  <div>
+    <k-card v-bind="$props" :itemActions="actions">
+      <q-icon slot="card-icon" :name="icon.name" :color="icon.color"></q-icon>
+      <div slot="card-content">
+        <div v-if="participantLabel">
+          {{participantLabel}}<br /><br />
+        </div>
+        <span v-if="comment">
+          <k-text-area class="light-paragraph" :length="20" :text="comment" /><br />
+        </span>
+        <div v-if="coordinatorLabel">
+          {{coordinatorLabel}}<br /><br />
+        </div>
+        <div v-if="createdAt || updatedAt">
+          <cite v-if="createdAt">{{$t('KEventCard.CREATED_AT_LABEL')}} {{createdAt.toLocaleString()}}</cite><br />
+          <cite v-if="updatedAt">{{$t('KEventCard.UPDATED_AT_LABEL')}} {{updatedAt.toLocaleString()}}</cite>
+        </div>
       </div>
-      <span v-if="comment">
-        <k-text-area class="light-paragraph" :length="20" :text="comment" /><br />
-      </span>
-      <div v-if="coordinatorLabel">
-        {{coordinatorLabel}}<br /><br />
-      </div>
-      <div v-if="createdAt || updatedAt">
-        <cite v-if="createdAt">{{$t('KEventCard.CREATED_AT_LABEL')}} {{createdAt.toLocaleString()}}</cite><br />
-        <cite v-if="updatedAt">{{$t('KEventCard.UPDATED_AT_LABEL')}} {{updatedAt.toLocaleString()}}</cite>
-      </div>
-    </div>
+    </k-card>
     <k-modal ref="followUpModal" v-if="hasParticipantInteraction" :title="followUpTitle" :toolbar="getFollowUpToolbar()" :buttons="getFollowUpButtons()" :route="false" >
       <div slot="modal-content">
         <k-form ref="form" :schema="schema"/>
       </div>
     </k-modal>
     <k-uploader ref="uploader" :contextId="contextId" :resource="item._id" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
-    <k-media-browser ref="mediaBrowser" :contextId="contextId"/>
-  </k-card>
+    <k-media-browser ref="mediaBrowser" :contextId="contextId" />
+  </div>
 </template>
 
 <script>

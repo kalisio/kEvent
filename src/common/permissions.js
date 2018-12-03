@@ -12,10 +12,15 @@ export function defineEventAbilities (subject, can, cannot) {
             // Indeed we have for instance a 'events' service in each organisation.
             can('service', organisation._id.toString() + '/events')
             can('service', organisation._id.toString() + '/event-logs')
+            // A user can access the templates to create an event
+            can('service', organisation._id.toString() + '/event-templates')
+            can('read', 'event-templates', { context: organisation._id })
             // A user can access events in which he is a participant or his group or his org
             // A coordinator can manage his events
+            can('create', 'events', { context: organisation._id })
             can('read', 'events', { context: organisation._id, 'participants._id': subject._id })
             can('all', 'events', { context: organisation._id, 'coordinators._id': subject._id })
+            //can('all', 'events', { context: organisation._id, 'coordinators._id': subject._id })
             // BUG: adding org level participant/coordinator generates a bug because the org owner
             // has the same ID than the org itself causing everybody accessing the event
             //can('read', 'events', { context: organisation._id, 'participants._id': organisation._id })
@@ -46,13 +51,12 @@ export function defineEventAbilities (subject, can, cannot) {
         }
         if (role >= permissions.Roles.manager) {
           if (organisation._id) {
-            can('create', 'events', { context: organisation._id })
             // The unique identifier of a service is its path not its name.
             // Indeed we have for instance a 'events' service in each organisation.
-            can('service', organisation._id.toString() + '/event-templates')
             can('all', 'event-templates', { context: organisation._id })
           }
         }
+        
       })
     }
   }
