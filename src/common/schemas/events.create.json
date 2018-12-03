@@ -9,7 +9,6 @@
       "minLength": 3,
       "field": {
         "component": "form/KTextField",
-        "label": "Name",
         "helper": "schemas.EVENTS_NAME_FIELD_HELPER"
       }
     },
@@ -17,7 +16,6 @@
       "type": "string", 
       "field": {
         "component": "form/KTextareaField",
-        "label": "Description",
         "helper": "schemas.EVENTS_DESCRIPTION_FIELD_HELPER"
       }
     },
