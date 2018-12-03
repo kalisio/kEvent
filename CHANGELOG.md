@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.0.2](https://github.com/kalisio/kEvent/tree/v1.0.2) (2018-12-03)
+
+[Full Changelog](https://github.com/kalisio/kEvent/compare/v1.0.1...v1.0.2)
+
+**Implemented enhancements:**
+
+- Allow the members to create an event [\#44](https://github.com/kalisio/kEvent/issues/44)
+
+**Fixed bugs:**
+
+- By default, the participants field has an error in the event editor [\#45](https://github.com/kalisio/kEvent/issues/45)
+- The actions browse or upload medias are not working [\#43](https://github.com/kalisio/kEvent/issues/43)
+
 ## [v1.0.1](https://github.com/kalisio/kEvent/tree/v1.0.1) (2018-10-15)
 
 [Full Changelog](https://github.com/kalisio/kEvent/compare/v1.0.0...v1.0.1)
