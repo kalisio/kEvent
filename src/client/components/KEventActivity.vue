@@ -326,7 +326,7 @@ export default {
         service: 'storage',
         acceptedFiles: 'image/*',
         multiple: true,
-        maxFilesize: 5,
+        maxFilesize: 10,
         autoProcessQueue: true,
         resourcesService: 'events',
         storagePath: '<%= id %>/<%= file.name %>'
