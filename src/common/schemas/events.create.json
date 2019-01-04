@@ -126,7 +126,7 @@
         "service": "storage",
         "acceptedFiles": "image/*",
         "multiple": true,
-        "maxFilesize": 5,
+        "maxFilesize": 10,
         "autoProcessQueue": false,
         "resourcesService": "events",
         "storagePath": "<%= id %>/<%= file.name %>"
