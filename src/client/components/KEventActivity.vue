@@ -347,7 +347,7 @@ export default {
     this.observe = true
   },
   mounted () {
-    this.setupMap()
+    this.setupMap('map')
     this.addCollectionLayer('Actors', { spiderfyDistanceMultiplier: 5.0 })
     // Setup event connections
     // this.$on('popupopen', this.onPopupOpen)
