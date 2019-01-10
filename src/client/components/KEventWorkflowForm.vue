@@ -185,9 +185,7 @@ export default {
     },
     fillStepForm () {
       let form = this.getForm('stepForm')
-      // Skip validation so that place holder can be seen
-      // Validation occur on add, next or previous step
-      form.fill(this.getCurrentStep(), true)
+      form.fill(this.getCurrentStep())
       this.setupEndField()
     },
     setupEndField () {

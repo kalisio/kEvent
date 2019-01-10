@@ -61,6 +61,7 @@
     "ADD_MEDIA_LABEL": "$t(KEventActivity.ADD_MEDIA_LABEL)",
     "BROWSE_MEDIA_LABEL": "$t(KEventActivity.BROWSE_MEDIA_LABEL)",
     "NAVIGATE_LABEL": "Navigate",
+    "LOCATE_LABEL": "Locate",
     "REMOVE_DIALOG_TITLE": "Remove the event {{event}} ?",
     "REMOVE_DIALOG_MESSAGE": "Are you sure you want to remove the event <b>{{event}}</b> ?",
     "ACTION_REQUIRED_WARNING": "Action required",

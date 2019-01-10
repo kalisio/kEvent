@@ -7,7 +7,7 @@
   "properties": {
     "name": {
       "type": "string", 
-      "minLength": 1,
+      "minLength": 3,
       "field": {
         "component": "form/KTextField",
         "helper": "schemas.EVENTS_NAME_FIELD_HELPER"

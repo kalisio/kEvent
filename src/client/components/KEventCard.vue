@@ -3,19 +3,27 @@
     <k-card v-bind="$props" :itemActions="actions">
       <q-icon slot="card-icon" :name="icon.name" :color="icon.color"></q-icon>
       <div slot="card-content">
+        <div v-if="location">
+          {{ location }}
+          <q-card-separator class="card-separator" />
+        </div>
         <div v-if="participantLabel">
-          {{participantLabel}}<br /><br />
+          {{ participantLabel }}
+          <q-card-separator class="card-separator" />
         </div>
         <span v-if="comment">
-          <k-text-area class="light-paragraph" :length="20" :text="comment" /><br />
+          <k-text-area class="light-paragraph" :length="20" :text="comment" />
+          <q-card-separator class="card-separator" />
         </span>
         <div v-if="coordinatorLabel">
-          {{coordinatorLabel}}<br /><br />
+          {{ coordinatorLabel }}
+          <q-card-separator class="card-separator" />
         </div>
         <div v-if="createdAt || updatedAt">
-          <cite v-if="createdAt">{{$t('KEventCard.CREATED_AT_LABEL')}} {{createdAt.toLocaleString()}}</cite><br />
-          <cite v-if="updatedAt">{{$t('KEventCard.UPDATED_AT_LABEL')}} {{updatedAt.toLocaleString()}}</cite>
+          <cite v-if="createdAt"><small>{{$t('KEventCard.CREATED_AT_LABEL')}} {{createdAt.toLocaleString()}}</small></cite><br />
+          <cite v-if="updatedAt"><small>{{$t('KEventCard.UPDATED_AT_LABEL')}} {{updatedAt.toLocaleString()}}</small></cite>
         </div>
+        
       </div>
     </k-card>
     <k-modal ref="followUpModal" v-if="hasParticipantInteraction" :title="followUpTitle" :toolbar="getFollowUpToolbar()" :buttons="getFollowUpButtons()" :route="false" >
@@ -25,12 +33,13 @@
     </k-modal>
     <k-uploader ref="uploader" :contextId="contextId" :resource="item._id" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
     <k-media-browser ref="mediaBrowser" :contextId="contextId" />
+    <k-location-map ref="locationMap" />
   </div>
 </template>
 
 <script>
 import _ from 'lodash'
-import { Events, QIcon, Dialog } from 'quasar'
+import { Events, QIcon, QCardSeparator, Dialog } from 'quasar'
 import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client'
 import { errors } from '@kalisio/kdk-map/common'
@@ -47,6 +56,7 @@ export default {
     mixins.eventLogs
   ],
   components: {
+    QCardSeparator,
     QIcon
   },
   computed: {
@@ -67,6 +77,10 @@ export default {
     },
     hasParticipantInteraction () {
       return this.waitingInteraction(this.participantStep, this.participantState, 'participant')
+    },
+    location () {
+      if (this.item.location) return this.item.location.name
+      return ''
     }
   },
   data () {
@@ -79,6 +93,9 @@ export default {
     }
   },
   methods: {
+    hasGeoLocation () {
+      return !_.isEmpty(this.item.location) && !_.isNil(this.item.location.longitude) && !_.isNil(this.item.location.latitude)
+    },
     getFollowUpToolbar () {
       return [{
         name: 'close-action',
@@ -168,8 +185,12 @@ export default {
           name: 'browse-media', label: this.$t('KEventCard.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
         })
       }
-      if (this.canNavigate() && !_.isEmpty(this.item.location) &&
-          !_.isNil(this.item.location.longitude) && !_.isNil(this.item.location.latitude)) {
+      if (this.hasGeoLocation()) {
+        this.registerPaneAction({
+          name: 'locate', label: this.$t('KEventCard.LOCATE_LABEL'), icon: 'map', handler: this.displayLocationMap
+        })
+      }
+      if (this.canNavigate() && this.hasGeoLocation()) {
         this.registerPaneAction({
           name: 'navigate', label: this.$t('KEventCard.NAVIGATE_LABEL'), icon: 'navigation', handler: this.launchNavigation
         })
@@ -180,6 +201,9 @@ export default {
     },
     browseMedia () {
       this.$refs.mediaBrowser.open(this.item.attachments)
+    },
+    displayLocationMap () {
+      this.$refs.locationMap.open(this.item.location)
     },
     launchNavigation () {
       let longitude = this.item.location.longitude
@@ -359,6 +383,7 @@ export default {
     this.$options.components['k-form'] = this.$load('form/KForm')
     this.$options.components['k-uploader'] = this.$load('input/KUploader')
     this.$options.components['k-media-browser'] = this.$load('media/KMediaBrowser')
+    this.$options.components['k-location-map'] = this.$load('KLocationMap')
     // Required alias for the event logs mixin
     this.event = this.item
     // Set the required actor
@@ -377,3 +402,9 @@ export default {
   }
 }
 </script>
+
+<style>
+  .card-separator {
+    margin: 8px
+  }
+</style>
