@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.0.3](https://github.com/kalisio/kEvent/tree/v1.0.3) (2019-01-10)
+
+[Full Changelog](https://github.com/kalisio/kEvent/compare/v1.0.2...v1.0.3)
+
+**Implemented enhancements:**
+
+- Display the location of the event within the card [\#47](https://github.com/kalisio/kEvent/issues/47)
+
 ## [v1.0.2](https://github.com/kalisio/kEvent/tree/v1.0.2) (2018-12-03)
 
 [Full Changelog](https://github.com/kalisio/kEvent/compare/v1.0.1...v1.0.2)
