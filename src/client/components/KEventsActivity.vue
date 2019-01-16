@@ -13,7 +13,7 @@
 
 <script>
 import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
-import { mixins as kMapMixins } from '@kalisio/kdk-map/client'
+import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 
 export default {
   name: 'k-events-activity',

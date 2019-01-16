@@ -46,7 +46,7 @@ import _ from 'lodash'
 import L from 'leaflet'
 import { Events, QWindowResizeObservable, QResizeObservable, QScrollArea, QBtn, QIcon, dom } from 'quasar'
 import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
-import { mixins as kMapMixins } from '@kalisio/kdk-map/client'
+import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 import mixins from '../mixins'
 
 const { offset } = dom
@@ -64,7 +64,6 @@ export default {
     kCoreMixins.baseActivity,
     kCoreMixins.baseCollection,
     kMapMixins.map.baseMap,
-    kMapMixins.map.baseLayers,
     kMapMixins.map.geojsonLayers,
     kMapMixins.map.collectionLayer,
     mixins.eventLogs
@@ -346,13 +345,17 @@ export default {
     // Enable the observers in order to refresh the layout
     this.observe = true
   },
-  mounted () {
-    this.setupMap('map')
+  async mounted () {
+    this.setupMap('map', { maxZoom: 18 })
     this.addCollectionLayer('Actors', { spiderfyDistanceMultiplier: 5.0 })
     // Setup event connections
     // this.$on('popupopen', this.onPopupOpen)
     this.$on('click', this.onFeatureClicked)
     this.$on('collection-refreshed', this.onCollectionRefreshed)
+    const catalogService = this.$api.getService('catalog')
+      // Get first visible base layer
+      let response = await catalogService.find({ query: { type: 'BaseLayer', 'leaflet.isVisible': true } })
+      if (response.data.length > 0) this.addLayer(response.data[0])
   },
   beforeDestroy () {
     // No need to refresh the layout when leaving the component
