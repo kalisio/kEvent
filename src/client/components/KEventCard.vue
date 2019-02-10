@@ -31,8 +31,8 @@
         <k-form ref="form" :schema="schema"/>
       </div>
     </k-modal>
-    <k-uploader ref="uploader" :contextId="contextId" :resource="item._id" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
-    <k-media-browser ref="mediaBrowser" :contextId="contextId" />
+    <k-uploader ref="uploader" :resource="item._id" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
+    <k-media-browser ref="mediaBrowser" />
     <k-location-map ref="locationMap" />
   </div>
 </template>
