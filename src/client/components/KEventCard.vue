@@ -32,7 +32,7 @@
       </div>
     </k-modal>
     <k-uploader ref="uploader" :resource="item._id" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
-    <k-media-browser ref="mediaBrowser" />
+    <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
     <k-location-map ref="locationMap" />
   </div>
 </template>
@@ -358,7 +358,7 @@ export default {
     },
     uploaderOptions () {
       return {
-        service: 'storage',
+        service: this.contextId + '/storage',
         acceptedFiles: 'image/*',
         multiple: true,
         maxFilesize: 10,
@@ -370,6 +370,11 @@ export default {
     uploaderQuery () {
       return {
         notification: this.$t('KEventNotifications.UPDATE_MEDIA')
+      }
+    },
+    mediaBrowserOptions () {
+      return {
+        service: this.contextId + '/storage'
       }
     }
   },
