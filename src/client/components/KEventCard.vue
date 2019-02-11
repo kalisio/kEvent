@@ -175,12 +175,10 @@ export default {
           })
         }
       }
-      if (this.$can('update', 'events', this.contextId, this.item)) {
+      if (this.$can('read', 'events', this.contextId, this.item)) {
         this.registerPaneAction({
           name: 'add-media', label: this.$t('KEventCard.ADD_MEDIA_LABEL'), icon: 'add_a_photo', handler: this.uploadMedia
         })
-      }
-      if (this.$can('read', 'events', this.contextId, this.item)) {
         this.registerPaneAction({
           name: 'browse-media', label: this.$t('KEventCard.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
         })
