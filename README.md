@@ -4,10 +4,10 @@
 [![Code Climate](https://codeclimate.com/github/kalisio/kEvent/badges/gpa.svg)](https://codeclimate.com/github/kalisio/kEvent)
 [![Test Coverage](https://codeclimate.com/github/kalisio/kEvent/badges/coverage.svg)](https://codeclimate.com/github/kalisio/kEvent/coverage)
 [![Dependency Status](https://img.shields.io/david/kalisio/kEvent.svg?style=flat-square)](https://david-dm.org/kalisio/kEvent)
-[![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://kalisio.gitbooks.io/kalisio/api)
+[![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://kalisio.github.io/kdk/)
 [![Known Vulnerabilities](https://snyk.io/test/github/kalisio/kEvent/badge.svg)](https://snyk.io/test/github/kalisio/kEvent)
 
-> Basic utils to support event management for Kalisio applications and services
+> Basic utils to support event management for KDK-based applications and services
 
 ## Installation
 
@@ -19,7 +19,7 @@ yarn add @kalisio/kdk-event
 
 ## Documentation
 
-The [kDocs](https://kalisio.gitbooks.io/kalisio/) are loaded with awesome stuff and tell you everything you need to know about using and configuring it.
+The [kDocs](https://kalisio.github.io/kdk/) are loaded with awesome stuff and tell you everything you need to know about using and configuring it.
 
 ## License
 
