@@ -65,7 +65,6 @@ export default {
     kCoreMixins.baseCollection,
     kMapMixins.map.baseMap,
     kMapMixins.map.geojsonLayers,
-    kMapMixins.map.collectionLayer,
     mixins.eventLogs
   ],
   props: {
@@ -137,7 +136,7 @@ export default {
           icon: L.icon.fontAwesome({
             iconClasses: 'fa ' + this.event.icon.name || 'fa-circle',
             markerColor: kCoreUtils.Colors[this.event.icon.color || 'blue'],
-            iconColor: '#FFF'
+            iconColor: '#FFFFFF'
           })
         })
         // Address as popup
@@ -178,19 +177,6 @@ export default {
     browseMedia () {
       this.$refs.mediaBrowser.open(this.event.attachments)
     },
-    getPointMarker (feature, latlng) {
-      const icon = feature.icon // this.getIcon(feature, this.getWorkflowStep(feature))
-      return this.createMarkerFromStyle(latlng, {
-        icon: {
-          type: 'icon.fontAwesome',
-          options: {
-            iconClasses: 'fa ' + (icon.name || 'fa-user'),
-            markerColor: kCoreUtils.Colors[(icon.color || 'blue')],
-            iconColor: '#FFF'
-          }
-        }
-      })
-    },
     filterItem (item) {
       // Is there any filter active ?
       if (!this.filter) return true
@@ -207,7 +193,24 @@ export default {
       }
       return true
     },
-    getFeaturePopup (feature, layer) {
+    refreshActorsLayer (name) {
+      const filteredItems = _.filter(this.items, (item) => this.filterItem(item))
+      this.updateLayer('Actors', { type: 'FeatureCollection', features: filteredItems })
+    },
+    getActorMarker (feature, latlng) {
+      const icon = feature.icon // this.getIcon(feature, this.getWorkflowStep(feature))
+      return this.createMarkerFromStyle(latlng, {
+        icon: {
+          type: 'icon.fontAwesome',
+          options: {
+            iconClasses: 'fa ' + (icon.name || 'fa-user'),
+            markerColor: kCoreUtils.Colors[(icon.color || 'blue')],
+            iconColor: '#FFFFFF'
+          }
+        }
+      })
+    },
+    getActorPopup (feature, layer) {
       let popup = L.popup({ autoPan: false }, layer)
       const step = this.getWorkflowStep(feature)
       // Check for any recorded interaction to be displayed
@@ -229,7 +232,7 @@ export default {
         return null
       }
     },
-    getFeatureTooltip (feature, layer) {
+    getActorTooltip (feature, layer) {
       // Default content is participant name
       let tooltip = L.tooltip({ permanent: true }, layer)
       const step = this.getWorkflowStep(feature)
@@ -270,10 +273,13 @@ export default {
       if (this.canFollowUp(feature)) this.doFollowUp(feature._id)
     },
     onZoomClicked (actor) {
-      this.collectionLayer.eachLayer(layer => {
-        if (layer.feature && layer.feature._id === actor._id) {
-          let feature = layer.feature
-          if (feature.geometry && feature.geometry.coordinates) this.center(feature.geometry.coordinates[0], feature.geometry.coordinates[1])
+      const layer = this.getLeafletLayerByName('Actors')
+      if (!layer) return
+      layer.eachLayer(layer => {
+        const id = _.get(layer, 'feature._id')
+        if (id === actor._id) {
+          const coordinates = _.get(layer, 'feature.geometry.coordinates')
+          if (coordinates) this.center(coordinates[0], coordinates[1])
         }
       })
     },
@@ -296,14 +302,14 @@ export default {
       } else {
         this.filter = null
       }
-      this.refreshLayer()
+      this.refreshActorsLayer()
     },
     onCollectionRefreshed () {
       this.items.forEach((item) => {
         item.icon = this.getIcon(item, this.getWorkflowStep(item) || {}) // Will default to evnt icon when no workflow
         item.comment = this.getComment(item)
       })
-      this.refreshLayer()
+      this.refreshActorsLayer()
       if (this.items.length < this.nbTotalItems) {
         Events.$emit('error', new Error(this.$t('errors.EVENT_LOG_LIMIT')))
       }
@@ -323,7 +329,7 @@ export default {
     uploaderOptions () {
       return {
         service: 'storage',
-        acceptedFiles: 'image/*',
+        acceptedFiles: 'image/*,application/pdf',
         multiple: true,
         maxFilesize: 10,
         autoProcessQueue: true,
@@ -344,23 +350,34 @@ export default {
     this.$options.components['k-media-browser'] = this.$load('media/KMediaBrowser')
     // Enable the observers in order to refresh the layout
     this.observe = true
+    this.registerLeafletStyle('tooltip', this.getActorTooltip)
+    this.registerLeafletStyle('popup', this.getActorPopup)
+    this.registerLeafletStyle('markerStyle', this.getActorMarker)
   },
   async mounted () {
-    this.setupMap('map', { maxZoom: 18 })
-    this.addCollectionLayer('Actors', { spiderfyDistanceMultiplier: 5.0 })
+    this.setupMap('map')
+    // Create an empty layer used as a container
+    this.addLayer({ name: 'Actors', type: 'OverlayLayer',
+      leaflet: {
+        type: 'geoJson',
+        realtime: true,
+        isVisible: true,
+        cluster: { spiderfyDistanceMultiplier: 5.0 }
+      }
+    })
     // Setup event connections
     // this.$on('popupopen', this.onPopupOpen)
     this.$on('click', this.onFeatureClicked)
     this.$on('collection-refreshed', this.onCollectionRefreshed)
     const catalogService = this.$api.getService('catalog')
-      // Get first visible base layer
-      let response = await catalogService.find({ query: { type: 'BaseLayer', 'leaflet.isVisible': true } })
-      if (response.data.length > 0) this.addLayer(response.data[0])
+    // Get first visible base layer
+    let response = await catalogService.find({ query: { type: 'BaseLayer', 'leaflet.isVisible': true } })
+    if (response.data.length > 0) this.addLayer(response.data[0])
   },
   beforeDestroy () {
     // No need to refresh the layout when leaving the component
     this.observe = false
-    this.removeCollectionLayer('Actors')
+    this.removeLayer('Actors')
     // Remove event connections
     // this.$off('popupopen', this.onPopupOpen)
     this.$off('click', this.onFeatureClicked)
