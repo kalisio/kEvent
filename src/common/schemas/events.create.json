@@ -124,7 +124,7 @@
         "component": "form/KAttachmentField",
         "helper": "schemas.EVENTS_ATTACHMENTS_FIELD_HELPER",
         "service": "storage",
-        "acceptedFiles": "image/*",
+        "acceptedFiles": "image/*,application/pdf",
         "multiple": true,
         "maxFilesize": 10,
         "autoProcessQueue": false,

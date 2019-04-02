@@ -360,7 +360,7 @@ export default {
     uploaderOptions () {
       return {
         service: this.contextId + '/storage',
-        acceptedFiles: 'image/*',
+        acceptedFiles: 'image/*,application/pdf',
         multiple: true,
         maxFilesize: 10,
         autoProcessQueue: true,
