@@ -339,9 +339,6 @@ export default {
       }
     },
     refresh (error) {
-      // We force a refresh anyway in case of geolocation error
-      if (error && !(error instanceof errors.KPositionError)) return
-
       this.refreshUser()
       if (this.userId) {
         // Update content according to user role
@@ -391,16 +388,11 @@ export default {
     // Required alias for the event logs mixin
     this.event = this.item
     // Set the required actor
-    // Because we can have multiple cards we need a listener per card
-    // to have appropriate this binding
-    this.refreshOnGeolocation = _ => this.refresh()
-    if (this.$store.get('user.position')) this.refreshOnGeolocation()
-    Events.$on('user-position-changed', this.refreshOnGeolocation)
-    Events.$on('error', this.refreshOnGeolocation)
+    if (this.$store.get('user')) this.refresh()
+    Events.$on('user-changed', this.refresh)
   },
   beforeDestroy () {
-    Events.$off('user-position-changed', this.refreshOnGeolocation)
-    Events.$off('error', this.refreshOnGeolocation)
+    Events.$off('user-changed', this.refresh)
     this.unsubscribeParticipantLog()
     this.unsubscribeCoordinatorLog()
   }
