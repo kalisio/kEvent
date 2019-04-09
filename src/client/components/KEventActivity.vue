@@ -304,6 +304,10 @@ export default {
       }
       this.refreshActorsLayer()
     },
+    getCollectionPaginationQuery () {
+      // No pagination on map items
+      return {}
+    },
     onCollectionRefreshed () {
       this.items.forEach((item) => {
         item.icon = this.getIcon(item, this.getWorkflowStep(item) || {}) // Will default to evnt icon when no workflow
