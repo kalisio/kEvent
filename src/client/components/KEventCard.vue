@@ -42,7 +42,6 @@ import _ from 'lodash'
 import { Events, QIcon, QCardSeparator, Dialog } from 'quasar'
 import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
-import { errors } from '@kalisio/kdk-map/common'
 import mixins from '../mixins'
 
 export default {
@@ -338,7 +337,7 @@ export default {
         this.coordinatorLogListener = null
       }
     },
-    refresh (error) {
+    refresh () {
       this.refreshUser()
       if (this.userId) {
         // Update content according to user role
