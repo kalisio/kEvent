@@ -13,7 +13,7 @@
       }
     },
     "description": {
-      "type": "string", 
+      "type": "string",
       "field": {
         "component": "form/KTextareaField",
         "helper": "schemas.EVENTS_DESCRIPTION_FIELD_HELPER"
@@ -21,6 +21,7 @@
     },
     "location": {
       "type": "object", 
+      "draggable": true,
       "field": {
         "component": "KLocationField",
         "helper": "schemas.EVENTS_LOCATION_FIELD_HELPER"

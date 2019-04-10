@@ -22,6 +22,7 @@
     },
     "location": {
       "type": "object", 
+      "draggable": true,
       "field": {
         "component": "KLocationField",
         "helper": "schemas.EVENTS_LOCATION_FIELD_HELPER"
