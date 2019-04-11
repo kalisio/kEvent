@@ -24,6 +24,7 @@
     "EVENT_WORKFLOW_STAKEHOLDER_FIELD_HELPER": "Select the stakeholder",
     "EVENT_WORKFLOW_PARTICIPANT_LABEL": "Participant",
     "EVENT_WORKFLOW_COORDINATOR_LABEL": "Coordinator",
+    "EVENTS_ADVANCED_SETTINGS": "Advanced settings",
     "EVENTS_CREATE_TITLE": "Create a new event ?",
     "EVENTS_NAME_FIELD_HELPER": "Enter the name of this event",
     "EVENTS_DESCRIPTION_FIELD_HELPER": "Enter a description of this event",

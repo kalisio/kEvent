@@ -30,6 +30,7 @@
     },
     "expireAt": {
       "type": "string", 
+      "group": "schemas.EVENTS_ADVANCED_SETTINGS",
       "format": "date-time",
       "field": {
         "component": "form/KDatetimeField",
@@ -122,6 +123,7 @@
     },
     "notification": {
       "type": "boolean",
+      "group": "schemas.EVENTS_ADVANCED_SETTINGS",
       "default": true,
       "field": {
         "component": "form/KToggleField",

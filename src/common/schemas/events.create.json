@@ -28,7 +28,8 @@
       }
     },
     "expireAt": {
-      "type": "string", 
+      "type": "string",
+      "group": "schemas.EVENTS_ADVANCED_SETTINGS",
       "format": "date-time",
       "field": {
         "component": "form/KDatetimeField",
@@ -121,6 +122,7 @@
     },
     "attachments": { 
       "type": "array",
+      "group": "schemas.EVENTS_ADVANCED_SETTINGS",
       "field": {
         "component": "form/KAttachmentField",
         "helper": "schemas.EVENTS_ATTACHMENTS_FIELD_HELPER",
@@ -135,6 +137,7 @@
     },
     "hasWorkflow": {
       "type": "boolean", 
+      "group": "schemas.EVENTS_ADVANCED_SETTINGS",
       "default": true,
       "field": {
         "component": "form/KToggleField",
@@ -144,6 +147,7 @@
     },
     "notification": {
       "type": "boolean",
+      "group": "schemas.EVENTS_ADVANCED_SETTINGS",
       "default": true,
       "field": {
         "component": "form/KToggleField",
