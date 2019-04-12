@@ -28,7 +28,7 @@
     "node": ">= 4.6.0"
   },
   "scripts": {
-    "prepublish": "npm run compile",
+    "prepublish": "npm run snyk-protect; npm run compile",
     "publish": "git push origin --tags && npm run changelog && git push origin",
     "release:patch": "npm version patch && npm publish --access=public",
     "release:minor": "npm version minor && npm publish --access=public",
@@ -42,7 +42,8 @@
     "mocha": "cross-env NODE_CONFIG_DIR=./test/config/ mocha --opts mocha.opts",
     "coverage": "cross-env NODE_CONFIG_DIR=./test/config/ node node_modules/istanbul/lib/cli cover node_modules/mocha/bin/_mocha -- --opts mocha.opts",
     "test": "npm run compile && npm run lint && npm run coverage",
-    "start": "npm run compile && node lib"
+    "start": "npm run compile && node lib",
+    "snyk-protect": "snyk protect"
   },
   "standard": {
     "parser": "babel-eslint",
@@ -75,7 +76,8 @@
     "quasar-framework": "0.14.7",
     "vue": "2.5.17",
     "vue-avatar": "^2.1.1",
-    "winston": "2.3.1"
+    "winston": "2.3.1",
+    "snyk": "^1.150.0"
   },
   "devDependencies": {
     "@kalisio/kdk-notify": "^1.0.0",
@@ -106,5 +108,6 @@
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "2.5.2"
   },
-  "peerDependencies": {}
+  "peerDependencies": {},
+  "snyk": true
 }
