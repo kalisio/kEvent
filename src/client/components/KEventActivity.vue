@@ -362,6 +362,7 @@ export default {
     this.setupMap('map')
     // Create an empty layer used as a container
     this.addLayer({ name: 'Actors', type: 'OverlayLayer',
+      featureId: '_id',
       leaflet: {
         type: 'geoJson',
         realtime: true,
