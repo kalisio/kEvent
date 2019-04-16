@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-06/schema#",
   "$id": "http://www.kalisio.xyz/schemas/events.update.json#",
-  "title": "<%= object.name %>",
+  "title": "schemas.OBJECT_NAME",
   "description": "Event update schema",
   "type": "object",
   "properties": {
@@ -22,6 +22,7 @@
     },
     "location": {
       "type": "object", 
+      "draggable": true,
       "field": {
         "component": "KLocationField",
         "helper": "schemas.EVENTS_LOCATION_FIELD_HELPER"
@@ -29,6 +30,7 @@
     },
     "expireAt": {
       "type": "string", 
+      "group": "schemas.EVENTS_ADVANCED_SETTINGS",
       "format": "date-time",
       "field": {
         "component": "form/KDatetimeField",
@@ -121,6 +123,7 @@
     },
     "notification": {
       "type": "boolean",
+      "group": "schemas.EVENTS_ADVANCED_SETTINGS",
       "default": true,
       "field": {
         "component": "form/KToggleField",

@@ -21,7 +21,7 @@
 <script>
 import { QList, QItem, QItemMain, QItemSide, QItemSeparator } from 'quasar'
 import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
-import { mixins as kMapMixins } from '@kalisio/kdk-map/client'
+import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 import { Avatar } from 'vue-avatar'
 
 export default {

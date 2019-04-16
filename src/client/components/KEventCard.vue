@@ -31,8 +31,8 @@
         <k-form ref="form" :schema="schema"/>
       </div>
     </k-modal>
-    <k-uploader ref="uploader" :contextId="contextId" :resource="item._id" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
-    <k-media-browser ref="mediaBrowser" :contextId="contextId" />
+    <k-uploader ref="uploader" :resource="item._id" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
+    <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
     <k-location-map ref="locationMap" />
   </div>
 </template>
@@ -41,8 +41,7 @@
 import _ from 'lodash'
 import { Events, QIcon, QCardSeparator, Dialog } from 'quasar'
 import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
-import { mixins as kMapMixins } from '@kalisio/kdk-map/client'
-import { errors } from '@kalisio/kdk-map/common'
+import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 import mixins from '../mixins'
 
 export default {
@@ -214,13 +213,14 @@ export default {
         message: this.$t('KEventCard.REMOVE_DIALOG_TITLE', { event: event.name }),
         buttons: [
           {
-            label: 'Ok',
+            label: this.$t('OK'),
             handler: () => {
               let eventsService = this.$api.getService('events', this.contextId)
               eventsService.remove(event._id, { query: { notification: this.$t('KEventNotifications.REMOVE') } })
             }
-          },
-          'Cancel'
+          }, {
+            label: this.$t('CANCEL')
+          }
         ]
       })
     },
@@ -337,10 +337,7 @@ export default {
         this.coordinatorLogListener = null
       }
     },
-    refresh (error) {
-      // We force a refresh anyway in case of geolocation error
-      if (error && !(error instanceof errors.KPositionError)) return
-
+    refresh () {
       this.refreshUser()
       if (this.userId) {
         // Update content according to user role
@@ -358,8 +355,8 @@ export default {
     },
     uploaderOptions () {
       return {
-        service: 'storage',
-        acceptedFiles: 'image/*',
+        service: this.contextId + '/storage',
+        acceptedFiles: 'image/*,application/pdf',
         multiple: true,
         maxFilesize: 10,
         autoProcessQueue: true,
@@ -370,6 +367,11 @@ export default {
     uploaderQuery () {
       return {
         notification: this.$t('KEventNotifications.UPDATE_MEDIA')
+      }
+    },
+    mediaBrowserOptions () {
+      return {
+        service: this.contextId + '/storage'
       }
     }
   },
@@ -385,16 +387,11 @@ export default {
     // Required alias for the event logs mixin
     this.event = this.item
     // Set the required actor
-    // Because we can have multiple cards we need a listener per card
-    // to have appropriate this binding
-    this.refreshOnGeolocation = _ => this.refresh()
-    if (this.$store.get('user.position')) this.refreshOnGeolocation()
-    Events.$on('user-position-changed', this.refreshOnGeolocation)
-    Events.$on('error', this.refreshOnGeolocation)
+    if (this.$store.get('user')) this.refresh()
+    Events.$on('user-changed', this.refresh)
   },
   beforeDestroy () {
-    Events.$off('user-position-changed', this.refreshOnGeolocation)
-    Events.$off('error', this.refreshOnGeolocation)
+    Events.$off('user-changed', this.refresh)
     this.unsubscribeParticipantLog()
     this.unsubscribeCoordinatorLog()
   }

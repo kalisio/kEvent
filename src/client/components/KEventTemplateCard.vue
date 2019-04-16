@@ -51,13 +51,14 @@ export default {
         message: this.$t('KEventTemplateCard.REMOVE_DIALOG_MESSAGE', { template: template.name }),
         buttons: [
           {
-            label: 'Ok',
+            label: this.$t('OK'),
             handler: () => {
               let eventTemplatesService = this.$api.getService('event-templates')
               eventTemplatesService.remove(template._id)
             }
-          },
-          'Cancel'
+          }, {
+            label: this.$t('CANCEL')
+          }
         ]
       })
     }
