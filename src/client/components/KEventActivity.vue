@@ -32,8 +32,8 @@
           </div>
         </div>
       </div>
-      <k-uploader ref="uploader" :contextId="contextId" :resource="objectId" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
-      <k-media-browser ref="mediaBrowser" :contextId="contextId"/>
+      <k-uploader ref="uploader" :resource="objectId" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
+      <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
       <div>
         <router-view service="events" :router="router()"></router-view>
       </div>
@@ -329,22 +329,6 @@ export default {
     onMapResized (size) {
       // Avoid to refresh the layout when leaving the component
       if (this.observe) this.refreshMap()
-    },
-    uploaderOptions () {
-      return {
-        service: 'storage',
-        acceptedFiles: 'image/*,application/pdf',
-        multiple: true,
-        maxFilesize: 10,
-        autoProcessQueue: true,
-        resourcesService: 'events',
-        storagePath: '<%= id %>/<%= file.name %>'
-      }
-    },
-    uploaderQuery () {
-      return {
-        notification: this.$t('KEventNotifications.UPDATE_MEDIA')
-      }
     }
   },
   created () {

@@ -178,6 +178,27 @@ let eventsMixin = {
         this.isParticipant = this.hasRoleInEvent(user, this.event.participants)
         this.isCoordinator = this.hasRoleInEvent(user, this.event.coordinators)
       }
+    },
+    uploaderOptions () {
+      return {
+        service: this.contextId + '/storage',
+        acceptedFiles: 'image/*,application/pdf',
+        multiple: true,
+        maxFilesize: 10,
+        autoProcessQueue: true,
+        resourcesService: 'events',
+        storagePath: '<%= id %>/<%= file.name %>'
+      }
+    },
+    uploaderQuery () {
+      return {
+        notification: this.$t('KEventNotifications.UPDATE_MEDIA')
+      }
+    },
+    mediaBrowserOptions () {
+      return {
+        service: this.contextId + '/storage'
+      }
     }
   }
 }

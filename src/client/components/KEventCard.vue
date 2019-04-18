@@ -352,27 +352,6 @@ export default {
     async logParticipantState (event, done) {
       await this.logStep(this.$refs.form, this.participantStep, this.participantState)
       done()
-    },
-    uploaderOptions () {
-      return {
-        service: this.contextId + '/storage',
-        acceptedFiles: 'image/*,application/pdf',
-        multiple: true,
-        maxFilesize: 10,
-        autoProcessQueue: true,
-        resourcesService: 'events',
-        storagePath: '<%= id %>/<%= file.name %>'
-      }
-    },
-    uploaderQuery () {
-      return {
-        notification: this.$t('KEventNotifications.UPDATE_MEDIA')
-      }
-    },
-    mediaBrowserOptions () {
-      return {
-        service: this.contextId + '/storage'
-      }
     }
   },
   created () {
