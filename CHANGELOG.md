@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.1.1](https://github.com/kalisio/kEvent/tree/v1.1.1) (2019-05-14)
+
+[Full Changelog](https://github.com/kalisio/kEvent/compare/v1.1.0...v1.1.1)
+
 ## [v1.1.0](https://github.com/kalisio/kEvent/tree/v1.1.0) (2019-04-18)
 
 [Full Changelog](https://github.com/kalisio/kEvent/compare/v1.0.4...v1.1.0)
