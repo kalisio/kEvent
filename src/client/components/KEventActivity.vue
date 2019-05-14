@@ -267,7 +267,7 @@ export default {
       if (!feature) return
       if (this.canFollowUp(feature)) this.doFollowUp(feature._id)
     },
-    onFeatureClicked (event) {
+    onFeatureClicked (options, event) {
       const feature = _.get(event, 'target.feature')
       if (!feature) return
       if (this.canFollowUp(feature)) this.doFollowUp(feature._id)
