@@ -2,6 +2,10 @@
 
 ## [v1.1.1](https://github.com/kalisio/kEvent/tree/v1.1.1) (2019-05-14)
 
+**Fixed bugs:**
+
+- Can't change actor states by picking markers in the event activity [\#58](https://github.com/kalisio/kEvent/issues/58)
+
 [Full Changelog](https://github.com/kalisio/kEvent/compare/v1.1.0...v1.1.1)
 
 ## [v1.1.0](https://github.com/kalisio/kEvent/tree/v1.1.0) (2019-04-18)
