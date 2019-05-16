@@ -65,6 +65,9 @@ export default {
     kCoreMixins.baseCollection,
     kMapMixins.map.baseMap,
     kMapMixins.map.geojsonLayers,
+    kMapMixins.map.style,
+    kMapMixins.map.tooltip,
+    kMapMixins.map.popup,
     mixins.eventLogs
   ],
   props: {
