@@ -9,6 +9,7 @@
 <script>
 import _ from 'lodash'
 import { mixins } from '@kalisio/kdk-core/client'
+import { utils } from '@kalisio/kdk-map/client'
 
 const editorMixin = mixins.baseEditor(['eventForm'])
 
@@ -23,6 +24,10 @@ export default {
   ],
   props: {
     templateId: {
+      type: String,
+      default: ''
+    },
+    featureId: {
       type: String,
       default: ''
     }
@@ -40,7 +45,7 @@ export default {
         { name: 'close-action', label: this.$t('KEventEditor.CLOSE_ACTION'), icon: 'close', handler: () => this.doClose() }
       ]
     },
-    loadObject () {
+    async loadObject () {
       // When a template is provided use it as reference for object
       if (this.template) {
         this._object = Object.assign({}, this.template)
@@ -48,6 +53,15 @@ export default {
         delete this._object._id
         // Setup hasWorkflow tag
         this._object.hasWorkflow = !_.isNil(this.template.workflow)
+        // Perform reverse geocoding if we target a feature
+        if (this.featureId) {
+          const feature = await this.$api.getService('features').get(this.featureId)
+          const results = await this.$api.getService('geocoder').create(feature)
+          if (results.length > 0) {
+            let element = results[0]
+            this._object.location = Object.assign(element, { name: utils.formatGeocodingResult(element) })
+          }
+        }
       } else {
         // Otherwise proceed as usual to load the event object
         return mixins.objectProxy.methods.loadObject.call(this)
@@ -98,20 +112,15 @@ export default {
       this.$refs.modal.close(() => this.$router.push({ name: 'events-activity' }))
     }
   },
-  created () {
+  async created () {
     // Load the required components
     this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-form'] = this.$load('form/KForm')
-    // On creation wait for template first
+    // On creation wait for template/feature first
     if (this.templateId) {
-      this.$api.getService('event-templates').get(this.templateId)
-      .then(template => {
-        this.template = template
-        this.refresh()
-      })
-    } else {
-      this.refresh()
+      this.template = await this.$api.getService('event-templates').get(this.templateId)
     }
+    this.refresh()
     this.$on('applied', this.doClose)
   },
   beforeDestroy () {
