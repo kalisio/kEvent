@@ -61,7 +61,6 @@
 <script>
 import _ from 'lodash'
 import L from 'leaflet'
-import moment from 'moment'
 import { Events, QResizeObservable, QFixedPosition, QBtn, QIcon } from 'quasar'
 import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
