@@ -93,24 +93,15 @@ export default {
     }
 
   },
-  created () {
+  async created () {
     // Load the required components
     this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-form'] = this.$load('form/KForm')
     // Retrieve source log/event
-    /* this.state = await this.loadService().get(this.logId)
+    this.state = await this.loadService().get(this.logId)
     this.event = await this.$api.getService('events', this.contextId).get(this.objectId)
-    */
-    this.loadService().get(this.logId)
-    .then(state => {
-      this.state = state
-      return this.$api.getService('events', this.contextId).get(this.objectId)
-    })
-    .then(event => {
-      this.event = event
-      this.step = this.getWorkflowStep(this.state)
-      this.refresh()
-    })
+    this.step = this.getWorkflowStep(this.state)
+    this.refresh()
   }
 }
 </script>

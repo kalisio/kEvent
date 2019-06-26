@@ -47,7 +47,11 @@
     "HIDE_PANE_LABEL": "Cacher le volet participants",
     "ACTION_REQUIRED": "Action requise",
     "AWAITING_INFORMATION": "En attente d'information",
-    "UNAMED": "Sans nom"
+    "UNAMED": "Sans nom",
+    "PARTICIPANTS_LAYER_NAME": "Participants"
+  },
+  "KEventActivityPanel": {
+    "PARTICIPANTS_LABEL": "Participants"
   },
   "KEventsActivity": {
     "EVENTS_LABEL": "$t(EVENTS_LABEL)",

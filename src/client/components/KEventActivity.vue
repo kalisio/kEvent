@@ -1,42 +1,59 @@
 <template>
   <div>
-    <q-window-resize-observable @resize="onWindowResized" />
-    <div v-if="objectId !== ''" class="column justify-center full-width">
-      <div class="row full-width">
-        <div class="col-3 full-height" v-if="pane">
-          <q-scroll-area :style="paneStyle">
-            <template v-for="actor in filteredItems">
-              <div class="row justify-between no-wrap" style="overflow: auto" :key="actor._id">
-                <div class="col-auto self-center">
-                  <q-btn v-if="actor.icon" flat round small color="primary" @click="onStateClicked(actor)">
-                    <q-icon :name="actor.icon.name"  :color="actor.icon.color" />
-                  </q-btn>
-                  {{actor.participant.name}}
-                </div>
-                <k-text-area v-if="actor.comment" style="flex-shrink: 0" class="col-auto light-paragraph self-center" :length="20" :text="actor.comment" />
-                <div class="col-auto self-center">
-                  <q-btn v-if="canFollowUp(actor)" flat round small color="primary" @click="onFollowUpClicked(actor)">
-                    <q-icon name="message" color="red" />
-                  </q-btn>
-                  <q-btn flat round small color="primary" @click="onZoomClicked(actor)">
-                    <q-icon name="remove_red_eye" />
-                  </q-btn>
-                </div>
-              </div>
-            </template>
-          </q-scroll-area>
-        </div>      
-        <div class="col-auto full-height">
-          <div id="map" :style="mapStyle">
-            <q-resize-observable @resize="onMapResized" />
-          </div>
+    <div ref="map" :style="viewStyle">
+      <q-resize-observable @resize="onMapResized" />
+      <k-widget ref="timeseriesWidget" :offset="{ minimized: [18,18], maximized: [0,0] }" :title="probedLocationName" @state-changed="onUpdateTimeseries">
+        <div slot="widget-content">
+          <k-location-time-series ref="timeseries"
+            :feature="probedLocation" 
+            :variables="variables"
+            :current-time-format="currentTimeFormat"
+            :current-formatted-time="currentFormattedTime" />
         </div>
-      </div>
-      <k-uploader ref="uploader" :resource="objectId" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
-      <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
-      <div>
-        <router-view service="events" :router="router()"></router-view>
-      </div>
+      </k-widget>
+    </div>
+    <q-btn 
+      id="map-panel-toggle"
+      color="secondary"
+      class="fixed"
+      style="right: 18px; top: 72px"
+      small
+      round 
+      icon="layers"
+      @click="layout.toggleRight()" />
+    <k-uploader ref="uploader" :resource="objectId" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
+    <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
+    <k-color-legend v-if="colorLegend.visible"
+      class="fixed"
+      :style="colorLegendStyle"
+      :unit="colorLegend.unit"
+      :hint="colorLegend.hint"
+      :colorMap="colorLegend.colorMap"
+      :colors="colorLegend.colors"
+      :values="colorLegend.values"
+      :unitValues="colorLegend.unitValues"
+      :showGradient="colorLegend.showGradient"
+      @click="onColorLegendClick" />
+    />
+
+    <q-fixed-position corner="bottom-left" :offset="[110, 60]" :style="timelineContainerStyle">   
+      <k-time-controller
+        v-if="timelineEnabled"
+        :key="timelineRefreshKey"
+        :min="timeline.start" 
+        :max="timeline.end"
+        :step="'h'"
+        :value="timeline.current"
+        :timeInterval="timelineInterval"
+        :timeFormatter="timelineFormatter"
+        @change="onTimelineUpdated"
+        pointerColor="#8bc34a" 
+        pointerTextColor="white"
+        style="width: 100%;"
+      />
+    </q-fixed-position>
+    <div>
+      <router-view service="events" :router="router()"></router-view>
     </div>
   </div>
 </template>
@@ -44,30 +61,42 @@
 <script>
 import _ from 'lodash'
 import L from 'leaflet'
-import { Events, QWindowResizeObservable, QResizeObservable, QScrollArea, QBtn, QIcon, dom } from 'quasar'
+import moment from 'moment'
+import { Events, QResizeObservable, QFixedPosition, QBtn, QIcon } from 'quasar'
 import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 import mixins from '../mixins'
 
-const { offset } = dom
+const activityMixin = kMapMixins.activity('event')
 
 export default {
   name: 'k-event-activity',
+  inject: ['layout'],
   components: {
-    QWindowResizeObservable,
     QResizeObservable,
-    QScrollArea,
+    QFixedPosition,
     QBtn,
     QIcon
   },
   mixins: [
+    kCoreMixins.refsResolver(['map']),
     kCoreMixins.baseActivity,
     kCoreMixins.baseCollection,
+    kMapMixins.featureService,
+    kMapMixins.weacast,
+    kMapMixins.time,
+    kMapMixins.timeline,
+    kMapMixins.timeseries,
+    activityMixin,
+    kMapMixins.legend,
+    kMapMixins.locationIndicator,
     kMapMixins.map.baseMap,
     kMapMixins.map.geojsonLayers,
+    kMapMixins.map.forecastLayers,
     kMapMixins.map.style,
     kMapMixins.map.tooltip,
     kMapMixins.map.popup,
+    kMapMixins.map.activity,
     mixins.eventLogs
   ],
   props: {
@@ -80,38 +109,11 @@ export default {
       required: true
     }
   },
-  computed: {
-    filteredItems () {
-      return _.filter(this.items, (item) => this.filterItem(item))
-    },
-    paneStyle () {
-      return 'width: 100%; height: ' + this.viewport.height + 'px'
-    },
-    mapStyle () {
-      let width = this.pane === true ? 75 : 100
-      return 'width: ' + width + '%; height: 100%; fontWeight: normal; zIndex: 0; position: absolute'
-    }
-  },
   data () {
     return {
-      viewport: {
-        width: 0,
-        height: 0
-      },
-      mapOffset: {
-        left: 0.0,
-        top: 0
-      },
       filter: null,
-      pane: true,
-      actorRenderer: {
-        component: 'KActorCard',
-        props: {
-          options: {
-            layout: 'col-12'
-          }
-        }
-      }
+      event: {},
+      participants: []
     }
   },
   methods: {
@@ -127,30 +129,18 @@ export default {
     getCollectionBaseQuery () {
       return { lastInEvent: true, event: this.objectId }
     },
-    async refreshEvent () {
-      this.event = await this.$api.getService('events', this.contextId).get(this.objectId)
-      this.setTitle(this.event.name)
-      // Located event ?
-      if (this.event.location && this.event.location.longitude && this.event.location.latitude) {
-        // Recenter map
-        this.center(this.event.location.longitude, this.event.location.latitude, 15)
-        // And add event marker
-        let marker = L.marker([this.event.location.latitude, this.event.location.longitude], {
-          icon: L.icon.fontAwesome({
-            iconClasses: 'fa ' + this.event.icon.name || 'fa-circle',
-            markerColor: kCoreUtils.Colors[this.event.icon.color || 'blue'],
-            iconColor: '#FFFFFF'
-          })
-        })
-        // Address as popup
-        marker.bindPopup(this.event.location.name)
-        marker.addTo(this.map)
-      }
-    },
     async refreshActivity () {
       this.clearActivity()
-      await this.refreshEvent()
-      // Fab actions
+      this.event = await this.$api.getService('events', this.contextId).get(this.objectId)
+      this.setTitle(this.event.name)
+      // Setup the right pane
+      this.setRightPanelContent('KEventActivityPanel', this.$data)
+      // Wait until map is ready
+      await this.initializeMap()
+      // If we'd like to only work in real-time
+      //this.setCurrentTime(moment.utc())
+      this.registerActivityActions()
+      // Custom actions
       if (this.$can('update', 'events', this.contextId, this.event)) {
         this.registerFabAction({
           name: 'add-media', label: this.$t('KEventActivity.ADD_MEDIA_LABEL'), icon: 'add_a_photo', handler: this.uploadMedia
@@ -169,10 +159,46 @@ export default {
           route: { name: 'edit-event', params: { contextId: this.contextId, service: 'events', objectId: this.objectId } }
         })
       }
-      this.registerFabAction({
-        name: 'toggle-pane', label: this.getPaneLabel(), icon: 'toc', handler: this.togglePane
+      // Located event ?
+      if (this.event.location && this.event.location.longitude && this.event.location.latitude) {
+        // Recenter map
+        this.center(this.event.location.longitude, this.event.location.latitude, 15)
+        // And add event marker
+        let marker = L.marker([this.event.location.latitude, this.event.location.longitude], {
+          icon: L.icon.fontAwesome({
+            iconClasses: 'fa ' + this.event.icon.name || 'fa-circle',
+            markerColor: kCoreUtils.Colors[this.event.icon.color || 'blue'],
+            iconColor: '#FFFFFF'
+          })
+        })
+        // Address as popup
+        marker.bindPopup(this.event.location.name)
+        marker.addTo(this.map)
+      }
+      // Create an empty layer used as a container for participants
+      this.addLayer({
+        name: this.$t('KEventActivity.PARTICIPANTS_LAYER_NAME'),
+        type: 'OverlayLayer',
+        icon: 'fa-user',
+        featureId: 'participant._id',
+        leaflet: {
+          type: 'geoJson',
+          realtime: true,
+          isVisible: true,
+          cluster: { spiderfyDistanceMultiplier: 5.0 }
+        }
       })
+      // Then update it
       this.refreshCollection()
+    },
+    async getCatalogLayers () {
+      // We get layers coming from global catalog first
+      let response = await this.$api.getService('catalog', '').find()
+      let layers = response.data
+      // Then merge layers coming from contextual catalog by calling super
+      response = await activityMixin.methods.getCatalogLayers.call(this)
+      layers = layers.concat(response)
+      return layers
     },
     uploadMedia () {
       this.$refs.uploader.open(this.event.attachments)
@@ -196,24 +222,26 @@ export default {
       }
       return true
     },
-    refreshActorsLayer (name) {
-      const filteredItems = _.filter(this.items, (item) => this.filterItem(item))
-      this.updateLayer('Actors', { type: 'FeatureCollection', features: filteredItems })
+    refreshParticipantsLayer (name) {
+      this.participants.splice(0, this.participants.length)
+      _.filter(this.items, (item) => this.filterItem(item)).forEach(item => this.participants.push(item))
+      this.updateLayer(this.$t('KEventActivity.PARTICIPANTS_LAYER_NAME'), { type: 'FeatureCollection', features: this.participants })
     },
-    getActorMarker (feature, latlng) {
-      const icon = feature.icon // this.getIcon(feature, this.getWorkflowStep(feature))
+    getParticipantMarker (feature, latlng, options) {
+      if (options.name !== this.$t('KEventActivity.PARTICIPANTS_LAYER_NAME')) return
       return this.createMarkerFromStyle(latlng, {
         icon: {
           type: 'icon.fontAwesome',
           options: {
-            iconClasses: 'fa ' + (icon.name || 'fa-user'),
-            markerColor: kCoreUtils.Colors[(icon.color || 'blue')],
+            iconClasses: 'fa ' + _.get(feature, 'icon.name', 'fa-user'),
+            markerColor: kCoreUtils.Colors[_.get(feature, 'icon.color', 'blue')],
             iconColor: '#FFFFFF'
           }
         }
       })
     },
-    getActorPopup (feature, layer) {
+    getParticipantPopup (feature, layer, options) {
+      if (options.name !== this.$t('KEventActivity.PARTICIPANTS_LAYER_NAME')) return
       let popup = L.popup({ autoPan: false }, layer)
       const step = this.getWorkflowStep(feature)
       // Check for any recorded interaction to be displayed
@@ -235,7 +263,8 @@ export default {
         return null
       }
     },
-    getActorTooltip (feature, layer) {
+    getParticipantTooltip (feature, layer, options) {
+      if (options.name !== this.$t('KEventActivity.PARTICIPANTS_LAYER_NAME')) return
       // Default content is participant name
       let tooltip = L.tooltip({ permanent: true }, layer)
       const step = this.getWorkflowStep(feature)
@@ -249,22 +278,6 @@ export default {
         return tooltip.setContent('<b>' + name + '</b>')
       }
     },
-    getPaneLabel () {
-      return this.pane === false ? this.$t('KEventActivity.SHOW_PANE_LABEL') : this.$t('KEventActivity.HIDE_PANE_LABEL')
-    },
-    togglePane () {
-      this.pane = !this.pane
-      // Update label accordingly
-      let action = this.getAction('toggle-pane')
-      if (action) action.label = this.getPaneLabel()
-    },
-    canFollowUp (actor) {
-      const step = this.getWorkflowStep(actor)
-      return this.waitingInteraction(step, actor, 'coordinator')
-    },
-    doFollowUp (actorId) {
-      this.$router.push({ name: 'event-log', params: { logId: actorId } })
-    },
     onPopupOpen (event) {
       const feature = _.get(event, 'layer.feature')
       if (!feature) return
@@ -275,37 +288,34 @@ export default {
       if (!feature) return
       if (this.canFollowUp(feature)) this.doFollowUp(feature._id)
     },
-    onZoomClicked (actor) {
-      const layer = this.getLeafletLayerByName('Actors')
+    onZoomToParticipant (participant) {
+      const layer = this.getLeafletLayerByName(this.$t('KEventActivity.PARTICIPANTS_LAYER_NAME'))
       if (!layer) return
       layer.eachLayer(layer => {
         const id = _.get(layer, 'feature._id')
-        if (id === actor._id) {
+        if (id === participant._id) {
           const coordinates = _.get(layer, 'feature.geometry.coordinates')
           if (coordinates) this.center(coordinates[0], coordinates[1])
         }
       })
     },
-    onFollowUpClicked (actor) {
-      this.doFollowUp(actor._id)
-    },
-    onStateClicked (actor) {
-      const step = this.getWorkflowStep(actor)
+    onFilterParticipantStates (participant) {
+      const step = this.getWorkflowStep(participant)
       // Not applicable when no workflow
       if (!step) return
       // If a filter is alredy active then clear it
       if (!this.filter) {
-        // Defines the filter to the actor's state
+        // Defines the filter to the participant's state
         this.filter = {
           'step': step.name,
           'interaction': undefined
         }
-        if (actor.interaction) this.filter.interaction = actor.interaction.value
-        else if (actor.previous && actor.previous.interaction) this.filter.interaction = actor.previous.interaction.value
+        if (participant.interaction) this.filter.interaction = participant.interaction.value
+        else if (participant.previous && participant.previous.interaction) this.filter.interaction = participant.previous.interaction.value
       } else {
         this.filter = null
       }
-      this.refreshActorsLayer()
+      this.refreshParticipantsLayer()
     },
     getCollectionPaginationQuery () {
       // No pagination on map items
@@ -313,67 +323,48 @@ export default {
     },
     onCollectionRefreshed () {
       this.items.forEach((item) => {
-        item.icon = this.getIcon(item, this.getWorkflowStep(item) || {}) // Will default to evnt icon when no workflow
+        item.icon = this.getIcon(item, this.getWorkflowStep(item) || {}) // Take care when no workflow
         item.comment = this.getComment(item)
       })
-      this.refreshActorsLayer()
+      this.refreshParticipantsLayer()
       if (this.items.length < this.nbTotalItems) {
         Events.$emit('error', new Error(this.$t('errors.EVENT_LOG_LIMIT')))
       }
-    },
-    onWindowResized (size) {
-      // Avoid to refresh the layout when leaving the component
-      if (this.observe) {
-        let mapElement = document.getElementById('map')
-        this.viewport.width = size.width
-        this.viewport.height = size.height - offset(mapElement).top
-      }
-    },
-    onMapResized (size) {
-      // Avoid to refresh the layout when leaving the component
-      if (this.observe) this.refreshMap()
     }
   },
   created () {
     // Load the required components
-    this.$options.components['k-text-area'] = this.$load('frame/KTextArea')
     this.$options.components['k-uploader'] = this.$load('input/KUploader')
     this.$options.components['k-media-browser'] = this.$load('media/KMediaBrowser')
-    // Enable the observers in order to refresh the layout
-    this.observe = true
-    this.registerLeafletStyle('tooltip', this.getActorTooltip)
-    this.registerLeafletStyle('popup', this.getActorPopup)
-    this.registerLeafletStyle('markerStyle', this.getActorMarker)
+    this.registerLeafletStyle('tooltip', this.getParticipantTooltip)
+    this.registerLeafletStyle('popup', this.getParticipantPopup)
+    this.registerLeafletStyle('markerStyle', this.getParticipantMarker)
   },
-  async mounted () {
-    this.setupMap('map')
-    // Create an empty layer used as a container
-    this.addLayer({ name: 'Actors', type: 'OverlayLayer',
-      featureId: 'participant._id',
-      leaflet: {
-        type: 'geoJson',
-        realtime: true,
-        isVisible: true,
-        cluster: { spiderfyDistanceMultiplier: 5.0 }
-      }
-    })
+  mounted () {
     // Setup event connections
     // this.$on('popupopen', this.onPopupOpen)
     this.$on('click', this.onFeatureClicked)
     this.$on('collection-refreshed', this.onCollectionRefreshed)
-    const catalogService = this.$api.getService('catalog')
-    // Get first visible base layer
-    let response = await catalogService.find({ query: { type: 'BaseLayer', 'leaflet.isVisible': true } })
-    if (response.data.length > 0) this.addLayer(response.data[0])
+    // Emitted from panel
+    Events.$on('zoom-to-participant', this.onZoomToParticipant)
+    Events.$on('filter-participant-states', this.onFilterParticipantStates)
   },
   beforeDestroy () {
-    // No need to refresh the layout when leaving the component
-    this.observe = false
-    this.removeLayer('Actors')
     // Remove event connections
     // this.$off('popupopen', this.onPopupOpen)
     this.$off('click', this.onFeatureClicked)
     this.$off('collection-refreshed', this.onCollectionRefreshed)
+    Events.$off('zoom-to-participant', this.onZoomToParticipant)
+    Events.$off('filter-participant-states', this.onFilterParticipantStates)
   }
 }
 </script>
+
+<style>
+.probe-cursor {
+  cursor: crosshair;
+}
+.processing-cursor {
+  cursor: wait;
+}
+</style>

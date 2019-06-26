@@ -56,6 +56,10 @@ export default {
         // Perform reverse geocoding if we target a feature
         if (this.featureId) {
           const feature = await this.$api.getService('features').get(this.featureId)
+          const layer = await this.$api.getService('catalog').get(feature.layer)
+          let description = _.get(feature, 'name', _.get(feature, 'NAME'))
+          if (!description && layer.featureId) description = _.get(feature, `properties.${layer.featureId}`)
+          if (description) this._object.description = description
           const results = await this.$api.getService('geocoder').create(feature)
           if (results.length > 0) {
             let element = results[0]

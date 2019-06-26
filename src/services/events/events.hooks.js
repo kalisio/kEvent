@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { hooks } from '@kalisio/kdk-core'
 import { setNow, discard } from 'feathers-hooks-common'
 import { addCreatorAsCoordinator, processNotification, sendEventNotifications } from '../../hooks'
@@ -16,7 +17,27 @@ module.exports = {
 
   after: {
     all: [],
-    find: [],
+    find: [
+      (hook) => {
+        const asGeoJson = _.get(hook, 'params.query.geoJson')
+        if (!asGeoJson) return
+        let results = hook.result
+        const pagination = _.pick(results, ['total', 'skip', 'limit'])
+        results = Array.isArray(results) ? results : results.data
+        // Event locations are returned as a standard GeoJson collection
+        results = results
+        .filter(event => event.location)
+        .map(event => Object.assign({
+          type: 'Feature',
+          geometry: { coordinates: [event.location.longitude, event.location.latitude] }
+        }, event))
+        // Copy pagination information so that client can use it anyway
+        hook.result = Object.assign({
+          type: 'FeatureCollection',
+          features: results
+        }, pagination)
+      }
+    ],
     get: [],
     create: [ sendEventNotifications ],
     update: [ sendEventNotifications ],

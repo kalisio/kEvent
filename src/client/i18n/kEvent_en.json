@@ -47,7 +47,11 @@
     "HIDE_PANE_LABEL": "Hide participants pane",
     "ACTION_REQUIRED": "Action required",
     "AWAITING_INFORMATION": "Awaiting information",
-    "UNAMED": "Unamed"
+    "UNAMED": "Unamed",
+    "PARTICIPANTS_LAYER_NAME": "Participants"
+  },
+  "KEventActivityPanel": {
+    "PARTICIPANTS_LABEL": "Participants"
   },
   "KEventsActivity": {
     "EVENTS_LABEL": "$t(EVENTS_LABEL)",

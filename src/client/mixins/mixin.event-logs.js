@@ -53,6 +53,13 @@ let eventsMixin = {
         return currentStep
       }
     },
+    canFollowUp (participant) {
+      const step = this.getWorkflowStep(participant)
+      return this.waitingInteraction(step, participant, 'coordinator')
+    },
+    doFollowUp (participantId) {
+      this.$router.push({ name: 'event-log', params: { logId: participantId } })
+    },
     getIcon(state = {}, step = {}) {
       // When last step was an interaction use it as icon
       if (state.interaction) return state.interaction.icon
@@ -61,8 +68,9 @@ let eventsMixin = {
       // Otherwise use workflow icon for current step
       if (step.icon) return step.icon
       // In case of no workflow
-      if (this.event && this.event.icon) return this.event.icon
-      return {}
+      // FIXME: not sure we'd like to have the same icon for all participants in this case, should be different from event one
+      //if (this.event && this.event.icon) return this.event.icon
+      return { name: 'fa-user', color: 'blue' }
     },
     getComment(state = {}) {
       // When last step had a recorded interaction use its comment if any
