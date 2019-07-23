@@ -1,12 +1,10 @@
 <template>
   <div>
     <template v-for="org in items">
-      <q-list :key="org._id" inset-separator no-border>
+      <q-list :key="org._id" separator>
         <q-item>
-          <q-item-section><q-avatar v-if="!avatarImage" :size="40">{{org.name}} </q-avatar></q-item-section>
-          <q-item-label>
-            <span class="organisation-title">{{org.name}}</span>
-          </q-item-label>
+          <q-item-section><q-avatar color="primary" text-color="white" size="40px">{{getInitials(org)}}</q-avatar></q-item-section>
+          <q-item-section>{{org.name}}</q-item-section>
         </q-item>
         <q-item>
           <q-item-section>
@@ -19,7 +17,7 @@
 </template>
 
 <script>
-import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
+import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 
 export default {
@@ -46,6 +44,9 @@ export default {
     }
   },
   methods: {
+    getInitials (org) {
+      return kCoreUtils.getInitials(org.name)
+    },
     loadService () {
       return this.$api.getService('organisations')
     },
