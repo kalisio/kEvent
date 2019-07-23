@@ -5,7 +5,7 @@
       <div slot="card-content">
         <div v-if="location">
           {{ location }}
-          <q-card-separator class="card-separator" />
+          <q-separator class="card-separator" />
         </div>
         <div v-if="participantLabel">
           {{ participantLabel }}
@@ -13,11 +13,11 @@
         </div>
         <span v-if="comment">
           <k-text-area class="light-paragraph" :length="20" :text="comment" />
-          <q-card-separator class="card-separator" />
+          <q-separator class="card-separator" />
         </span>
         <div v-if="coordinatorLabel">
           {{ coordinatorLabel }}
-          <q-card-separator class="card-separator" />
+          <q-separator class="card-separator" />
         </div>
         <div v-if="createdAt || updatedAt">
           <cite v-if="createdAt"><small>{{$t('KEventCard.CREATED_AT_LABEL')}} {{createdAt.toLocaleString()}}</small></cite><br />
@@ -39,7 +39,7 @@
 
 <script>
 import _ from 'lodash'
-import { Events, QIcon, QCardSeparator, Dialog } from 'quasar'
+import { Dialog } from 'quasar'
 import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 import mixins from '../mixins'
@@ -54,10 +54,6 @@ export default {
     kMapMixins.navigator,
     mixins.eventLogs
   ],
-  components: {
-    QCardSeparator,
-    QIcon
-  },
   computed: {
     icon () {
       return this.getIcon(this.participantState, this.participantStep)
@@ -315,7 +311,7 @@ export default {
         this.coordinatorLabel = this.$t('KEventCard.NO_PARTICPANTS_AWAITING_LABEL')
       }
       if (logs.data.length < logs.total) {
-        Events.$emit('error', new Error(this.$t('errors.EVENT_LOG_LIMIT')))
+        this.$events.$emit('error', new Error(this.$t('errors.EVENT_LOG_LIMIT')))
       }
     },
     subscribeCoordinatorLog () {
@@ -367,10 +363,10 @@ export default {
     this.event = this.item
     // Set the required actor
     if (this.$store.get('user')) this.refresh()
-    Events.$on('user-changed', this.refresh)
+    this.$events.$on('user-changed', this.refresh)
   },
   beforeDestroy () {
-    Events.$off('user-changed', this.refresh)
+    this.$events.$off('user-changed', this.refresh)
     this.unsubscribeParticipantLog()
     this.unsubscribeCoordinatorLog()
   }

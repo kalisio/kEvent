@@ -1,7 +1,7 @@
 <template>
   <div>
     <div ref="map" :style="viewStyle">
-      <q-resize-observable @resize="onMapResized" />
+      <q-resize-observer @resize="onMapResized" />
       <k-widget ref="timeseriesWidget" :offset="{ minimized: [18,18], maximized: [0,0] }" :title="probedLocationName" @state-changed="onUpdateTimeseries">
         <div slot="widget-content">
           <k-location-time-series ref="timeseries"
@@ -36,22 +36,25 @@
       @click="onColorLegendClick" />
     />
 
-    <q-fixed-position corner="bottom-left" :offset="[110, 60]" :style="timelineContainerStyle">   
-      <k-time-controller
-        v-if="timelineEnabled"
-        :key="timelineRefreshKey"
-        :min="timeline.start" 
-        :max="timeline.end"
-        :step="'h'"
-        :value="timeline.current"
-        :timeInterval="timelineInterval"
-        :timeFormatter="timelineFormatter"
-        @change="onTimelineUpdated"
-        pointerColor="#8bc34a" 
-        pointerTextColor="white"
-        style="width: 100%;"
-      />
-    </q-fixed-position>
+    <q-page-sticky position="bottom-left" :offset="[110, 60]">
+      <div :style="timelineContainerStyle">
+        <k-time-controller
+          v-if="timelineEnabled"
+          :key="timelineRefreshKey"
+          :min="timeline.start" 
+          :max="timeline.end"
+          :step="'h'"
+          :value="timeline.current"
+          :timeInterval="timelineInterval"
+          :timeFormatter="timelineFormatter"
+          @change="onTimelineUpdated"
+          pointerColor="#8bc34a" 
+          pointerTextColor="white"
+          style="width: 100%;"
+        />
+        </k-time-controller>
+      </div>
+    </q-page-sticky>
     <div>
       <router-view service="events" :router="router()"></router-view>
     </div>
@@ -61,7 +64,6 @@
 <script>
 import _ from 'lodash'
 import L from 'leaflet'
-import { Events, QResizeObservable, QFixedPosition, QBtn, QIcon } from 'quasar'
 import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 import mixins from '../mixins'
@@ -71,12 +73,6 @@ const activityMixin = kMapMixins.activity('event')
 export default {
   name: 'k-event-activity',
   inject: ['layout'],
-  components: {
-    QResizeObservable,
-    QFixedPosition,
-    QBtn,
-    QIcon
-  },
   mixins: [
     kCoreMixins.refsResolver(['map']),
     kCoreMixins.baseActivity,
@@ -327,7 +323,7 @@ export default {
       })
       this.refreshParticipantsLayer()
       if (this.items.length < this.nbTotalItems) {
-        Events.$emit('error', new Error(this.$t('errors.EVENT_LOG_LIMIT')))
+        this.$events.$emit('error', new Error(this.$t('errors.EVENT_LOG_LIMIT')))
       }
     }
   },
@@ -345,16 +341,16 @@ export default {
     this.$on('click', this.onFeatureClicked)
     this.$on('collection-refreshed', this.onCollectionRefreshed)
     // Emitted from panel
-    Events.$on('zoom-to-participant', this.onZoomToParticipant)
-    Events.$on('filter-participant-states', this.onFilterParticipantStates)
+    this.$events.$on('zoom-to-participant', this.onZoomToParticipant)
+    this.$events.$on('filter-participant-states', this.onFilterParticipantStates)
   },
   beforeDestroy () {
     // Remove event connections
     // this.$off('popupopen', this.onPopupOpen)
     this.$off('click', this.onFeatureClicked)
     this.$off('collection-refreshed', this.onCollectionRefreshed)
-    Events.$off('zoom-to-participant', this.onZoomToParticipant)
-    Events.$off('filter-participant-states', this.onFilterParticipantStates)
+    this.$events.$off('zoom-to-participant', this.onZoomToParticipant)
+    this.$events.$off('filter-participant-states', this.onFilterParticipantStates)
   }
 }
 </script>

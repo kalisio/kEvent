@@ -40,7 +40,7 @@
 import _ from 'lodash'
 import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
 import mixins from '../mixins'
-import { QStepper, QStep, QBtn, QTooltip, Events, uid } from 'quasar'
+import { QStepper, QStep, QBtn, QTooltip, uid } from 'quasar'
 
 export default {
   name: 'k-event-workflow-form',
@@ -173,7 +173,7 @@ export default {
         return schema
       })
       .catch(error => {
-        Events.$emit('error', error)
+        this.$events.$emit('error', error)
         throw error
       })
     },

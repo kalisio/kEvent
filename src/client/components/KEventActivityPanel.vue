@@ -1,10 +1,10 @@
 <template>
   <k-layers-panel :layers="layers" :layerHandlers="layerHandlers" :categories="layerCategories" >
       <div slot="panel-footer" >
-        <q-collapsible v-if="forecastModels.length > 0" icon="fa-globe" :label="$t('KCatalogPanel.FORECASTS_LABEL')">
+        <q-expansion-item v-if="forecastModels.length > 0" icon="fa-globe" :label="$t('KCatalogPanel.FORECASTS_LABEL')">
           <k-forecast-models-selector :forecastModels="forecastModels" :forecastModelHandlers="forecastModelHandlers" :forecastModel="forecastModel" />
-        </q-collapsible>
-        <q-collapsible v-if="participants.length > 0" icon="fa-user" :label="$t('KEventActivityPanel.PARTICIPANTS_LABEL')">
+        </q-expansion-item>
+        <q-expansion-item v-if="participants.length > 0" icon="fa-user" :label="$t('KEventActivityPanel.PARTICIPANTS_LABEL')">
           <!--q-scroll-area-->
             <template v-for="participant in participants">
               <div class="row justify-between no-wrap" style="overflow: auto" :key="participant._id">
@@ -26,21 +26,18 @@
               </div>
             </template>
           <!--/q-scroll-area-->
-        </q-collapsible>
+        </q-expansion-item>
       </div>
   </k-layers-panel>
 </template>
 
 <script>
-import { Events, QBtn, QIcon, QCollapsible, QScrollArea } from 'quasar'
+import { QScrollArea } from 'quasar'
 import mixins from '../mixins'
 
 export default {
   name: 'k-event-activity-panel',
   components: {
-    QBtn,
-    QIcon, 
-    QCollapsible,
     QScrollArea
   },
   mixins: [
@@ -82,10 +79,10 @@ export default {
   },
   methods: {
     onZoomClicked (participant) {
-      Events.$emit('zoom-to-participant', participant)
+      this.$events.$emit('zoom-to-participant', participant)
     },
     onStateClicked (participant) {
-      Events.$emit('filter-participant-states', participant)
+      this.$events.$emit('filter-participant-states', participant)
     }
   },
   created () {

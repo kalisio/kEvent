@@ -3,15 +3,15 @@
     <template v-for="org in items">
       <q-list :key="org._id" inset-separator no-border>
         <q-item>
-          <q-item-side><avatar :username="org.name" :size="40" /></q-item-side>
-          <q-item-main>
+          <q-item-section><q-avatar v-if="!avatarImage" :size="40">{{org.name}} </q-avatar></q-item-section>
+          <q-item-label>
             <span class="organisation-title">{{org.name}}</span>
-          </q-item-main>
+          </q-item-label>
         </q-item>
         <q-item>
-          <q-item-main>
+          <q-item-section>
             <k-grid service="events" :renderer="renderer" :contextId="org._id" :base-query="baseQuery" :filter-query="searchQuery" :list-strategy="'smart'" />
-          </q-item-main>
+          </q-item-section>
         </q-item>
       </q-list>
     </template>
@@ -19,21 +19,11 @@
 </template>
 
 <script>
-import { QList, QItem, QItemMain, QItemSide, QItemSeparator } from 'quasar'
 import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
-import { Avatar } from 'vue-avatar'
 
 export default {
   name: 'k-event-dashboard',
-  components: {
-    QList,
-    QItem,
-    QItemMain,
-    QItemSide,
-    QItemSeparator,
-    Avatar
-  },
   mixins: [
     kCoreMixins.baseActivity,
     kCoreMixins.baseCollection,
