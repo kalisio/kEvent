@@ -1,7 +1,7 @@
 <template>
   <div>
     <k-card v-bind="$props" :itemActions="actions">
-      <q-icon slot="card-icon" :name="icon.name" :color="icon.color"></q-icon>
+      <q-icon slot="card-icon" :name="iconName" :color="iconColor"></q-icon>
       <div slot="card-content">
         <div v-if="location">
           {{ location }}
@@ -57,6 +57,14 @@ export default {
   computed: {
     icon () {
       return this.getIcon(this.participantState, this.participantStep)
+    },
+    iconColor () {
+      return _.get(this.icon, 'color', '')
+    },
+    iconName () {
+      const icon = _.get(this.icon, 'name', '')
+      // Backward compatibility with font awesome 4 icons
+      return (icon.startsWith('fa-') ? `fas ${icon}` : icon)
     },
     comment () {
       return this.getComment(this.participantState)
@@ -207,17 +215,15 @@ export default {
       Dialog.create({
         title: this.$t('KEventCard.REMOVE_DIALOG_TITLE', { event: event.name }),
         message: this.$t('KEventCard.REMOVE_DIALOG_TITLE', { event: event.name }),
-        buttons: [
-          {
-            label: this.$t('OK'),
-            handler: () => {
-              let eventsService = this.$api.getService('events', this.contextId)
-              eventsService.remove(event._id, { query: { notification: this.$t('KEventNotifications.REMOVE') } })
-            }
-          }, {
-            label: this.$t('CANCEL')
-          }
-        ]
+        ok: {
+          label: this.$t('OK'),
+        },
+        cancel: {
+          label: this.$t('CANCEL')
+        }
+      }).onOk(() => {
+        let eventsService = this.$api.getService('events', this.contextId)
+        eventsService.remove(event._id, { query: { notification: this.$t('KEventNotifications.REMOVE') } })
       })
     },
     followUp () {

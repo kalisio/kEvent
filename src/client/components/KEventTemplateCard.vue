@@ -1,10 +1,11 @@
 <template>
   <k-card v-bind="$props" :itemActions="actions">
-    <q-icon slot="card-icon" :name="icon.name" :color="icon.color"></q-icon>
+    <q-icon slot="card-icon" :name="iconName" :color="iconColor"></q-icon>
   </k-card>
 </template>
 
 <script>
+import _ from 'lodash'
 import { mixins } from '@kalisio/kdk-core/client'
 import { Dialog, QIcon } from 'quasar'
 
@@ -15,8 +16,13 @@ export default {
     QIcon
   },
   computed: {
-    icon () {
-      return this.item.icon
+    iconColor () {
+      return _.get(this.item, 'icon.color', '')
+    },
+    iconName () {
+      const icon = _.get(this.item, 'icon.name', '')
+      // Backward compatibility with font awesome 4 icons
+      return (icon.startsWith('fa-') ? `fas ${icon}` : icon)
     }
   },
   methods: {
@@ -49,17 +55,15 @@ export default {
       Dialog.create({
         title: this.$t('KEventTemplateCard.REMOVE_DIALOG_TITLE', { template: template.name }),
         message: this.$t('KEventTemplateCard.REMOVE_DIALOG_MESSAGE', { template: template.name }),
-        buttons: [
-          {
-            label: this.$t('OK'),
-            handler: () => {
-              let eventTemplatesService = this.$api.getService('event-templates')
-              eventTemplatesService.remove(template._id)
-            }
-          }, {
-            label: this.$t('CANCEL')
-          }
-        ]
+        ok: {
+          label: this.$t('OK'),
+        },
+        cancel: {
+          label: this.$t('CANCEL')
+        }
+      }).onOk(() => {
+        let eventTemplatesService = this.$api.getService('event-templates')
+        eventTemplatesService.remove(template._id)
       })
     }
   },
