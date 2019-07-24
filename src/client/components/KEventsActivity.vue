@@ -89,10 +89,12 @@ export default {
             // It is easier to access the DOM with template names, eg in tests, so we use it as action name whenever possible
             // However we have to check about duplicated names
             const doublons = templates.filter(otherTemplate => otherTemplate.name.toLowerCase() === template.name.toLowerCase())
+            const icon = template.icon.name
             this.registerFabAction({
               name: 'create-' + (doublons.length > 1 ? template._id : template.name),
               label: template.name,
-              icon: template.icon.name,
+              // Backward compatibility with fontawesome 4 icons
+              icon: (icon.startsWith('fa-') ? `fas ${icon}` : icon),
               route: { name: 'create-event', params: { contextId: this.contextId, templateId: template._id } }
             })
           })
