@@ -284,15 +284,8 @@ export default {
       if (this.canFollowUp(feature)) this.doFollowUp(feature._id)
     },
     onZoomToParticipant (participant) {
-      const layer = this.getLeafletLayerByName(this.$t('KEventActivity.PARTICIPANTS_LAYER_NAME'))
-      if (!layer) return
-      layer.eachLayer(layer => {
-        const id = _.get(layer, 'feature._id')
-        if (id === participant._id) {
-          const coordinates = _.get(layer, 'feature.geometry.coordinates')
-          if (coordinates) this.center(coordinates[0], coordinates[1])
-        }
-      })
+      const coordinates = _.get(participant, 'geometry.coordinates')
+      if (coordinates) this.center(coordinates[0], coordinates[1])
     },
     onFilterParticipantStates (participant) {
       const step = this.getWorkflowStep(participant)
