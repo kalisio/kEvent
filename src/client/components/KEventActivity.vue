@@ -20,7 +20,7 @@
       small
       round 
       icon="layers"
-      @click="layout.toggleRight()" />
+      @click="klayout.toggleRightDrawer()" />
     <k-uploader ref="uploader" :resource="objectId" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
     <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
     <k-color-legend v-if="colorLegend.visible"
@@ -72,7 +72,7 @@ const activityMixin = kMapMixins.activity('event')
 
 export default {
   name: 'k-event-activity',
-  inject: ['layout'],
+  inject: ['klayout'],
   mixins: [
     kCoreMixins.refsResolver(['map']),
     kCoreMixins.baseActivity,

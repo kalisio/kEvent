@@ -40,7 +40,7 @@
 <script>
 import _ from 'lodash'
 import { Dialog } from 'quasar'
-import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
+import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 import mixins from '../mixins'
 
@@ -62,9 +62,7 @@ export default {
       return _.get(this.icon, 'color', '')
     },
     iconName () {
-      const icon = _.get(this.icon, 'name', '')
-      // Backward compatibility with font awesome 4 icons
-      return (icon.startsWith('fa-') ? `fas ${icon}` : icon)
+      return kCoreUtils.getIconName(this)
     },
     comment () {
       return this.getComment(this.participantState)

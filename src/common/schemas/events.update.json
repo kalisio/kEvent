@@ -49,7 +49,7 @@
         "field": "profile.name",
         "subfield": "email",
         "baseQuery": {
-          "$select": ["_id", "email", "profile.name"]
+          "$select": ["_id", "profile.name", "email"]
         },
         "icon": {
           "name": "person"
@@ -58,8 +58,9 @@
       {
         "service": "groups",
         "field": "name",
+        "subfield": "description",
         "baseQuery": {
-          "$select": ["_id", "name"]
+          "$select": ["_id", "name", "description"]
         },
         "icon": {
           "name": "group_work"

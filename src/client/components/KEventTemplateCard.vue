@@ -6,12 +6,12 @@
 
 <script>
 import _ from 'lodash'
-import { mixins } from '@kalisio/kdk-core/client'
+import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import { Dialog, QIcon } from 'quasar'
 
 export default {
   name: 'k-event-template-card',
-  mixins: [ mixins.baseItem ],
+  mixins: [ kCoreMixins.baseItem ],
   components: {
     QIcon
   },
@@ -20,9 +20,7 @@ export default {
       return _.get(this.item, 'icon.color', '')
     },
     iconName () {
-      const icon = _.get(this.item, 'icon.name', '')
-      // Backward compatibility with font awesome 4 icons
-      return (icon.startsWith('fa-') ? `fas ${icon}` : icon)
+      return kCoreUtils.getIconName(this.item)
     }
   },
   methods: {

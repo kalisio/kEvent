@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
+import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 
 export default {
@@ -93,8 +93,7 @@ export default {
             this.registerFabAction({
               name: 'create-' + (doublons.length > 1 ? template._id : template.name),
               label: template.name,
-              // Backward compatibility with fontawesome 4 icons
-              icon: (icon.startsWith('fa-') ? `fas ${icon}` : icon),
+              icon: kCoreUtils.getIconName(template),
               route: { name: 'create-event', params: { contextId: this.contextId, templateId: template._id } }
             })
           })
