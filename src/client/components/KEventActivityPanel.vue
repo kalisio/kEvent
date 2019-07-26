@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import mixins from '../mixins'
 
