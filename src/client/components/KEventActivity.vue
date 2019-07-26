@@ -21,7 +21,12 @@
       round 
       icon="layers"
       @click="klayout.toggleRightDrawer()" />
-    <k-uploader ref="uploader" :resource="objectId" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
+    <k-modal ref="uploaderModal" :toolbar="getUploaderToolbar()" :buttons="getUploaderButtons()">
+      <div slot="modal-content">
+        <k-uploader ref="uploader" :resource="objectId" :base-query="uploaderQuery()"
+          :options="uploaderOptions()" @uploader-ready="initializeMedias"/>
+      </div>
+    </k-modal>
     <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
     <k-color-legend v-if="colorLegend.visible"
       class="fixed"
@@ -112,6 +117,22 @@ export default {
     }
   },
   methods: {
+    getUploaderToolbar () {
+      return [{
+        name: 'close-action',
+        label: this.$t('CLOSE'),
+        icon: 'close',
+        handler: () => this.$refs.uploaderModal.close()
+      }]
+    },
+    getUploaderButtons () {
+      return [{
+        name: 'done-button',
+        label: this.$t('DONE'),
+        color: 'primary',
+        handler: () => this.$refs.uploaderModal.close()
+      }]
+    },
     router () {
       return {
         onApply: { name: 'event-activity', params: { contextId: this.contextId, objectId: this.objectId } },
@@ -196,7 +217,12 @@ export default {
       return layers
     },
     uploadMedia () {
-      this.$refs.uploader.open(this.event.attachments)
+      this.$refs.uploaderModal.open()
+      // If the modal has already been created the uploader is ready otherwise wait for event
+      if (this.$refs.uploader) this.initializeMedias()
+    },
+    initializeMedias () {
+      this.$refs.uploader.initialize(this.event.attachments)
     },
     browseMedia () {
       this.$refs.mediaBrowser.open(this.event.attachments)

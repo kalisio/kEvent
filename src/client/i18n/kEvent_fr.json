@@ -76,7 +76,7 @@
     "PARTICPANTS_AWAITING_LABEL": "{{number}} participants en attente de coordination",
     "NO_PARTICPANTS_AWAITING_LABEL": "Aucun participant en attente de coordination",
     "FOLLOWUP_MODAL_CLOSE_ACTION": "$t(CLOSE_LABEL)",
-    "FOLLOWUP_MODAL_SAVE_BUTTON": "$t(SAVE_LABEL)"   
+    "FOLLOWUP_MODAL_SAVE_BUTTON": "$t(SAVE_LABEL)"
   },
   "KEventTemplatesActivity": {
     "EVENTS_LABEL": "$t(EVENTS_LABEL)",

@@ -31,7 +31,12 @@
         <k-form ref="form" :schema="schema"/>
       </div>
     </k-modal>
-    <k-uploader ref="uploader" :resource="item._id" :base-query="uploaderQuery()" :options="uploaderOptions()"/>
+    <k-modal ref="uploaderModal" :toolbar="getUploaderToolbar()" :buttons="getUploaderButtons()">
+      <div slot="modal-content">
+        <k-uploader ref="uploader" :resource="item._id" :base-query="uploaderQuery()"
+          :options="uploaderOptions()" @uploader-ready="initializeMedias"/>
+      </div>
+    </k-modal>
     <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
     <k-location-map ref="locationMap" />
   </div>
@@ -110,6 +115,22 @@ export default {
         name: 'save-button',
         label: this.$t('KEventCard.FOLLOWUP_MODAL_SAVE_BUTTON'),
         handler: (event, done) => this.logParticipantState(event, done)
+      }]
+    },
+    getUploaderToolbar () {
+      return [{
+        name: 'close-action',
+        label: this.$t('CLOSE'),
+        icon: 'close',
+        handler: () => this.$refs.uploaderModal.close()
+      }]
+    },
+    getUploaderButtons () {
+      return [{
+        name: 'done-button',
+        label: this.$t('DONE'),
+        color: 'primary',
+        handler: () => this.$refs.uploaderModal.close()
       }]
     },
     loadService () {
@@ -196,7 +217,12 @@ export default {
       }
     },
     uploadMedia () {
-      this.$refs.uploader.open(this.item.attachments)
+      this.$refs.uploaderModal.open()
+      // If the modal has already been created the uploader is ready otherwise wait for event
+      if (this.$refs.uploader) this.initializeMedias()
+    },
+    initializeMedias () {
+      this.$refs.uploader.initialize(this.item.attachments)
     },
     browseMedia () {
       this.$refs.mediaBrowser.open(this.item.attachments)
