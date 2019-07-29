@@ -38,7 +38,11 @@
       </div>
     </k-modal>
     <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
-    <k-location-map ref="locationMap" />
+    <k-modal ref="locationModal" :toolbar="getLocationToolbar()" >
+      <div slot="modal-content">
+        <k-location-map ref="locationMap" @map-ready="initializeMap" />
+      </div>
+    </k-modal>
   </div>
 </template>
 
@@ -133,6 +137,14 @@ export default {
         handler: () => this.$refs.uploaderModal.close()
       }]
     },
+    getLocationToolbar () {
+      return [{
+        name: 'close-action',
+        label: this.$t('CLOSE'),
+        icon: 'close',
+        handler: () => this.$refs.locationModal.close()
+      }]
+    },
     loadService () {
       this._service = this.$api.getService('event-logs', this.contextId)
       return this._service
@@ -225,10 +237,15 @@ export default {
       this.$refs.uploader.initialize(this.item.attachments)
     },
     browseMedia () {
-      this.$refs.mediaBrowser.open(this.item.attachments)
+      this.$refs.mediaBrowser.open()
     },
     displayLocationMap () {
-      this.$refs.locationMap.open(this.item.location)
+      this.$refs.locationModal.open()
+      // If the modal has already been created the map is ready otherwise wait for event
+      if (this.$refs.locationMap) this.initializeMap()
+    },
+    initializeMap () {
+      this.$refs.locationMap.initialize(this.item.location)
     },
     launchNavigation () {
       let longitude = this.item.location.longitude
