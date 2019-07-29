@@ -182,8 +182,8 @@ export default {
         // And add event marker
         let marker = L.marker([this.event.location.latitude, this.event.location.longitude], {
           icon: L.icon.fontAwesome({
-            iconClasses: 'fa ' + this.event.icon.name || 'fa-circle',
-            markerColor: kCoreUtils.Colors[this.event.icon.color || 'blue'],
+            iconClasses: kCoreUtils.getIconName(this.event) || 'fas fa-circle',
+            markerColor: kCoreUtils.Colors[_.get(this.event, 'icon.color', 'blue')],
             iconColor: '#FFFFFF'
           })
         })
@@ -195,7 +195,7 @@ export default {
       this.addLayer({
         name: this.$t('KEventActivity.PARTICIPANTS_LAYER_NAME'),
         type: 'OverlayLayer',
-        icon: 'fa-user',
+        icon: 'fas fa-user',
         featureId: 'participant._id',
         leaflet: {
           type: 'geoJson',
@@ -254,7 +254,7 @@ export default {
         icon: {
           type: 'icon.fontAwesome',
           options: {
-            iconClasses: 'fa ' + _.get(feature, 'icon.name', 'fa-user'),
+            iconClasses: kCoreUtils.getIconName(feature) || 'fas fa-user',
             markerColor: kCoreUtils.Colors[_.get(feature, 'icon.color', 'blue')],
             iconColor: '#FFFFFF'
           }

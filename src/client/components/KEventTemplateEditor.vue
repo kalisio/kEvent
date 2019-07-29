@@ -3,7 +3,7 @@
     <div slot="modal-content" class="column xs-gutter">
       <k-form :class="{ 'light-dimmed': applyInProgress }" ref="templateForm" :schema="schema" />
       <p :class="{ 'light-dimmed': applyInProgress }" class="col-10 caption pull-left">
-        <q-toggle icon="fa-retweet" v-model="hasWorkflow" @change="onWorkflow"/>
+        <q-toggle icon="fa-retweet" v-model="hasWorkflow" @input="onWorkflow"/>
         <strong v-show="!hasWorkflow">{{$t('KEventTemplateEditor.ADD_WORKFLOW_LABEL')}}</strong>
         <span v-show="hasWorkflow">{{$t('KEventTemplateEditor.WORKFLOW_HELPER_LABEL')}}</span>
       </p>
@@ -78,36 +78,28 @@ export default {
       this.$refs.modal.close()
       this.$router.push({ name: 'event-templates-activity' })
     },
-    initialize () {
-      this.refresh()
-      .then(() => {
-        // In edition mode activate workflow according to its existence
-        if (this.objectId || this.templateId) {
-          this.hasWorkflow = !_.isNil(this.getObject().workflow)
-          this.setFormDisabled('workflowForm', !this.hasWorkflow)
-        } else {
-          // In creation mode disabled by default
-          this.setFormDisabled('workflowForm', true)
-        }
-      })
+    async initialize () {
+      await this.refresh()
+      // In edition mode activate workflow according to its existence
+      if (this.objectId || this.templateId) {
+        this.hasWorkflow = !_.isNil(this.getObject().workflow)
+        this.setFormDisabled('workflowForm', !this.hasWorkflow)
+      } else {
+        // In creation mode disabled by default
+        this.setFormDisabled('workflowForm', true)
+      }
     }
   },
-  created () {
+  async created () {
     // Load the required components
     this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-form'] = this.$load('form/KForm')
     this.$options.components['k-event-workflow-form'] = this.$load('KEventWorkflowForm')
     // On creation check whether we copy or create a new template
     if (this.templateId) {
-      this.$api.getService('event-templates').get(this.templateId)
-      .then((template) => {
-        this.template = template
-        this.initialize()
-      })
-    } else {
-      this.initialize()
+      this.template = await this.$api.getService('event-templates').get(this.templateId)
     }
-    
+    this.initialize()
     this.$on('applied', this.doClose)
   },
   beforeDestroy () {
