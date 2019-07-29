@@ -15,7 +15,7 @@
     },
     "icon": {
       "type": "object", 
-      "default": { "name": "check", "color": "dark" },
+      "default": { "name": "check", "color": "primary" },
       "field": {
         "component": "form/KIconField",
         "helper": "schemas.EVENT_WORKFLOW_ICON_FIELD_HELPER"

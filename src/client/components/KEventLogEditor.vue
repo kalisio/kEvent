@@ -48,7 +48,10 @@ export default {
         name: 'close-action',
         label: this.$t('KEventLogEditor.CLOSE_ACTION'),
         icon: 'close',
-        handler: () => this.$refs.modal.close(this.router ? _ => this.$router.push(this.router.onDismiss) : null)
+        handler: () => {
+          this.$refs.modal.close()
+          if (this.router) this.$router.push(this.router.onDismiss)
+        }
       }]
     },
     buttons () {
@@ -56,7 +59,7 @@ export default {
         name: 'save-button',
         label: this.$t('KEventLogEditor.SAVE_BUTTON'),
         color: 'primary',
-        handler: (event, done) => this.logCoordinatorState(event, done)
+        handler: () => this.logCoordinatorState()
       }]
     },
     loadService () {
@@ -86,10 +89,10 @@ export default {
         await this.$refs.form.build()
       }
     },
-    async logCoordinatorState (event, done) {
+    async logCoordinatorState () {
       await this.logStep(this.$refs.form, this.step, this.state)
-      done()
-      this.$refs.modal.close(this.router ? _ => this.$router.push(this.router.onApply) : null)
+      this.$refs.modal.close()
+      if (this.router) this.$router.push(this.router.onApply)
     }
 
   },

@@ -1,22 +1,25 @@
 <template>
-  <q-stepper flat ref="stepper" v-model="currentStep" color="primary" contractable @step="onStepSelected">
-    <q-step v-for="(step, index) in steps" :key="step.name + '_' + index" :name="step.name" :order="index" :title="step.title" :icon="step.icon.name" :active-icon="preview ? step.icon.name : 'edit'" :done-icon="step.icon.name">
+  <q-stepper header-nav flat animated ref="stepper" v-model="currentStep" @input="onStepSelected">
+    <q-step v-for="(step, index) in steps" :key="step.name + '_' + index" :name="step.name"
+      :title="step.title" :icon="getStepIcon(step)">
       <k-form ref="stepForm" v-show="!preview" :schema="schema" @form-ready="fillStepForm" @field-changed="onStepFieldChanged"/>
       <div v-show="preview">
         <k-form ref="previewForm" :schema="previewSchema"/>
       </div>
-      <div class="row justify-end">
-        <q-btn class="col-1" v-show="index > 0" flat color="primary" icon="navigate_before" @click="onPreviousStep(index)">
-          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
+    </q-step>
+    <template v-slot:navigation>
+      <q-stepper-navigation class="row justify-end">
+        <q-btn class="col-1" :disabled="currentStep === steps[0].name" flat color="primary" icon="navigate_before" @click="onPreviousStep()">
+          <q-tooltip v-if="currentStep !== steps[0].name" anchor="top middle" self="bottom middle" :offset="[10, 10]">
             {{$t('KEventWorkflowForm.PREVIOUS_STEP_BUTTON')}}
           </q-tooltip>
         </q-btn>
-        <q-btn class="col-1" v-show="!preview" flat color="primary" icon="playlist_add" @click="onAddStep(index)">
+        <q-btn class="col-1" v-show="!preview" flat color="primary" icon="playlist_add" @click="onAddStep()">
           <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
             {{$t('KEventWorkflowForm.ADD_STEP_BUTTON')}}
           </q-tooltip>
         </q-btn>
-        <q-btn class="col-1" v-show="!preview && (steps.length > 1)" flat color="primary" icon="delete_sweep" @click="onRemoveStep(index)">
+        <q-btn class="col-1" v-show="!preview && (steps.length > 1)" flat color="primary" icon="delete_sweep" @click="onRemoveStep()">
           <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
             {{$t('KEventWorkflowForm.REMOVE_STEP_BUTTON')}}
           </q-tooltip>
@@ -26,29 +29,28 @@
             {{$t(!preview ? 'KEventWorkflowForm.PREVIEW_WORKFLOW_BUTTON': 'KEventWorkflowForm.EDIT_WORKFLOW_BUTTON')}}
           </q-tooltip>
         </q-btn>
-        <q-btn class="col-1" v-show="index < (steps.length - 1)" flat color="primary" icon="navigate_next" @click="onNextStep(index)">
-          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
+        <q-btn class="col-1" :disabled="currentStep === steps[steps.length - 1].name" flat color="primary" icon="navigate_next" @click="onNextStep()">
+          <q-tooltip v-if="currentStep !== steps[steps.length - 1].name" anchor="top middle" self="bottom middle" :offset="[10, 10]">
             {{$t('KEventWorkflowForm.NEXT_STEP_BUTTON')}}
           </q-tooltip>
         </q-btn>
-      </div>
-    </q-step>
+      </q-stepper-navigation>
+    </template>
   </q-stepper>
 </template>
 
 <script>
 import _ from 'lodash'
-import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
+import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import mixins from '../mixins'
-import { QStepper, QStep, QBtn, QTooltip, uid } from 'quasar'
+import { QStepper, QStep, QStepperNavigation, uid } from 'quasar'
 
 export default {
   name: 'k-event-workflow-form',
   components: {
     QStepper,
     QStep,
-    QBtn,
-    QTooltip
+    QStepperNavigation
   },
   mixins: [
     kCoreMixins.schemaProxy,
@@ -83,40 +85,57 @@ export default {
     getCurrentStep () {
       return this.steps.find(step => step.name === this.currentStep)
     },
-    onAddStep (index) {
+    getCurrentStepIndex () {
+      return _.findIndex(this.steps, step => step.name === this.currentStep)
+    },
+    getStepIcon (step) {
+      return kCoreUtils.getIconName(step)
+    },
+    onAddStep () {
       // Apply current changes when editing
       // If not possible the current form is invalid so do nothing
       if (!this.applyStepChanges()) return
-
-      this.steps.push(this.generateStep())
-      this.currentStep = this.steps[index + 1].name
+      const index = this.getCurrentStepIndex()
+      const step = this.generateStep()
+      // Insert or push ?
+      if (index < (this.steps.length - 1)) {
+        this.steps.splice(index + 1, 0, step)
+        this.currentStep = this.steps[index + 1].name
+      } else {
+        this.steps.push(step)
+        this.currentStep = this.steps.length - 1
+      }
       this.restoreStep()
     },
-    onRemoveStep (index) {
+    onRemoveStep () {
+      const name = this.currentStep
+      const index = this.getCurrentStepIndex()
       // Before modifying array check if current step is the last one,
       // if so go back otherwise jump to previous
-      if (index > 0) {
+      if (this.currentStep !== this.steps[0].name) {
         this.currentStep = this.steps[index - 1].name
       } else {
         // when removing first step the second will replace it
         this.currentStep = this.steps[1].name
       }
       // Can't use splice because Vue does not detect the change
-      this.steps = this.steps.filter((step, i) => i !== index)
+      this.steps = this.steps.filter((step) => step.name !== name)
       // Restore step form when editing
       this.restoreStep()
     },
-    onPreviousStep (index) {
+    onPreviousStep () {
       // Apply current form changes when editing
       // If not possible the current form is invalid so do nothing
       if (!this.applyStepChanges()) return
+      const index = this.getCurrentStepIndex()
       this.currentStep = this.steps[index - 1].name
       this.restoreStep()
     },
-    onNextStep (index) {
+    onNextStep () {
       // Apply current form changes when editing
       // If not possible the current form is invalid so do nothing
       if (!this.applyStepChanges()) return
+      const index = this.getCurrentStepIndex()
       this.currentStep = this.steps[index + 1].name
       // Restore step form when editing
       this.restoreStep()
@@ -142,7 +161,7 @@ export default {
       this.restoreStep()
     },
     applyStepChanges () {
-      if (this.preview) return false
+      if (this.preview) return true
 
       let form = this.getForm('stepForm').validate()
       if (form.isValid) {
@@ -165,17 +184,19 @@ export default {
         this.fillStepForm()
       }
     },
-    loadPreviewSchema () {
-      return this.$load('event-logs.create', 'schema')
-      .then(schema => {
+    async loadPreviewSchema () {
+      try {
+        let schema = await this.$load('event-logs.create', 'schema')
+        // FIXME: not yet sure why this is now required, might be related to
+        // https://forum.vuejs.org/t/solved-using-standalone-version-but-getting-failed-to-mount-component-template-or-render-function-not-defined/19569/2
+        if (schema.default) schema = schema.default
         this.previewSchemaBase = schema
         this.previewSchema = this.generateSchemaForStep(this.getCurrentStep(), this.previewSchemaBase)
         return schema
-      })
-      .catch(error => {
+      } catch(error) {
         this.$events.$emit('error', error)
         throw error
-      })
+      }
     },
     onStepFieldChanged (field, value) {
       // Setup workflow ending values selector depending on interaction field state
@@ -195,22 +216,21 @@ export default {
       // Add required label field
       _.set(endField, 'properties.field.options', interactionField.model.map(option => Object.assign({ label: option.value }, option)))
     },
-    build () {
+    async build () {
       // Because our step form is under a v-if caused by the Quasar stepper
       // it is destroyed/recreated by Vue so that we need to restore the refs each time it is build
       this.setRefs(['stepForm'])
       // Build the internal form
-      return Promise.all([
+      await Promise.all([
         this.loadSchema(),
         this.loadPreviewSchema(),
         this.loadRefs()
       ])
-      .then(() => {
-        return Promise.all([
-          this.getForm('stepForm').build(),
-          this.getForm('previewForm').build()
-        ])
-      })
+      
+      return Promise.all([
+        this.getForm('stepForm').build(),
+        this.getForm('previewForm').build()
+      ])
     },
     fill (object) {
       // If no workflow given this will use default one
@@ -243,7 +263,7 @@ export default {
   created () {
     this.defaultStep = {
       title: '',
-      icon: { name: 'check', color: 'dark' },
+      icon: { name: 'check', color: 'primary' },
       description: '',
       interaction: [],
       end: [],

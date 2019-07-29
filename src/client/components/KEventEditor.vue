@@ -35,7 +35,7 @@ export default {
   computed: {
     buttons () {
       return [
-        { name: 'apply-button', label: this.applyButton, color: 'primary', handler: (event, done) => this.apply(event, done) }
+        { name: 'apply-button', label: this.applyButton, color: 'primary', handler: (event) => this.apply(event) }
       ]
     }
   },
@@ -113,7 +113,8 @@ export default {
       }
     },
     doClose () {
-      this.$refs.modal.close(() => this.$router.push({ name: 'events-activity' }))
+      this.$refs.modal.close()
+      this.$router.push({ name: 'events-activity' })
     }
   },
   async created () {

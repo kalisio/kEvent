@@ -114,7 +114,7 @@ export default {
       return [{
         name: 'save-button',
         label: this.$t('KEventCard.FOLLOWUP_MODAL_SAVE_BUTTON'),
-        handler: (event, done) => this.logParticipantState(event, done)
+        handler: () => this.logParticipantState()
       }]
     },
     getUploaderToolbar () {
@@ -239,6 +239,7 @@ export default {
       Dialog.create({
         title: this.$t('KEventCard.REMOVE_DIALOG_TITLE', { event: event.name }),
         message: this.$t('KEventCard.REMOVE_DIALOG_TITLE', { event: event.name }),
+        html: true,
         ok: {
           label: this.$t('OK'),
         },
@@ -375,9 +376,8 @@ export default {
         }
       }
     },
-    async logParticipantState (event, done) {
+    async logParticipantState () {
       await this.logStep(this.$refs.form, this.participantStep, this.participantState)
-      done()
     }
   },
   created () {

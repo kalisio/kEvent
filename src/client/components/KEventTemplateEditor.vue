@@ -2,7 +2,6 @@
   <k-modal ref="modal" :title="editorTitle" :toolbar="toolbar()" :buttons="buttons" :route="true">
     <div slot="modal-content" class="column xs-gutter">
       <k-form ref="templateForm" :schema="schema" />
-      <br />
       <p class="col-10 caption pull-left">
         <q-toggle icon="fa-retweet" v-model="hasWorkflow" @change="onWorkflow"/>
         <strong v-show="!hasWorkflow">{{$t('KEventTemplateEditor.ADD_WORKFLOW_LABEL')}}</strong>
@@ -37,7 +36,7 @@ export default {
   computed: {
     buttons () {
       return [
-        { name: 'apply-button', label: this.applyButton, color: 'primary', handler: (event, done) => this.apply(event, done) }
+        { name: 'apply-button', label: this.applyButton, color: 'primary', handler: (event) => this.apply(event) }
       ]
     }
   },
@@ -75,7 +74,8 @@ export default {
       this.setFormDisabled('workflowForm', !hasWorkflow)
     },
     doClose () {
-      this.$refs.modal.close(() => this.$router.push({ name: 'event-templates-activity' }))
+      this.$refs.modal.close()
+      this.$router.push({ name: 'event-templates-activity' })
     },
     initialize () {
       this.refresh()

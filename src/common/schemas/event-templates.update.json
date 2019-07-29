@@ -15,7 +15,7 @@
     },
     "icon": {
       "type": "object", 
-      "default": { "name": "mode_edit", "color": "dark" },
+      "default": { "name": "mode_edit", "color": "primary" },
       "field": {
         "component": "form/KIconField",
         "helper": "schemas.EVENT_TEMPLATES_ICON_FIELD_HELPER"

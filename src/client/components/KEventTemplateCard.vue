@@ -53,6 +53,7 @@ export default {
       Dialog.create({
         title: this.$t('KEventTemplateCard.REMOVE_DIALOG_TITLE', { template: template.name }),
         message: this.$t('KEventTemplateCard.REMOVE_DIALOG_MESSAGE', { template: template.name }),
+        html: true,
         ok: {
           label: this.$t('OK'),
         },
