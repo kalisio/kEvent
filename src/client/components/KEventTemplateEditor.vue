@@ -1,13 +1,14 @@
 <template>
   <k-modal ref="modal" :title="editorTitle" :toolbar="toolbar()" :buttons="buttons" :route="true">
     <div slot="modal-content" class="column xs-gutter">
-      <k-form ref="templateForm" :schema="schema" />
-      <p class="col-10 caption pull-left">
+      <k-form :class="{ 'light-dimmed': applyInProgress }" ref="templateForm" :schema="schema" />
+      <p :class="{ 'light-dimmed': applyInProgress }" class="col-10 caption pull-left">
         <q-toggle icon="fa-retweet" v-model="hasWorkflow" @change="onWorkflow"/>
         <strong v-show="!hasWorkflow">{{$t('KEventTemplateEditor.ADD_WORKFLOW_LABEL')}}</strong>
         <span v-show="hasWorkflow">{{$t('KEventTemplateEditor.WORKFLOW_HELPER_LABEL')}}</span>
       </p>
       <k-event-workflow-form v-show="hasWorkflow" ref="workflowForm" schemaName="event-workflow" :objectId="objectId" />
+      <q-spinner-cube color="primary" class="fixed-center" v-if="applyInProgress" size="4em"/>
     </div>
   </k-modal>
 </template>
@@ -36,7 +37,7 @@ export default {
   computed: {
     buttons () {
       return [
-        { name: 'apply-button', label: this.applyButton, color: 'primary', handler: (event) => this.apply(event) }
+        { name: 'apply-button', label: this.applyButton, color: 'primary', handler: () => this.apply() }
       ]
     }
   },
