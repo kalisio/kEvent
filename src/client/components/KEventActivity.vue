@@ -21,7 +21,7 @@
       round 
       icon="layers"
       @click="klayout.toggleRightDrawer()" />
-    <k-modal ref="uploaderModal" :toolbar="getUploaderToolbar()" :buttons="getUploaderButtons()">
+    <k-modal ref="uploaderModal" :toolbar="getUploaderToolbar()">
       <div slot="modal-content">
         <k-uploader ref="uploader" :resource="objectId" :base-query="uploaderQuery()"
           :options="uploaderOptions()" @uploader-ready="initializeMedias"/>
@@ -120,16 +120,8 @@ export default {
     getUploaderToolbar () {
       return [{
         name: 'close-action',
-        label: this.$t('CLOSE'),
+        label: this.$t('KEventActivity.UPLOADER_MODAL_CLOSE_ACTION'),
         icon: 'close',
-        handler: () => this.$refs.uploaderModal.close()
-      }]
-    },
-    getUploaderButtons () {
-      return [{
-        name: 'done-button',
-        label: this.$t('DONE'),
-        color: 'primary',
         handler: () => this.$refs.uploaderModal.close()
       }]
     },
@@ -223,9 +215,11 @@ export default {
     },
     initializeMedias () {
       this.$refs.uploader.initialize(this.event.attachments)
+      // Open file dialog the first time
+      if (!this.event.attachments || (this.event.attachments.length === 0)) this.$refs.uploader.openFileInput()
     },
     browseMedia () {
-      this.$refs.mediaBrowser.open(this.event.attachments)
+      this.$refs.mediaBrowser.show(this.event.attachments)
     },
     filterItem (item) {
       // Is there any filter active ?

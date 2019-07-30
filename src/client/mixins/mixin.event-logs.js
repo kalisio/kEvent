@@ -207,6 +207,10 @@ let eventsMixin = {
       return {
         service: this.contextId + '/storage'
       }
+    },
+    locationMapOptions () {
+      // Use defaults
+      return undefined
     }
   }
 }

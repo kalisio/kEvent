@@ -48,7 +48,8 @@
     "ACTION_REQUIRED": "Action required",
     "AWAITING_INFORMATION": "Awaiting information",
     "UNAMED": "Unamed",
-    "PARTICIPANTS_LAYER_NAME": "Participants"
+    "PARTICIPANTS_LAYER_NAME": "Participants",
+    "UPLOADER_MODAL_CLOSE_ACTION": "$t(CLOSE_LABEL)"
   },
   "KEventActivityPanel": {
     "PARTICIPANTS_LABEL": "Participants"
@@ -65,6 +66,8 @@
     "FOLLOW_UP_LABEL": "Follow up",
     "ADD_MEDIA_LABEL": "$t(KEventActivity.ADD_MEDIA_LABEL)",
     "BROWSE_MEDIA_LABEL": "$t(KEventActivity.BROWSE_MEDIA_LABEL)",
+    "UPLOADER_MODAL_CLOSE_ACTION": "$t(KEventActivity.UPLOADER_MODAL_CLOSE_ACTION)",
+    "LOCATION_MAP_MODAL_CLOSE_ACTION": "$t(CLOSE_LABEL)",
     "NAVIGATE_LABEL": "Navigate",
     "LOCATE_LABEL": "Locate",
     "REMOVE_DIALOG_TITLE": "Remove the event {{event}} ?",

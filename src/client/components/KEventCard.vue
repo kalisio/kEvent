@@ -31,7 +31,7 @@
         <k-form ref="form" :schema="schema"/>
       </div>
     </k-modal>
-    <k-modal ref="uploaderModal" :toolbar="getUploaderToolbar()" :buttons="getUploaderButtons()">
+    <k-modal ref="uploaderModal" :toolbar="getUploaderToolbar()" >
       <div slot="modal-content">
         <k-uploader ref="uploader" :resource="item._id" :base-query="uploaderQuery()"
           :options="uploaderOptions()" @uploader-ready="initializeMedias"/>
@@ -40,7 +40,7 @@
     <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
     <k-modal ref="locationModal" :toolbar="getLocationToolbar()" >
       <div slot="modal-content">
-        <k-location-map ref="locationMap" @map-ready="initializeMap" />
+        <k-location-map ref="locationMap" :options="locationMapOptions()" @map-ready="initializeMap" />
       </div>
     </k-modal>
   </div>
@@ -124,23 +124,15 @@ export default {
     getUploaderToolbar () {
       return [{
         name: 'close-action',
-        label: this.$t('CLOSE'),
+        label: this.$t('KEventCard.UPLOADER_MODAL_CLOSE_ACTION'),
         icon: 'close',
-        handler: () => this.$refs.uploaderModal.close()
-      }]
-    },
-    getUploaderButtons () {
-      return [{
-        name: 'done-button',
-        label: this.$t('DONE'),
-        color: 'primary',
         handler: () => this.$refs.uploaderModal.close()
       }]
     },
     getLocationToolbar () {
       return [{
         name: 'close-action',
-        label: this.$t('CLOSE'),
+        label: this.$t('KEventCard.LOCATION_MAP_MODAL_CLOSE_ACTION'),
         icon: 'close',
         handler: () => this.$refs.locationModal.close()
       }]
@@ -235,9 +227,11 @@ export default {
     },
     initializeMedias () {
       this.$refs.uploader.initialize(this.item.attachments)
+      // Open file dialog the first time
+      if (!this.item.attachments || (this.item.attachments.length === 0)) this.$refs.uploader.openFileInput()
     },
     browseMedia () {
-      this.$refs.mediaBrowser.open()
+      this.$refs.mediaBrowser.show(this.item.attachments)
     },
     displayLocationMap () {
       this.$refs.locationModal.open()
