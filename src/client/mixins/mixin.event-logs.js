@@ -205,7 +205,9 @@ let eventsMixin = {
     },
     mediaBrowserOptions () {
       return {
-        service: this.contextId + '/storage'
+        service: this.contextId + '/storage',
+        backgroundColor: 'black',
+        controlColor: 'white'
       }
     },
     locationMapOptions () {
