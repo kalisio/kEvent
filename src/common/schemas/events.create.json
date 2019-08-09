@@ -158,6 +158,6 @@
       }
     }
   },
-  "required": ["name", "description", "location", "expireAt", "participants", "coordinators", "hasWorkflow", "notification"]
+  "required": ["name", "location", "expireAt", "participants", "hasWorkflow", "notification"]
 }
 

@@ -55,9 +55,7 @@
           @change="onTimelineUpdated"
           pointerColor="#8bc34a" 
           pointerTextColor="white"
-          style="width: 100%;"
-        />
-        </k-time-controller>
+          style="width: 100%;" />
       </div>
     </q-page-sticky>
     <div>
@@ -141,8 +139,8 @@ export default {
       this.clearActivity()
       this.event = await this.$api.getService('events', this.contextId).get(this.objectId)
       this.setTitle(this.event.name)
-      // Setup the right pane
-      this.setRightPanelContent('KEventActivityPanel', this.$data)
+      // Setup the right drawer
+      this.setRightDrawer('KEventActivityPanel', this.$data)
       // Wait until map is ready
       await this.initializeMap()
       // If we'd like to only work in real-time

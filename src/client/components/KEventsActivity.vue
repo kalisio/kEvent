@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <q-page padding>
     <!-- 
       Events collection
      -->
@@ -8,7 +8,7 @@
       Router view to enable routing to modals
      -->
     <router-view service="events" :router="router()"></router-view>
-  </div>
+  </q-page>
 </template>
 
 <script>

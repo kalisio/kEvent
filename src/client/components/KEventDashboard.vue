@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <q-page padding>
     <template v-for="org in items">
       <q-list :key="org._id" separator>
         <q-item>
@@ -13,7 +13,7 @@
         </q-item>
       </q-list>
     </template>
-  </div>
+  </q-page>
 </template>
 
 <script>
