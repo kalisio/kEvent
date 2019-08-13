@@ -3,27 +3,41 @@
     <k-card v-bind="$props" :itemActions="actions">
       <q-icon slot="card-icon" :name="iconName" :color="iconColor"></q-icon>
       <div slot="card-content">
-        <div v-if="location">
-          {{ location }}
-          <q-separator class="card-separator" />
+        <div class="column">
+          <div v-if="item.location">
+            <q-toolbar class="q-pa-none">
+              <span class="ellipsis">
+                {{ item.location.name }}
+              </span>
+              <q-space />
+              <q-btn icon="place" color="grey-7" flat dense round>
+                <q-tooltip>
+                  {{ $t('KEventCard.LOCATE_LABEL') }}
+                </q-tooltip>
+                <q-popup-proxy transition-show="scale" transition-hide="scale">
+                  <k-location-map v-model="item.location" :editable="false" />
+                </q-popup-proxy>
+              </q-btn>
+            </q-toolbar>
+            <q-separator class="card-separator" />
+          </div>
+          <div v-if="participantLabel">
+            {{ participantLabel }}
+            <q-card-separator class="card-separator" />
+          </div>
+          <span v-if="comment">
+            <k-text-area class="light-paragraph" :length="20" :text="comment" />
+            <q-separator class="card-separator" />
+          </span>
+          <div v-if="coordinatorLabel">
+            {{ coordinatorLabel }}
+            <q-separator class="card-separator" />
+          </div>
+          <div v-if="createdAt || updatedAt">
+            <cite v-if="createdAt"><small>{{$t('KEventCard.CREATED_AT_LABEL')}} {{createdAt.toLocaleString()}}</small></cite><br />
+            <cite v-if="updatedAt"><small>{{$t('KEventCard.UPDATED_AT_LABEL')}} {{updatedAt.toLocaleString()}}</small></cite>
+          </div>
         </div>
-        <div v-if="participantLabel">
-          {{ participantLabel }}
-          <q-card-separator class="card-separator" />
-        </div>
-        <span v-if="comment">
-          <k-text-area class="light-paragraph" :length="20" :text="comment" />
-          <q-separator class="card-separator" />
-        </span>
-        <div v-if="coordinatorLabel">
-          {{ coordinatorLabel }}
-          <q-separator class="card-separator" />
-        </div>
-        <div v-if="createdAt || updatedAt">
-          <cite v-if="createdAt"><small>{{$t('KEventCard.CREATED_AT_LABEL')}} {{createdAt.toLocaleString()}}</small></cite><br />
-          <cite v-if="updatedAt"><small>{{$t('KEventCard.UPDATED_AT_LABEL')}} {{updatedAt.toLocaleString()}}</small></cite>
-        </div>
-        
       </div>
     </k-card>
     <k-modal ref="followUpModal" v-if="hasParticipantInteraction" :title="followUpTitle" :toolbar="getFollowUpToolbar()" :buttons="getFollowUpButtons()" :route="false" >
@@ -38,11 +52,6 @@
       </div>
     </k-modal>
     <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
-    <k-modal ref="locationModal" :toolbar="getLocationToolbar()" >
-      <div slot="modal-content">
-        <k-location-map ref="locationMap" :options="locationMapOptions()" @map-ready="initializeMap" />
-      </div>
-    </k-modal>
   </div>
 </template>
 
@@ -87,10 +96,6 @@ export default {
     },
     hasParticipantInteraction () {
       return this.waitingInteraction(this.participantStep, this.participantState, 'participant')
-    },
-    location () {
-      if (this.item.location) return this.item.location.name
-      return ''
     }
   },
   data () {
@@ -103,8 +108,8 @@ export default {
     }
   },
   methods: {
-    hasGeoLocation () {
-      return !_.isEmpty(this.item.location) && !_.isNil(this.item.location.longitude) && !_.isNil(this.item.location.latitude)
+    hasLocation () {
+      return this.item.location && this.item.location.latitude && this.item.location.longitude
     },
     getFollowUpToolbar () {
       return [{
@@ -209,12 +214,7 @@ export default {
           name: 'browse-media', label: this.$t('KEventCard.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
         })
       }
-      if (this.hasGeoLocation()) {
-        this.registerPaneAction({
-          name: 'locate', label: this.$t('KEventCard.LOCATE_LABEL'), icon: 'map', handler: this.displayLocationMap
-        })
-      }
-      if (this.canNavigate() && this.hasGeoLocation()) {
+      if (this.hasLocation() && this.canNavigate()) {
         this.registerPaneAction({
           name: 'navigate', label: this.$t('KEventCard.NAVIGATE_LABEL'), icon: 'navigation', handler: this.launchNavigation
         })
@@ -232,14 +232,6 @@ export default {
     },
     browseMedia () {
       this.$refs.mediaBrowser.show(this.item.attachments)
-    },
-    displayLocationMap () {
-      this.$refs.locationModal.open()
-      // If the modal has already been created the map is ready otherwise wait for event
-      if (this.$refs.locationMap) this.initializeMap()
-    },
-    initializeMap () {
-      this.$refs.locationMap.initialize(this.item.location)
     },
     launchNavigation () {
       let longitude = this.item.location.longitude

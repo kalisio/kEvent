@@ -134,6 +134,6 @@
       }
     }
   },
-  "required": ["name", "description", "location", "expireAt", "participants", "coordinators", "notification"]
+  "required": ["name", "expireAt", "participants", "coordinators", "notification"]
 }
 

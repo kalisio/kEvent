@@ -209,10 +209,6 @@ let eventsMixin = {
         backgroundColor: 'black',
         controlColor: 'white'
       }
-    },
-    locationMapOptions () {
-      // Use defaults
-      return undefined
     }
   }
 }
