@@ -77,10 +77,10 @@ export default {
       return this.getIcon(this.participantState, this.participantStep)
     },
     iconColor () {
-      return _.get(this.icon, 'color', '')
+      return _.get(this.item, 'icon.color', '')
     },
     iconName () {
-      return kCoreUtils.getIconName(this)
+      return kCoreUtils.getIconName(this.item)
     },
     comment () {
       return this.getComment(this.participantState)
