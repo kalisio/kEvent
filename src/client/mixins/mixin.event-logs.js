@@ -113,11 +113,10 @@ const eventsMixin = {
         type: 'string',
         field: {
           component: 'form/KTextareaField',
-          label: 'Comment',
-          helper: this.$t('schemas.EVENTS_LOG_COMMENT')
+          label: this.$t('schemas.EVENTS_LOG_COMMENT_FIELD_LABEL'),
+          helper: this.$t('schemas.EVENTS_LOG_COMMENT_FIELD_HELPER')
         }
       }
-      schema.required.push('comment')
       return schema
     },
     createParticipantLog (step = {}, state = {}) {

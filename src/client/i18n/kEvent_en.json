@@ -37,7 +37,9 @@
     "EVENTS_HAS_WORKFLOW_FIELD_HELPER": "Activate workflow for this event",
     "EVENTS_NOTIFICATION_FIELD_CREATE_HELPER": "Notify participants when creating",
     "EVENTS_NOTIFICATION_FIELD_UPDATE_HELPER": "Notify participants when updating",
-    "EVENTS_LOG_COMMENT": "Enter your comment for this step"
+    "EVENTS_LOG_TITLE": "Enter your choice",
+    "EVENTS_LOG_COMMENT_FIELD_LABEL": "Comment",
+    "EVENTS_LOG_COMMENT_FIELD_HELPER": "Enter your comment for this step"
   },
   "KEventActivity": {
     "ADD_MEDIA_LABEL": "Add media",

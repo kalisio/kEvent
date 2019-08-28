@@ -34,7 +34,7 @@ export default {
   },
   computed: {
     title () {
-      return this.step.title ? this.step.title : 'Enter your choice'
+      return this.step.title ? this.step.title : this.$t('schemas.EVENTS_LOG_TITLE')
     }
   },
   data () {
