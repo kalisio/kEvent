@@ -1,4 +1,3 @@
-import logger from 'winston'
 import _ from 'lodash'
 import { createObjectID } from '@kalisio/kdk-core'
 import makeDebug from 'debug'
@@ -78,7 +77,7 @@ export async function sendEventNotifications (hook) {
         const result = await publishPromises[i]
         results.push(result)
       } catch (error) {
-        logger.error(error.message, error)
+        hook.app.logger.error(error.message, error)
       }
     }
     debug('Published event notifications on ' + results.length + ' topics/users for event ' + hook.result._id.toString())

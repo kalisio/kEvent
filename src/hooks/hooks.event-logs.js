@@ -1,6 +1,5 @@
 import makeDebug from 'debug'
 import _ from 'lodash'
-import logger from 'winston'
 import { getItems } from 'feathers-hooks-common'
 const debug = makeDebug('kalisio:kEvent:event-logs:hooks')
 
@@ -121,7 +120,7 @@ export async function sendStateNotifications (hook) {
         })
         debug('Published event state notifications for participant ' + participant.toString() + ' on event ' + event._id.toString())
       } catch (error) {
-        logger.error(error.message, error)
+        hook.app.logger.error(error.message, error)
       }
     }
   }

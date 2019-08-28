@@ -33,14 +33,10 @@ describe('kEvent', () => {
     corePermissions.defineAbilities.registerHook(permissions.defineEventAbilities)
 
     app = kalisio()
-    // Register authorisation hook
+    // Register authorisation/log hook
     app.hooks({
-      before: { all: [coreHooks.processObjectIDs, coreHooks.authorise] }
-      /* For debug
-      before: { all: [coreHooks.log, coreHooks.authorise] },
-      after: { all: coreHooks.log },
+      before: { all: [coreHooks.authorise] },
       error: { all: coreHooks.log }
-      */
     })
     // Add hooks for contextual services
     app.on('service', service => {
