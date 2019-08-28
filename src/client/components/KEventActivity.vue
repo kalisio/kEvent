@@ -5,20 +5,20 @@
       <k-widget ref="timeseriesWidget" :offset="{ minimized: [18,18], maximized: [0,0] }" :title="probedLocationName" @state-changed="onUpdateTimeseries">
         <div slot="widget-content">
           <k-location-time-series ref="timeseries"
-            :feature="probedLocation" 
+            :feature="probedLocation"
             :variables="variables"
             :current-time-format="currentTimeFormat"
             :current-formatted-time="currentFormattedTime" />
         </div>
       </k-widget>
     </div>
-    <q-btn 
+    <q-btn
       id="map-panel-toggle"
       color="secondary"
       class="fixed"
       style="right: 18px; top: 72px"
       small
-      round 
+      round
       icon="layers"
       @click="klayout.toggleRightDrawer()" />
     <k-modal ref="uploaderModal" :toolbar="getUploaderToolbar()">
@@ -46,14 +46,14 @@
         <k-time-controller
           v-if="timelineEnabled"
           :key="timelineRefreshKey"
-          :min="timeline.start" 
+          :min="timeline.start"
           :max="timeline.end"
           :step="'h'"
           :value="timeline.current"
           :timeInterval="timelineInterval"
           :timeFormatter="timelineFormatter"
           @change="onTimelineUpdated"
-          pointerColor="#8bc34a" 
+          pointerColor="#8bc34a"
           pointerTextColor="white"
           style="width: 100%;" />
       </div>
@@ -144,7 +144,7 @@ export default {
       // Wait until map is ready
       await this.initializeMap()
       // If we'd like to only work in real-time
-      //this.setCurrentTime(moment.utc())
+      // this.setCurrentTime(moment.utc())
       this.registerActivityActions()
       // Custom actions
       if (this.$can('update', 'events', this.contextId, this.event)) {
@@ -170,7 +170,7 @@ export default {
         // Recenter map
         this.center(this.event.location.longitude, this.event.location.latitude, 15)
         // And add event marker
-        let marker = L.marker([this.event.location.latitude, this.event.location.longitude], {
+        const marker = L.marker([this.event.location.latitude, this.event.location.longitude], {
           icon: L.icon.fontAwesome({
             iconClasses: kCoreUtils.getIconName(this.event) || 'fas fa-circle',
             markerColor: kCoreUtils.Colors[_.get(this.event, 'icon.color', 'blue')],
@@ -255,7 +255,7 @@ export default {
     },
     getParticipantPopup (feature, layer, options) {
       if (options.name !== this.$t('KEventActivity.PARTICIPANTS_LAYER_NAME')) return
-      let popup = L.popup({ autoPan: false }, layer)
+      const popup = L.popup({ autoPan: false }, layer)
       const step = this.getWorkflowStep(feature)
       // Check for any recorded interaction to be displayed
       // Nothing visible because clicking on the marker opens a dialog in this case
@@ -279,7 +279,7 @@ export default {
     getParticipantTooltip (feature, layer, options) {
       if (options.name !== this.$t('KEventActivity.PARTICIPANTS_LAYER_NAME')) return
       // Default content is participant name
-      let tooltip = L.tooltip({ permanent: true }, layer)
+      const tooltip = L.tooltip({ permanent: true }, layer)
       const step = this.getWorkflowStep(feature)
       const name = _.get(feature, 'participant.name', this.$t('KEventActivity.UNAMED'))
       // Check for any interaction to be performed
@@ -313,8 +313,8 @@ export default {
       if (!this.filter) {
         // Defines the filter to the participant's state
         this.filter = {
-          'step': step.name,
-          'interaction': undefined
+          step: step.name,
+          interaction: undefined
         }
         if (participant.interaction) this.filter.interaction = participant.interaction.value
         else if (participant.previous && participant.previous.interaction) this.filter.interaction = participant.previous.interaction.value

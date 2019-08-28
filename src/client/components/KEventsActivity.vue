@@ -1,10 +1,10 @@
 <template>
   <q-page padding>
-    <!-- 
+    <!--
       Events collection
      -->
     <k-grid service="events" :base-query="baseQuery" :filter-query="searchQuery" :renderer="renderer" :contextId="contextId" :list-strategy="'smart'" />
-    <!-- 
+    <!--
       Router view to enable routing to modals
      -->
     <router-view service="events" :router="router()"></router-view>
@@ -71,18 +71,18 @@ export default {
       // Fab actions
       if (this.$can('create', 'events', this.contextId)) {
         const eventTemplatesService = this.$api.getService('event-templates')
-        let response = await eventTemplatesService.find({ 
-          query: { $limit: 0 },
+        let response = await eventTemplatesService.find({
+          query: { $limit: 0 }
         })
         const batchSize = 50
         let batchCount = Math.floor(response.total, batchSize)
-        let remainder = response.total % batchSize
-        if (remainder > 0 ) batchCount++
+        const remainder = response.total % batchSize
+        if (remainder > 0) batchCount++
         let offset = 0
-        for (let i = 0;i < batchCount;i++) {
-          response = await eventTemplatesService.find({ 
+        for (let i = 0; i < batchCount; i++) {
+          response = await eventTemplatesService.find({
             query: { $skip: offset, $limit: batchSize },
-            $select: ['name', 'icon'] 
+            $select: ['name', 'icon']
           })
           const templates = response.data
           templates.forEach(template => {

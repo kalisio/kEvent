@@ -11,7 +11,7 @@ import { Dialog, QIcon } from 'quasar'
 
 export default {
   name: 'k-event-template-card',
-  mixins: [ kCoreMixins.baseItem ],
+  mixins: [kCoreMixins.baseItem],
   components: {
     QIcon
   },
@@ -55,13 +55,13 @@ export default {
         message: this.$t('KEventTemplateCard.REMOVE_DIALOG_MESSAGE', { template: template.name }),
         html: true,
         ok: {
-          label: this.$t('OK'),
+          label: this.$t('OK')
         },
         cancel: {
           label: this.$t('CANCEL')
         }
       }).onOk(() => {
-        let eventTemplatesService = this.$api.getService('event-templates')
+        const eventTemplatesService = this.$api.getService('event-templates')
         eventTemplatesService.remove(template._id)
       })
     }

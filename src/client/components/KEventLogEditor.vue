@@ -72,11 +72,11 @@ export default {
     loadSchema () {
       // Call super
       return kCoreMixins.schemaProxy.methods.loadSchema.call(this)
-      .then(schema => {
+        .then(schema => {
         // Start from schema template and clone it because it will be shared by all cards
-        this.schema = this.generateSchemaForStep(this.step, schema)
-        return this.schema
-      })
+          this.schema = this.generateSchemaForStep(this.step, schema)
+          return this.schema
+        })
     },
     async refresh () {
       this.refreshUser()

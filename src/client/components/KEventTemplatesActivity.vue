@@ -1,10 +1,10 @@
 <template>
   <q-page padding>
-    <!-- 
+    <!--
       Templates collection
      -->
     <k-grid service="event-templates" :base-query="baseQuery" :filter-query="searchQuery" :renderer="renderer" :contextId="contextId" :list-strategy="'smart'" />
-    <!-- 
+    <!--
       Router view to enable routing to modals
      -->
     <router-view service="event-templates" router="router()"></router-view>
@@ -27,7 +27,7 @@ export default {
     return {
       baseQuery: {
         $sort: {
-          'name': 1
+          name: 1
         }
       },
       renderer: {

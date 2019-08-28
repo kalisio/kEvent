@@ -6,7 +6,7 @@ const debug = makeDebug('kalisio:kEvent:event-logs:hooks')
 
 export async function addLogDefaults (hook) {
   if (hook.type !== 'before') {
-    throw new Error(`The 'addLogDefaults' hook should only be used as a 'before' hook.`)
+    throw new Error('The \'addLogDefaults\' hook should only be used as a \'before\' hook.')
   }
 
   let participant = hook.data.participant
@@ -22,20 +22,20 @@ export async function addLogDefaults (hook) {
   if (participant && event) {
     debug('Added default log properties for participant ' + hook.data.participant.toString() + ' on event ' + event.toString())
   }
-  
+
   return hook
 }
 
 export async function linkWithPreviousLog (hook) {
   if (hook.type !== 'before') {
-    throw new Error(`The 'linkWithPreviousLog' hook should only be used as a 'before' hook.`)
+    throw new Error('The \'linkWithPreviousLog\' hook should only be used as a \'before\' hook.')
   }
 
-  let item = getItems(hook)
+  const item = getItems(hook)
   const participant = item.participant
   const event = item.event
   if (event && participant) {
-    let previousLogs = await hook.service.find({
+    const previousLogs = await hook.service.find({
       query: {
         $sort: { createdAt: -1 }, // Sorting by newest ones
         $limit: 1,
@@ -46,7 +46,7 @@ export async function linkWithPreviousLog (hook) {
       paginate: false
     })
     if (previousLogs.length > 0) {
-      let previousLog = previousLogs[0]
+      const previousLog = previousLogs[0]
       debug('Tagging previous log for participant ' + participant.toString() + ' on event ' + event.toString())
       item.previous = previousLog._id
       // Copy expiry date
@@ -57,33 +57,33 @@ export async function linkWithPreviousLog (hook) {
       // Event service is contextual, look for context on initiator service
       const eventService = hook.app.getService('events', hook.service.context)
       if (!eventService) return Promise.reject(new Error('No valid context found to retrieve event service for initiator service ' + hook.service.name))
-      let eventObject = await eventService.get(event.toString())
+      const eventObject = await eventService.get(event.toString())
       // Copy expiry date
       debug('Tagging expiry date on log for participant ' + participant.toString() + ' on event ' + event.toString())
       item.expireAt = eventObject.expireAt
     }
   }
-  
+
   return hook
 }
 
 export async function updatePreviousLog (hook) {
   if (hook.type !== 'after') {
-    throw new Error(`The 'updatePreviousLog' hook should only be used as a 'after' hook.`)
+    throw new Error('The \'updatePreviousLog\' hook should only be used as a \'after\' hook.')
   }
 
-  let item = getItems(hook)
+  const item = getItems(hook)
 
   if (item.previous) {
     await hook.service.patch(item.previous.toString(), { lastInEvent: false })
   }
-  
+
   return hook
 }
 
 export async function sendStateNotifications (hook) {
   if (hook.type !== 'after') {
-    throw new Error(`The 'sendStateNotifications' hook should only be used as a 'after' hook.`)
+    throw new Error('The \'sendStateNotifications\' hook should only be used as a \'after\' hook.')
   }
 
   // A notification occur only when we record the interaction of a given workflow step
@@ -91,7 +91,7 @@ export async function sendStateNotifications (hook) {
   const interaction = _.get(hook, 'result.interaction')
   const stakeholder = _.get(hook, 'result.stakeholder')
   if (interaction && (stakeholder === 'coordinator')) {
-    let pusherService = hook.app.getService('pusher')
+    const pusherService = hook.app.getService('pusher')
     if (!pusherService) return hook
     const participant = hook.result.participant
     let event = hook.result.event

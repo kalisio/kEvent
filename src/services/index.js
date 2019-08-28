@@ -5,7 +5,7 @@ const servicesPath = path.join(__dirname, '..', 'services')
 
 const debug = makeDebug('kalisio:kEvent:services')
 
-export function createEventService(organisation, db) {
+export function createEventService (organisation, db) {
   const app = this
 
   app.createService('events', {
@@ -17,13 +17,13 @@ export function createEventService(organisation, db) {
   debug('Events service created for organisation ' + organisation.name)
 }
 
-export function removeEventService(organisation) {
+export function removeEventService (organisation) {
   // TODO
 }
 
-export function createEventTemplateService(organisation, db) {
+export function createEventTemplateService (organisation, db) {
   const app = this
-  
+
   app.createService('event-templates', {
     servicesPath,
     modelsPath,
@@ -33,11 +33,11 @@ export function createEventTemplateService(organisation, db) {
   debug('Event templates service created for organisation ' + organisation.name)
 }
 
-export function removeEventTemplateService(organisation) {
+export function removeEventTemplateService (organisation) {
   // TODO
 }
 
-export function createEventLogService(organisation, db) {
+export function createEventLogService (organisation, db) {
   const app = this
 
   app.createService('event-logs', {
@@ -53,7 +53,7 @@ export function createEventLogService(organisation, db) {
   debug('Event logs service created for organisation ' + organisation.name)
 }
 
-export function removeEventLogService(organisation) {
+export function removeEventLogService (organisation) {
   // TODO
 }
 
@@ -65,7 +65,7 @@ export default async function () {
 
   organisations.forEach(organisation => {
     // Get org DB
-    let db = app.db.instance.db(organisation._id.toString())
+    const db = app.db.instance.db(organisation._id.toString())
     createEventService.call(app, organisation, db)
     createEventTemplateService.call(app, organisation, db)
     createEventLogService.call(app, organisation, db)

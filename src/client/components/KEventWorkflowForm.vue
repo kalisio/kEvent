@@ -78,7 +78,7 @@ export default {
       return this.$refs[form][0]
     },
     generateStep () {
-      let newStep = _.cloneDeep(this.defaultStep)
+      const newStep = _.cloneDeep(this.defaultStep)
       // We generate a UID so that we can identify each step uniquely,
       // indeed titles might be similar
       newStep.name = uid().toString()
@@ -148,7 +148,7 @@ export default {
       // FIXME: when called the step has already been changed in model
       // so that current step is not the right one anymore
       // For now we don't validate
-      //if (!this.applyStepChanges()) return
+      // if (!this.applyStepChanges()) return
       // Restore step form when editing
       this.restoreStep()
     },
@@ -165,7 +165,7 @@ export default {
     applyStepChanges () {
       if (this.preview) return true
 
-      let form = this.getForm('stepForm').validate()
+      const form = this.getForm('stepForm').validate()
       if (form.isValid) {
         _.assign(this.getCurrentStep(), form.values)
       }
@@ -178,7 +178,7 @@ export default {
         // We need to force a refresh so that the schema is correctly transfered to child component by Vuejs
         this.$nextTick().then(() => {
           // Force form refresh to default values
-          let form = this.getForm('previewForm')
+          const form = this.getForm('previewForm')
           form.build().then(() => form.clear())
         })
       } else {
@@ -195,7 +195,7 @@ export default {
         this.previewSchemaBase = schema
         this.previewSchema = this.generateSchemaForStep(this.getCurrentStep(), this.previewSchemaBase)
         return schema
-      } catch(error) {
+      } catch (error) {
         this.$events.$emit('error', error)
         throw error
       }
@@ -207,14 +207,14 @@ export default {
       }
     },
     fillStepForm () {
-      let form = this.getForm('stepForm')
+      const form = this.getForm('stepForm')
       form.fill(this.getCurrentStep())
       this.setupEndField()
     },
     setupEndField () {
-      let form = this.getForm('stepForm')
-      let interactionField = form.getField('interaction')
-      let endField = form.getField('end')
+      const form = this.getForm('stepForm')
+      const interactionField = form.getField('interaction')
+      const endField = form.getField('end')
       // Add required label field
       _.set(endField, 'properties.field.options', interactionField.model.map(option => Object.assign({ label: option.value }, option)))
     },
@@ -228,7 +228,7 @@ export default {
         this.loadPreviewSchema(),
         this.loadRefs()
       ])
-      
+
       return Promise.all([
         this.getForm('stepForm').build(),
         this.getForm('previewForm').build()
@@ -248,7 +248,7 @@ export default {
     },
     validate () {
       // Apply current form changes when editing
-      let isValid = this.applyStepChanges()
+      const isValid = this.applyStepChanges()
       return {
         isValid,
         values: {

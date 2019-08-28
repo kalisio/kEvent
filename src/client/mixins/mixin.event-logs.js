@@ -1,6 +1,7 @@
-import { mixins } from '@kalisio/kdk-core/client'
+import _ from 'lodash'
+import sift from 'sift'
 
-let eventsMixin = {
+const eventsMixin = {
   data () {
     return {
       userId: '',
@@ -25,7 +26,7 @@ let eventsMixin = {
     isBeforeInWorkflow (stateName, stepName) {
       const stateIndex = this.event.workflow.findIndex(workflowStep => workflowStep.name === stateName)
       const stepIndex = this.event.workflow.findIndex(workflowStep => workflowStep.name === stepName)
-      
+
       return (stepIndex > stateIndex)
     },
     getWorkflowStep (state = {}) {
@@ -60,7 +61,7 @@ let eventsMixin = {
     doFollowUp (participantId) {
       this.$router.push({ name: 'event-log', params: { logId: participantId } })
     },
-    getIcon(state = {}, step = {}) {
+    getIcon (state = {}, step = {}) {
       // When last step was an interaction use it as icon
       if (state.interaction) return state.interaction.icon
       // If we wait for an interaction use previous state icon
@@ -69,17 +70,17 @@ let eventsMixin = {
       if (step.icon) return step.icon
       // In case of no workflow
       // FIXME: not sure we'd like to have the same icon for all participants in this case, should be different from event one
-      //if (this.event && this.event.icon) return this.event.icon
+      // if (this.event && this.event.icon) return this.event.icon
       return { name: 'fa-user', color: 'blue' }
     },
-    getComment(state = {}) {
+    getComment (state = {}) {
       // When last step had a recorded interaction use its comment if any
       if (state.comment) return state.comment
       // If we wait for an interaction use previous state comment if any
       if (state.previous && state.previous.comment) return state.previous.comment
       return ''
     },
-    getInteraction(state = {}) {
+    getInteraction (state = {}) {
       // When last step had a recorded interaction use it if any
       if (state.interaction) return state.interaction.value
       // If we wait for an interaction use previous state if any
@@ -89,11 +90,11 @@ let eventsMixin = {
     generateSchemaForStep (step, baseSchema) {
       // Start from schema template and clone it because modifications
       // will be shared by all caller otherwise
-      let schema = _.cloneDeep(baseSchema)
+      const schema = _.cloneDeep(baseSchema)
       // Then add step interaction
       if (step.interaction) {
         const options = step.interaction.map(option => { return { label: option.value, value: option } })
-        schema.properties['interaction'] = {
+        schema.properties.interaction = {
           type: 'object',
           field: {
             component: 'form/KSelectField',
@@ -103,13 +104,13 @@ let eventsMixin = {
           }
         }
         if (options.length > 0) {
-          schema.properties['interaction'].default = options[0].value
+          schema.properties.interaction.default = options[0].value
         }
         schema.required.push('interaction')
       }
       // Add a comment entry
-      schema.properties['comment'] = {
-        type: 'string', 
+      schema.properties.comment = {
+        type: 'string',
         field: {
           component: 'form/KTextareaField',
           label: 'Comment',
@@ -119,8 +120,8 @@ let eventsMixin = {
       schema.required.push('comment')
       return schema
     },
-    createParticipantLog(step = {}, state = {}) {
-      let log = {
+    createParticipantLog (step = {}, state = {}) {
+      const log = {
         type: 'Feature',
         participant: this.userId,
         event: this.event._id || this.event,
@@ -153,11 +154,11 @@ let eventsMixin = {
       return log
     },
     logStep (form, step, state = {}) {
-      let result = form.validate()
+      const result = form.validate()
       if (result.isValid) {
         // Directly store as GeoJson objects
         // FIXME: what to store as feature properties for mapping ?
-        let log = this.createParticipantLog(step, state)
+        const log = this.createParticipantLog(step, state)
         _.merge(log, result.values)
         return this.serviceCreate(log)
       } else {
@@ -172,7 +173,7 @@ let eventsMixin = {
         }
         if (role.service === 'tags') {
           if (user.tags) {
-            if (_.findIndex(user.tags, { '_id': role._id } >= 0)) return true
+            if (_.findIndex(user.tags, { _id: role._id } >= 0)) return true
           }
         }
         return false

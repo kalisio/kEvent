@@ -31,7 +31,7 @@ export default {
     return {
       baseQuery: {
         $sort: {
-          'updatedAt': -1
+          updatedAt: -1
         }
       },
       renderer: {

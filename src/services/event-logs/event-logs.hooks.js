@@ -17,8 +17,13 @@ const populateParticipant = populate({
     const usersService = hook.app.getService('users')
     return {
       include: [
-        { service: usersService.getPath(true), nameAs: 'participant', parentField: 'participant', childField: '_id',
-          query: { $select: ['profile.name'] } }
+        {
+          service: usersService.getPath(true),
+          nameAs: 'participant',
+          parentField: 'participant',
+          childField: '_id',
+          query: { $select: ['profile.name'] }
+        }
       ]
     }
   }
@@ -26,10 +31,10 @@ const populateParticipant = populate({
 
 module.exports = {
   before: {
-    all: [ hooks.convertObjectIDs(['participant', 'event']) ],
+    all: [hooks.convertObjectIDs(['participant', 'event'])],
     find: [],
     get: [],
-    create: [ setNow('createdAt'), addLogDefaults, linkWithPreviousLog ],
+    create: [setNow('createdAt'), addLogDefaults, linkWithPreviousLog],
     update: [],
     patch: [],
     remove: []
@@ -37,9 +42,9 @@ module.exports = {
 
   after: {
     all: [],
-    find: [ populatePreviousLog, populateParticipant ],
+    find: [populatePreviousLog, populateParticipant],
     get: [],
-    create: [ updatePreviousLog, sendStateNotifications ],
+    create: [updatePreviousLog, sendStateNotifications],
     update: [],
     patch: [],
     remove: []

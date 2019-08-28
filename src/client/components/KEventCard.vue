@@ -152,11 +152,11 @@ export default {
     loadSchema () {
       // Call super
       return kCoreMixins.schemaProxy.methods.loadSchema.call(this)
-      .then(schema => {
+        .then(schema => {
         // Start from schema template and clone it because it will be shared by all cards
-        this.schema = this.generateSchemaForStep(this.participantStep, schema)
-        return this.schema
-      })
+          this.schema = this.generateSchemaForStep(this.participantStep, schema)
+          return this.schema
+        })
     },
     refreshActions () {
       // Item actions
@@ -234,8 +234,8 @@ export default {
       this.$refs.mediaBrowser.show(this.item.attachments)
     },
     launchNavigation () {
-      let longitude = this.item.location.longitude
-      let latitude = this.item.location.latitude
+      const longitude = this.item.location.longitude
+      const latitude = this.item.location.latitude
       this.navigate(longitude, latitude)
     },
     removeEvent (event) {
@@ -244,13 +244,13 @@ export default {
         message: this.$t('KEventCard.REMOVE_DIALOG_TITLE', { event: event.name }),
         html: true,
         ok: {
-          label: this.$t('OK'),
+          label: this.$t('OK')
         },
         cancel: {
           label: this.$t('CANCEL')
         }
       }).onOk(() => {
-        let eventsService = this.$api.getService('events', this.contextId)
+        const eventsService = this.$api.getService('events', this.contextId)
         eventsService.remove(event._id, { query: { notification: this.$t('KEventNotifications.REMOVE') } })
       })
     },
@@ -277,7 +277,7 @@ export default {
         if (count.total === 0) {
           this.participantState = {}
           this.participantStep = this.getWorkflowStep() || {} // Use empty object by default to simplify display
-          let log = this.createParticipantLog(this.participantStep, this.participantState)
+          const log = this.createParticipantLog(this.participantStep, this.participantState)
           this.serviceCreate(log)
           // Real-time event should trigger a new refresh for current state
         }
@@ -289,7 +289,7 @@ export default {
         // When participant has just fullfilled a step we need to initiate the next one (if any) by a log acting as a read receipt
         // We know this when we get a higher step in workflow from the current state
         if (this.isBeforeInWorkflow(this.participantState.step, this.participantStep.name)) {
-          let log = this.createParticipantLog(this.participantStep, this.participantState)
+          const log = this.createParticipantLog(this.participantStep, this.participantState)
           this.serviceCreate(log)
           // Real-time event should trigger a new refresh for current state
         }
@@ -305,7 +305,7 @@ export default {
           this.loadSchema(),
           this.loadRefs()
         ])
-        .then(() => this.$refs.form.build())
+          .then(() => this.$refs.form.build())
       } else if (this.waitingInteraction(this.participantStep, this.participantState, 'coordinator')) {
         this.participantLabel = this.$t('KEventCard.WAITING_FOR_COORDINATOR_LABEL')
       }
@@ -314,17 +314,17 @@ export default {
       // Remove previous listener if any
       this.unsubscribeParticipantLog()
       this.participantLogListener = this.loadService().watch({ listStrategy: 'always' })
-      .find({
-        query: {
-          $sort: { createdAt: -1 }, // sort by newest ones
-          $limit: 1,
-          participant: this.userId,
-          event: this.item._id,
-          lastInEvent: true
-        }
-      })
+        .find({
+          query: {
+            $sort: { createdAt: -1 }, // sort by newest ones
+            $limit: 1,
+            participant: this.userId,
+            event: this.item._id,
+            lastInEvent: true
+          }
+        })
       // We can then load the last state of the user
-      .subscribe(this.refreshParticipantState)
+        .subscribe(this.refreshParticipantState)
     },
     unsubscribeParticipantLog () {
       if (this.participantLogListener) {
@@ -352,14 +352,14 @@ export default {
       // Remove previous listener if any
       this.unsubscribeCoordinatorLog()
       this.coordinatorLogListener = this.loadService().watch({ listStrategy: 'smart' })
-      .find({
-        query: {
-          event: this.item._id,
-          lastInEvent: true
-        }
-      })
+        .find({
+          query: {
+            event: this.item._id,
+            lastInEvent: true
+          }
+        })
       // We can then load the last state of the user
-      .subscribe(this.refreshCoordinatorState)
+        .subscribe(this.refreshCoordinatorState)
     },
     unsubscribeCoordinatorLog () {
       if (this.coordinatorLogListener) {

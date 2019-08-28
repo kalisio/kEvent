@@ -18,11 +18,11 @@ export function processNotification (hook) {
 
 export function addCreatorAsCoordinator (hook) {
   if (hook.type !== 'before') {
-    throw new Error(`The 'addCreatorAsCoordinator' hook should only be used as a 'before' hook.`)
+    throw new Error('The \'addCreatorAsCoordinator\' hook should only be used as a \'before\' hook.')
   }
 
   const user = hook.params.user
-  let coordinators = hook.data.coordinators || []
+  const coordinators = hook.data.coordinators || []
   if (user && Array.isArray(coordinators)) {
     // Add creator as coordinator if not already done
     if (!coordinators.find(coordinator => coordinator._id.toString() === user._id.toString())) {
@@ -40,15 +40,15 @@ export function addCreatorAsCoordinator (hook) {
 
 export async function sendEventNotifications (hook) {
   if (hook.type !== 'after') {
-    throw new Error(`The 'sendNotifications' hook should only be used as a 'after' hook.`)
+    throw new Error('The \'sendNotifications\' hook should only be used as a \'after\' hook.')
   }
 
-  let pusherService = hook.app.getService('pusher')
+  const pusherService = hook.app.getService('pusher')
   if (!pusherService) return hook
   const notification = hook.params.notification
   if (notification) {
     const participants = hook.result.participants || []
-    let publishPromises = []
+    const publishPromises = []
     participants.forEach(participant => {
       let participantService = participant.service
       if (hook.service.context) {
@@ -71,11 +71,11 @@ export async function sendEventNotifications (hook) {
       }))
     })
     // We'd like to be tolerant here because the participants might have be removed from the system while the event is still alive
-    //let results = await Promise.all(publishPromises)
-    let results = []
+    // let results = await Promise.all(publishPromises)
+    const results = []
     for (let i = 0; i < publishPromises.length; i++) {
       try {
-        let result = await publishPromises[i]
+        const result = await publishPromises[i]
         results.push(result)
       } catch (error) {
         logger.error(error.message, error)
@@ -85,4 +85,3 @@ export async function sendEventNotifications (hook) {
   }
   return hook
 }
-

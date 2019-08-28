@@ -5,14 +5,14 @@ import { addCreatorAsCoordinator, processNotification, sendEventNotifications } 
 
 module.exports = {
   before: {
-    all: [ ],
+    all: [],
     find: [],
     get: [],
     // Because expireAt comes from client convert it to Date object
-    create: [ processNotification, addCreatorAsCoordinator, setNow('createdAt', 'updatedAt'), hooks.convertDates(['expireAt']) ],
-    update: [ processNotification, discard('createdAt', 'updatedAt'), setNow('updatedAt'), hooks.convertDates(['expireAt']) ],
-    patch: [ processNotification, discard('createdAt', 'updatedAt'), setNow('updatedAt'), hooks.convertDates(['expireAt']) ],
-    remove: [ processNotification ]
+    create: [processNotification, addCreatorAsCoordinator, setNow('createdAt', 'updatedAt'), hooks.convertDates(['expireAt'])],
+    update: [processNotification, discard('createdAt', 'updatedAt'), setNow('updatedAt'), hooks.convertDates(['expireAt'])],
+    patch: [processNotification, discard('createdAt', 'updatedAt'), setNow('updatedAt'), hooks.convertDates(['expireAt'])],
+    remove: [processNotification]
   },
 
   after: {
@@ -26,11 +26,11 @@ module.exports = {
         results = Array.isArray(results) ? results : results.data
         // Event locations are returned as a standard GeoJson collection
         results = results
-        .filter(event => event.location)
-        .map(event => Object.assign({
-          type: 'Feature',
-          geometry: { coordinates: [event.location.longitude, event.location.latitude] }
-        }, event))
+          .filter(event => event.location)
+          .map(event => Object.assign({
+            type: 'Feature',
+            geometry: { coordinates: [event.location.longitude, event.location.latitude] }
+          }, event))
         // Copy pagination information so that client can use it anyway
         hook.result = Object.assign({
           type: 'FeatureCollection',
@@ -39,11 +39,11 @@ module.exports = {
       }
     ],
     get: [],
-    create: [ sendEventNotifications ],
-    update: [ sendEventNotifications ],
-    patch: [ sendEventNotifications ],
+    create: [sendEventNotifications],
+    update: [sendEventNotifications],
+    patch: [sendEventNotifications],
     // Because the notification ID is based on created/updated time we need to update it even on remove
-    remove: [ setNow('updatedAt'), sendEventNotifications, hooks.removeAttachments('attachments') ]
+    remove: [setNow('updatedAt'), sendEventNotifications, hooks.removeAttachments('attachments')]
   },
 
   error: {

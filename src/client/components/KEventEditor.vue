@@ -63,7 +63,7 @@ export default {
           if (description) this._object.description = description
           const results = await this.$api.getService('geocoder').create(feature)
           if (results.length > 0) {
-            let element = results[0]
+            const element = results[0]
             this._object.location = Object.assign(element, { name: utils.formatGeocodingResult(element) })
           }
         }
@@ -75,24 +75,24 @@ export default {
     loadSchema () {
       // Call super
       return mixins.schemaProxy.methods.loadSchema.call(this)
-      .then(schema => {
+        .then(schema => {
         // When a template is provided check for workflow availability
-        if (this.template) {
+          if (this.template) {
           // Start from schema template and clone it because it will be shared by all editors
-          this.schema = _.cloneDeep(schema)
-          // Remove workflow from schema if not present in template
-          if (_.isNil(this.template.workflow)) {
-            delete this.schema.properties.hasWorkflow
-            _.pull(this.schema.required, 'hasWorkflow')
+            this.schema = _.cloneDeep(schema)
+            // Remove workflow from schema if not present in template
+            if (_.isNil(this.template.workflow)) {
+              delete this.schema.properties.hasWorkflow
+              _.pull(this.schema.required, 'hasWorkflow')
+            }
           }
-        }
-        return this.schema
-      })
+          return this.schema
+        })
     },
     getBaseQuery (object) {
       // Overriden to handle notification messages
-      let query = editorMixin.methods.getBaseQuery.call(this)
-      let notification = _.get(object, 'notification', true)
+      const query = editorMixin.methods.getBaseQuery.call(this)
+      const notification = _.get(object, 'notification', true)
       if (notification) {
         if (this.getMode() === 'create') {
           query.notification = this.$t('KEventNotifications.CREATE')

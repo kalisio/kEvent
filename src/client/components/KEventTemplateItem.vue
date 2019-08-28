@@ -9,7 +9,7 @@ import { mixins } from '@kalisio/kdk-core/client'
 
 export default {
   name: 'k-event-template-item',
-  mixins: [ mixins.baseItem ],
+  mixins: [mixins.baseItem],
   computed: {
     icon () {
       return this.item.icon
