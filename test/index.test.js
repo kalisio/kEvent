@@ -467,7 +467,8 @@ describe('kEvent', () => {
   })
 
   // Cleanup
-  after(() => {
-    app.db.instance.dropDatabase()
+  after(async () => {
+    await app.db.instance.dropDatabase()
+    await app.db.disconnect()
   })
 })
