@@ -104,6 +104,8 @@ export default {
   created () {
     // Load the required components
     this.$options.components['k-grid'] = this.$load('collection/KGrid')
+    // Performs geolocation
+    this.updatePosition()
   }
 }
 </script>
