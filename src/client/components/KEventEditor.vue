@@ -72,9 +72,17 @@ export default {
         return mixins.objectProxy.methods.loadObject.call(this)
       }
     },
+    getSchemaName () {
+      // When used with a service by default use the same name for schema as for service
+      let schemaName = this.service + (this.objectId ? '.update' : '.create')
+      if (this.perspective) {
+        schemaName += ('-' + this.perspective)
+      }
+      return schemaName
+    },
     loadSchema () {
       // Call super
-      return mixins.schemaProxy.methods.loadSchema.call(this)
+      return mixins.schemaProxy.methods.loadSchema.call(this, this.getSchemaName())
         .then(schema => {
         // When a template is provided check for workflow availability
           if (this.template) {

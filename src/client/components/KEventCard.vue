@@ -23,7 +23,7 @@
           </div>
           <div v-if="participantLabel">
             {{ participantLabel }}
-            <q-card-separator class="card-separator" />
+            <q-separator class="card-separator" />
           </div>
           <span v-if="comment">
             <k-text-area class="light-paragraph" :length="20" :text="comment" />
@@ -146,12 +146,9 @@ export default {
       this._service = this.$api.getService('event-logs', this.contextId)
       return this._service
     },
-    getSchemaName () {
-      return 'event-logs.create'
-    },
     loadSchema () {
       // Call super
-      return kCoreMixins.schemaProxy.methods.loadSchema.call(this)
+      return kCoreMixins.schemaProxy.methods.loadSchema.call(this, 'event-logs.create')
         .then(schema => {
         // Start from schema template and clone it because it will be shared by all cards
           this.schema = this.generateSchemaForStep(this.participantStep, schema)

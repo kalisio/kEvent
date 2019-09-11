@@ -164,7 +164,6 @@ export default {
     },
     applyStepChanges () {
       if (this.preview) return true
-
       const form = this.getForm('stepForm').validate()
       if (form.isValid) {
         _.assign(this.getCurrentStep(), form.values)
@@ -224,7 +223,7 @@ export default {
       this.setRefs(['stepForm'])
       // Build the internal form
       await Promise.all([
-        this.loadSchema(),
+        this.loadSchema('event-workflow' + (this.objectId ? '.update' : '.create')),
         this.loadPreviewSchema(),
         this.loadRefs()
       ])

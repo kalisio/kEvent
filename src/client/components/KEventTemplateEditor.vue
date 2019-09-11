@@ -7,7 +7,7 @@
         <strong v-show="!hasWorkflow">{{$t('KEventTemplateEditor.ADD_WORKFLOW_LABEL')}}</strong>
         <span v-show="hasWorkflow">{{$t('KEventTemplateEditor.WORKFLOW_HELPER_LABEL')}}</span>
       </p>
-      <k-event-workflow-form v-show="hasWorkflow" ref="workflowForm" schemaName="event-workflow" :objectId="objectId" />
+      <k-event-workflow-form v-show="hasWorkflow" ref="workflowForm" :objectId="objectId" />
       <q-spinner-cube color="primary" class="fixed-center" v-if="applyInProgress" size="4em"/>
     </div>
   </k-modal>
@@ -15,7 +15,6 @@
 
 <script>
 import _ from 'lodash'
-import { QToggle } from 'quasar'
 import { mixins } from '@kalisio/kdk-core/client'
 
 export default {
@@ -27,7 +26,6 @@ export default {
     mixins.baseEditor(['templateForm', 'workflowForm']),
     mixins.refsResolver(['templateForm', 'workflowForm'])
   ],
-  components: { QToggle },
   props: {
     templateId: {
       type: String,
