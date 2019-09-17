@@ -2,65 +2,37 @@
   <div>
     <div ref="map" :style="viewStyle">
       <q-resize-observer @resize="onMapResized" />
-      <k-widget ref="timeseriesWidget" :offset="{ minimized: [18,18], maximized: [0,0] }" :title="probedLocationName" @state-changed="onUpdateTimeseries">
-        <div slot="widget-content">
-          <k-location-time-series ref="timeseries"
-            :feature="probedLocation"
-            :variables="variables"
-            :current-time-format="currentTimeFormat"
-            :current-formatted-time="currentFormattedTime" />
-        </div>
-      </k-widget>
     </div>
-    <q-btn
-      id="map-panel-toggle"
-      color="secondary"
-      class="fixed"
-      style="right: 18px; top: 72px"
-      small
-      round
-      icon="layers"
-      @click="klayout.toggleRightDrawer()" />
+
+    <q-page-sticky position="top" :offset="[0, 18]">
+      <k-navigation-bar />
+    </q-page-sticky>
+
+    <q-page-sticky position="left" :offset="[18, 0]">
+      <k-feature-info-box style="min-width: 150px; width: 15vw; max-height: 40vh" />
+    </q-page-sticky>
+
+    <q-page-sticky position="top" :offset="[0, 0]">
+      <k-location-time-series :variables="currentVariables" />
+    </q-page-sticky>
+
+    <q-page-sticky position="left" :offset="[18, 0]">
+      <k-color-legend/>
+    </q-page-sticky>
+
+    <q-page-sticky position="bottom" :offset="[0, 40]">
+      <k-timeline v-show="timelineEnabled"/>
+    </q-page-sticky>
+
     <k-modal ref="uploaderModal" :toolbar="getUploaderToolbar()">
       <div slot="modal-content">
         <k-uploader ref="uploader" :resource="objectId" :base-query="uploaderQuery()"
           :options="uploaderOptions()" @uploader-ready="initializeMedias"/>
       </div>
     </k-modal>
-    <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
-    <k-color-legend v-if="colorLegend.visible"
-      class="fixed"
-      :style="colorLegendStyle"
-      :unit="colorLegend.unit"
-      :hint="colorLegend.hint"
-      :colorMap="colorLegend.colorMap"
-      :colors="colorLegend.colors"
-      :values="colorLegend.values"
-      :unitValues="colorLegend.unitValues"
-      :showGradient="colorLegend.showGradient"
-      @click="onColorLegendClick" />
-    />
 
-    <q-page-sticky position="bottom-left" :offset="[110, 60]">
-      <div :style="timelineContainerStyle">
-        <k-time-controller
-          v-if="timelineEnabled"
-          :key="timelineRefreshKey"
-          :min="timeline.start"
-          :max="timeline.end"
-          :step="'h'"
-          :value="timeline.current"
-          :timeInterval="timelineInterval"
-          :timeFormatter="timelineFormatter"
-          @change="onTimelineUpdated"
-          pointerColor="#8bc34a"
-          pointerTextColor="white"
-          style="width: 100%;" />
-      </div>
-    </q-page-sticky>
-    <div>
-      <router-view service="events" :router="router()"></router-view>
-    </div>
+    <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
+    <router-view service="events" :router="router()"></router-view>
   </div>
 </template>
 
@@ -76,6 +48,12 @@ const activityMixin = kMapMixins.activity('event')
 export default {
   name: 'k-event-activity',
   inject: ['klayout'],
+  provide () {
+    return {
+      kActivity: this,
+      kMap: this
+    }
+  },
   mixins: [
     kCoreMixins.refsResolver(['map']),
     kCoreMixins.baseActivity,
@@ -83,10 +61,7 @@ export default {
     kMapMixins.featureService,
     kMapMixins.weacast,
     kMapMixins.time,
-    kMapMixins.timeline,
-    kMapMixins.timeseries,
     activityMixin,
-    kMapMixins.legend,
     kMapMixins.locationIndicator,
     kMapMixins.map.baseMap,
     kMapMixins.map.geojsonLayers,
@@ -340,6 +315,11 @@ export default {
   },
   created () {
     // Load the required components
+    this.$options.components['k-navigation-bar'] = this.$load('KNavigationBar')
+    this.$options.components['k-feature-info-box'] = this.$load('KFeatureInfoBox')
+    this.$options.components['k-color-legend'] = this.$load('KColorLegend')
+    this.$options.components['k-timeline'] = this.$load('KTimeline')
+    this.$options.components['k-location-time-series'] = this.$load('KLocationTimeSeries')
     this.$options.components['k-uploader'] = this.$load('input/KUploader')
     this.$options.components['k-media-browser'] = this.$load('media/KMediaBrowser')
     this.registerLeafletStyle('tooltip', this.getParticipantTooltip)
