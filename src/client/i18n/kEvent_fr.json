@@ -19,6 +19,7 @@
     "EVENT_WORKFLOW_TITLE_FIELD_HELPER": "Saisissez le nom de cette étape",
     "EVENT_WORKFLOW_ICON_FIELD_HELPER": "Selectionnez une icone pour représenter cette étape",
     "EVENT_WORKFLOW_DESCRIPTION_FIELD_HELPER": "Saisissez la description de cette étape",
+    "EVENT_WORKFLOW_FEATURE_INTERACTION_FIELD_HELPER": "Interaction avec les éléments géographiques",
     "EVENT_WORKFLOW_INTERACTION_FIELD_HELPER": "Saisissez les interactions de cette étape",
     "EVENT_WORKFLOW_END_FIELD_HELPER": "Sélectionnez l'interaction qui donne lieu à la fin du processus",
     "EVENT_WORKFLOW_STAKEHOLDER_FIELD_HELPER": "Sélectionnez la partie prenante",

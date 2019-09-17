@@ -20,6 +20,7 @@
     "EVENT_WORKFLOW_ICON_FIELD_HELPER": "Select the step icon",
     "EVENT_WORKFLOW_DESCRIPTION_FIELD_HELPER": "Enter the step description",
     "EVENT_WORKFLOW_INTERACTION_FIELD_HELPER": "Enter the step interaction values",
+    "EVENT_WORKFLOW_FEATURE_INTERACTION_FIELD_HELPER": "Interaction with geographical feature",
     "EVENT_WORKFLOW_END_FIELD_HELPER": "Enter the interaction values ending the workflow",
     "EVENT_WORKFLOW_STAKEHOLDER_FIELD_HELPER": "Select the stakeholder",
     "EVENT_WORKFLOW_PARTICIPANT_LABEL": "Participant",

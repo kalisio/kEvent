@@ -170,16 +170,16 @@ export default {
       }
       return form.isValid
     },
-    restoreStep () {
+    async restoreStep () {
       // For preview we need to update the underlying schema to reflect step values
       if (this.preview) {
-        this.previewSchema = this.generateSchemaForStep(this.getCurrentStep(), this.previewSchemaBase)
+        this.previewSchema = this.generateSchemaForStep(this.getCurrentStep())
         // We need to force a refresh so that the schema is correctly transfered to child component by Vuejs
-        this.$nextTick().then(() => {
-          // Force form refresh to default values
-          const form = this.getForm('previewForm')
-          form.build().then(() => form.clear())
-        })
+        await this.$nextTick()
+        // Force form refresh to default values
+        const form = this.getForm('previewForm')
+        await form.build()
+        form.clear()
       } else {
         // Otherwise simply fill the step form
         this.fillStepForm()
@@ -187,12 +187,7 @@ export default {
     },
     async loadPreviewSchema () {
       try {
-        let schema = await this.$load('event-logs.create', 'schema')
-        // FIXME: not yet sure why this is now required, might be related to
-        // https://forum.vuejs.org/t/solved-using-standalone-version-but-getting-failed-to-mount-component-template-or-render-function-not-defined/19569/2
-        if (schema.default) schema = schema.default
-        this.previewSchemaBase = schema
-        this.previewSchema = this.generateSchemaForStep(this.getCurrentStep(), this.previewSchemaBase)
+        this.previewSchema = this.generateSchemaForStep(this.getCurrentStep())
         return schema
       } catch (error) {
         this.$events.$emit('error', error)
@@ -215,7 +210,8 @@ export default {
       const interactionField = form.getField('interaction')
       const endField = form.getField('end')
       // Add required label field
-      _.set(endField, 'properties.field.options', interactionField.model.map(option => Object.assign({ label: option.value }, option)))
+      _.set(endField, 'properties.field.options',
+        interactionField.model.map(option => Object.assign({ label: option.value }, option)))
     },
     async build () {
       // Because our step form is under a v-if caused by the Quasar stepper

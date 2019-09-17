@@ -146,14 +146,9 @@ export default {
       this._service = this.$api.getService('event-logs', this.contextId)
       return this._service
     },
-    loadSchema () {
-      // Call super
-      return kCoreMixins.schemaProxy.methods.loadSchema.call(this, 'event-logs.create')
-        .then(schema => {
-        // Start from schema template and clone it because it will be shared by all cards
-          this.schema = this.generateSchemaForStep(this.participantStep, schema)
-          return this.schema
-        })
+    async loadSchema () {
+      this.schema = await this.generateSchemaForStep(this.participantStep)
+      return this.schema
     },
     refreshActions () {
       // Item actions

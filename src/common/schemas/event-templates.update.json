@@ -109,6 +109,6 @@
       }
     }
   },
-  "required": ["name", "icon", "description", "participants", "coordinators"]
+  "required": ["name", "icon"]
 }
 
