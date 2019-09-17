@@ -188,7 +188,7 @@ export default {
     async loadPreviewSchema () {
       try {
         this.previewSchema = this.generateSchemaForStep(this.getCurrentStep())
-        return schema
+        return this.previewSchema
       } catch (error) {
         this.$events.$emit('error', error)
         throw error
