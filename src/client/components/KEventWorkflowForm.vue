@@ -105,7 +105,7 @@ export default {
         this.currentStep = this.steps[index + 1].name
       } else {
         this.steps.push(step)
-        this.currentStep = this.steps.length - 1
+        this.currentStep = this.steps[this.steps.length - 1].name
       }
       this.restoreStep()
     },
