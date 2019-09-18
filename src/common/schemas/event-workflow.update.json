@@ -29,13 +29,17 @@
       }
     },
     "featureInteraction": {
-      "type": "boolean",
-      "default": false,
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
       "field": {
-        "component": "form/KToggleField",
+        "component": "form/KOptionsField",
         "helper": "schemas.EVENT_WORKFLOW_FEATURE_INTERACTION_FIELD_HELPER",
-        "checked-icon": "layers",
-        "unchecked-icon": "layers_clear"
+        "type": "checkbox",
+        "color": "primary",
+        "inline": true,
+        "dense": true,
+        "options": []
       }
     },
     "interaction": {
@@ -74,10 +78,9 @@
       }
     }
   },
-  "allOf": [{
-    "if": { "properties": { "featureInteraction": { "const": true } } },
-    "then": { "required": [ "title", "icon", "description", "stakeholder" ] },
-    "else": { "required": [ "title", "icon", "description", "interaction", "stakeholder" ] }
+  "oneOf": [{
+    "required": [ "title", "icon", "description", "featureInteraction", "stakeholder" ] }, {
+    "required": [ "title", "icon", "description", "interaction", "stakeholder" ]
   }]
 }
 

@@ -16,6 +16,7 @@
     "EVENTS_TEMPLATES_PARTICIPANTS_FIELD_HELPER": "Saisissez les participants par défaut de l'événement",
     "EVENTS_TEMPLATES_COORDINATORS_FIELD_CREATE_HELPER": "Saisissez les coordinateurs par défaut de l'événement (autres que le créateur)",
     "EVENTS_TEMPLATES_COORDINATORS_FIELD_UPDATE_HELPER": "Saisissez les coordinateurs par défaut de l'événement (autres que le créateur)",
+    "EVENTS_TEMPLATES_LAYER_FIELD_HELPER": "Sélectionnez une couche de données cible",
     "EVENT_WORKFLOW_TITLE_FIELD_HELPER": "Saisissez le nom de cette étape",
     "EVENT_WORKFLOW_ICON_FIELD_HELPER": "Selectionnez une icone pour représenter cette étape",
     "EVENT_WORKFLOW_DESCRIPTION_FIELD_HELPER": "Saisissez la description de cette étape",
@@ -106,7 +107,9 @@
   },
   "KEventTemplateEditor": {
     "ADD_WORKFLOW_LABEL": "Ajouter un processus ?",
-    "WORKFLOW_HELPER_LABEL": "Gérer ci-dessous les différentes étapes du processus",
+    "WORKFLOW_HELPER_LABEL": "Processus actif",
+    "WORKFLOW_MANAGE_HELPER_LABEL": "cliquez pour modifier",
+    "WORKFLOW_TITLE": "Gérez les différentes étapes du processus",
     "CLOSE_ACTION":  "$t(CLOSE_LABEL)"
   },
   "KEventNotifications": {

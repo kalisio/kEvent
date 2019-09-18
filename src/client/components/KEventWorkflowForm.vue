@@ -1,44 +1,43 @@
 <template>
-  <q-card>
-    <q-stepper header-nav animated ref="stepper" v-model="currentStep" @input="onStepSelected">
-      <q-step v-for="(step, index) in steps" :key="step.name + '_' + index" :name="step.name"
-        :title="step.title" :icon="getStepIcon(step)">
-        <k-form ref="stepForm" v-show="!preview" :schema="schema" @form-ready="fillStepForm" @field-changed="onStepFieldChanged"/>
-        <div v-show="preview">
-          <k-form ref="previewForm" :schema="previewSchema"/>
-        </div>
-      </q-step>
-      <template v-slot:navigation>
-        <q-stepper-navigation class="row justify-end">
-          <q-btn class="col-1" :disabled="currentStep === steps[0].name" flat color="primary" icon="navigate_before" @click="onPreviousStep()">
-            <q-tooltip v-if="currentStep !== steps[0].name" anchor="top middle" self="bottom middle" :offset="[10, 10]">
-              {{$t('KEventWorkflowForm.PREVIOUS_STEP_BUTTON')}}
-            </q-tooltip>
-          </q-btn>
-          <q-btn class="col-1" v-show="!preview" flat color="primary" icon="playlist_add" @click="onAddStep()">
-            <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
-              {{$t('KEventWorkflowForm.ADD_STEP_BUTTON')}}
-            </q-tooltip>
-          </q-btn>
-          <q-btn class="col-1" v-show="!preview && (steps.length > 1)" flat color="primary" icon="delete_sweep" @click="onRemoveStep()">
-            <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
-              {{$t('KEventWorkflowForm.REMOVE_STEP_BUTTON')}}
-            </q-tooltip>
-          </q-btn>
-          <q-btn class="col-1" flat color="primary" :icon="preview ? 'edit' : 'play_arrow'" @click="onPreviewOrEdit">
-            <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
-              {{$t(!preview ? 'KEventWorkflowForm.PREVIEW_WORKFLOW_BUTTON': 'KEventWorkflowForm.EDIT_WORKFLOW_BUTTON')}}
-            </q-tooltip>
-          </q-btn>
-          <q-btn class="col-1" :disabled="currentStep === steps[steps.length - 1].name" flat color="primary" icon="navigate_next" @click="onNextStep()">
-            <q-tooltip v-if="currentStep !== steps[steps.length - 1].name" anchor="top middle" self="bottom middle" :offset="[10, 10]">
-              {{$t('KEventWorkflowForm.NEXT_STEP_BUTTON')}}
-            </q-tooltip>
-          </q-btn>
-        </q-stepper-navigation>
-      </template>
-    </q-stepper>
-  </q-card>
+  <q-stepper header-nav animated ref="stepper" v-model="currentStep" @input="onStepSelected">
+    <q-step v-for="(step, index) in steps" :key="step.name + '_' + index" :name="step.name"
+      :title="step.title" :icon="getStepIcon(step)">
+      <k-form ref="stepForm" v-show="!preview" :schema="schema" @form-ready="fillStepForm" @field-changed="onStepFieldChanged">
+      </k-form>
+      <div v-show="preview">
+        <k-form ref="previewForm" :schema="previewSchema"/>
+      </div>
+    </q-step>
+    <template v-slot:navigation>
+      <q-stepper-navigation class="row justify-end">
+        <q-btn class="col-1" :disabled="currentStep === steps[0].name" flat color="primary" icon="navigate_before" @click="onPreviousStep()">
+          <q-tooltip v-if="currentStep !== steps[0].name" anchor="top middle" self="bottom middle" :offset="[10, 10]">
+            {{$t('KEventWorkflowForm.PREVIOUS_STEP_BUTTON')}}
+          </q-tooltip>
+        </q-btn>
+        <q-btn class="col-1" v-show="!preview" flat color="primary" icon="playlist_add" @click="onAddStep()">
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
+            {{$t('KEventWorkflowForm.ADD_STEP_BUTTON')}}
+          </q-tooltip>
+        </q-btn>
+        <q-btn class="col-1" v-show="!preview && (steps.length > 1)" flat color="primary" icon="delete_sweep" @click="onRemoveStep()">
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
+            {{$t('KEventWorkflowForm.REMOVE_STEP_BUTTON')}}
+          </q-tooltip>
+        </q-btn>
+        <q-btn class="col-1" flat color="primary" :icon="preview ? 'edit' : 'play_arrow'" @click="onPreviewOrEdit">
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
+            {{$t(!preview ? 'KEventWorkflowForm.PREVIEW_WORKFLOW_BUTTON': 'KEventWorkflowForm.EDIT_WORKFLOW_BUTTON')}}
+          </q-tooltip>
+        </q-btn>
+        <q-btn class="col-1" :disabled="currentStep === steps[steps.length - 1].name" flat color="primary" icon="navigate_next" @click="onNextStep()">
+          <q-tooltip v-if="currentStep !== steps[steps.length - 1].name" anchor="top middle" self="bottom middle" :offset="[10, 10]">
+            {{$t('KEventWorkflowForm.NEXT_STEP_BUTTON')}}
+          </q-tooltip>
+        </q-btn>
+      </q-stepper-navigation>
+    </template>
+  </q-stepper>
 </template>
 
 <script>
@@ -60,9 +59,21 @@ export default {
     mixins.eventLogs
   ],
   props: {
+    contextId: {
+      type: String
+    },
     objectId: {
       type: String,
       default: ''
+    },
+    layerId: {
+      type: String
+    }
+  },
+  watch: {
+    layerId: async function () {
+      await this.loadLayerSchema(this.layerId)
+      this.fill({ workflow: this.steps })
     }
   },
   data () {
@@ -173,7 +184,7 @@ export default {
     async restoreStep () {
       // For preview we need to update the underlying schema to reflect step values
       if (this.preview) {
-        this.previewSchema = this.generateSchemaForStep(this.getCurrentStep())
+        this.previewSchema = await this.generateSchemaForStep(this.getCurrentStep(), this.layer)
         // We need to force a refresh so that the schema is correctly transfered to child component by Vuejs
         await this.$nextTick()
         // Force form refresh to default values
@@ -187,7 +198,7 @@ export default {
     },
     async loadPreviewSchema () {
       try {
-        this.previewSchema = this.generateSchemaForStep(this.getCurrentStep())
+        this.previewSchema = await this.generateSchemaForStep(this.getCurrentStep(), this.layer)
         return this.previewSchema
       } catch (error) {
         this.$events.$emit('error', error)
@@ -203,7 +214,16 @@ export default {
     fillStepForm () {
       const form = this.getForm('stepForm')
       form.fill(this.getCurrentStep())
+      this.setupFeatureInteractionField()
       this.setupEndField()
+    },
+    setupFeatureInteractionField () {
+      if (!this.layerSchema) return
+      const form = this.getForm('stepForm')
+      const interactionField = form.getField('featureInteraction')
+      // Add required label field
+      _.set(interactionField, 'properties.field.options',
+        _.toPairs(this.layerSchema.properties).map(([key, value]) => ({ value: key, label: value.field.helper })))
     },
     setupEndField () {
       const form = this.getForm('stepForm')
@@ -229,7 +249,7 @@ export default {
         this.getForm('previewForm').build()
       ])
     },
-    fill (object) {
+    async fill (object) {
       // If no workflow given this will use default one
       if (object.workflow) {
         this.steps = object.workflow
@@ -262,6 +282,7 @@ export default {
       title: '',
       icon: { name: 'check', color: 'primary' },
       description: '',
+      featureInteraction: [],
       interaction: [],
       end: [],
       stakeholder: 'participant'
@@ -271,6 +292,8 @@ export default {
     // Initialize step data on creation so that local ref to form can be resolved
     this.steps = [this.generateStep()]
     this.currentStep = this.steps[0].name
+    // Load layer schema if any
+    this.loadLayerSchema(this.layerId)
   }
 }
 </script>

@@ -16,6 +16,7 @@
     "EVENTS_TEMPLATES_PARTICIPANTS_FIELD_HELPER": "Select event participants",
     "EVENTS_TEMPLATES_COORDINATORS_FIELD_CREATE_HELPER": "Select event coordinators (other than yourself)",
     "EVENTS_TEMPLATES_COORDINATORS_FIELD_UPDATE_HELPER": "Select event coordinators",
+    "EVENTS_TEMPLATES_LAYER_FIELD_HELPER": "Select a target data layer",
     "EVENT_WORKFLOW_TITLE_FIELD_HELPER": "Enter the title for this step",
     "EVENT_WORKFLOW_ICON_FIELD_HELPER": "Select the step icon",
     "EVENT_WORKFLOW_DESCRIPTION_FIELD_HELPER": "Enter the step description",
@@ -106,7 +107,9 @@
   },
   "KEventTemplateEditor": {
     "ADD_WORKFLOW_LABEL": "Add a workflow ?",
-    "WORKFLOW_HELPER_LABEL": "Manage below the different steps of the workflow",
+    "WORKFLOW_HELPER_LABEL": "Workflow activated",
+    "WORKFLOW_MANAGE_HELPER_LABEL": "click to update",
+    "WORKFLOW_TITLE": "Manage the different steps of the workflow",
     "CLOSE_ACTION":  "$t(CLOSE_LABEL)"
   },
   "KEventNotifications": {

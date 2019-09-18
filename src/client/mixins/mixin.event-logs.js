@@ -87,6 +87,12 @@ const eventsMixin = {
       if (state.previous && state.previous.interaction) return state.previous.interaction.value
       return ''
     },
+    async loadLayerSchema (layerId) {
+      this.layerSchema = null
+      if (!layerId) return
+      const layer = await this.$api.getService('catalog', this.contextId).get(layerId)
+      if (layer.schema) this.layerSchema = JSON.parse(layer.schema.content)
+    },
     async generateSchemaForStep (step) {
       // Start from schema template and clone it because modifications
       // will be shared by all caller otherwise
@@ -96,16 +102,14 @@ const eventsMixin = {
         // https://forum.vuejs.org/t/solved-using-standalone-version-but-getting-failed-to-mount-component-template-or-render-function-not-defined/19569/2
         if (this.baseLogSchema.default) this.baseLogSchema = this.baseLogSchema.default
       }
-      const schema = _.cloneDeep(this.baseLogSchema)
+      let schema = _.cloneDeep(this.baseLogSchema)
       // Then add step interaction
-      if (step.featureInteraction) {
-        const layer = await this.$api.getService('catalog').get(this.event.layer)
-        if (layer.schema) {
-          const layerSchema = JSON.parse(layer.schema.content)
-          schema.properties = layerSchema.properties
-          schema.required = layerSchema.required
+      if (step.featureInteraction && !_.isEmpty(step.featureInteraction)) {
+        if (this.layerSchema) {
+          schema.properties = _.pickBy(this.layerSchema.properties, (value, property) => step.featureInteraction.includes(property))
+          schema.required = _.filter(this.layerSchema.required, (property) => step.featureInteraction.includes(property))
         }
-      } else if (step.interaction) {
+      } else if (step.interaction && !_.isEmpty(step.interaction)) {
         const options = step.interaction.map(option => { return { label: option.value, value: option } })
         schema.properties.interaction = {
           type: 'object',

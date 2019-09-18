@@ -147,6 +147,8 @@ export default {
       return this._service
     },
     async loadSchema () {
+      // Load layer schema if any first
+      await this.loadLayerSchema(this.event.layer)
       this.schema = await this.generateSchemaForStep(this.participantStep)
       return this.schema
     },

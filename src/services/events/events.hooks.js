@@ -5,7 +5,7 @@ import { addCreatorAsCoordinator, processNotification, sendEventNotifications } 
 
 module.exports = {
   before: {
-    all: [],
+    all: [hooks.convertObjectIDs(['layer', 'feature'])],
     find: [],
     get: [],
     // Because expireAt comes from client convert it to Date object

@@ -67,7 +67,7 @@ export default {
       return this._service
     },
     async loadSchema () {
-      this.schema = await this.generateSchemaForStep(this.step)
+      this.schema = await this.generateSchemaForStep(this.step, this.event.layer)
       return this.schema
     },
     async refresh () {
@@ -95,6 +95,8 @@ export default {
     // Retrieve source log/event
     this.state = await this.loadService().get(this.logId)
     this.event = await this.$api.getService('events', this.contextId).get(this.objectId)
+    // Load layer schema if any
+    await this.loadLayerSchema(this.event.layer)
     this.step = this.getWorkflowStep(this.state)
     this.refresh()
   }

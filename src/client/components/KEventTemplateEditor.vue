@@ -1,16 +1,22 @@
 <template>
-  <k-modal ref="modal" :title="editorTitle" :toolbar="toolbar()" :buttons="buttons" :route="true">
-    <div slot="modal-content" class="column xs-gutter">
-      <k-form :class="{ 'light-dimmed': applyInProgress }" ref="templateForm" :schema="schema" />
-      <p :class="{ 'light-dimmed': applyInProgress }" class="col-10 caption pull-left">
-        <q-toggle icon="fa-retweet" v-model="hasWorkflow" @input="onWorkflow"/>
-        <strong v-show="!hasWorkflow">{{$t('KEventTemplateEditor.ADD_WORKFLOW_LABEL')}}</strong>
-        <span v-show="hasWorkflow">{{$t('KEventTemplateEditor.WORKFLOW_HELPER_LABEL')}}</span>
-      </p>
-      <k-event-workflow-form v-show="hasWorkflow" ref="workflowForm" :objectId="objectId" />
+  <div>
+    <k-modal ref="modal" :title="title" :toolbar="toolbar()" :buttons="buttons" :route="true">
+      <div slot="modal-content" class="column xs-gutter">
+        <div v-show="!workflowEdition">
+          <k-form :class="{ 'light-dimmed': applyInProgress }" ref="templateForm" :schema="schema"  @field-changed="onFieldChanged"/>
+          <p :class="{ 'light-dimmed': applyInProgress }" class="col-10 caption pull-left">
+            <q-toggle icon="fas fa-retweet" v-model="hasWorkflow" @input="onWorkflow">
+            </q-toggle>
+            <strong v-show="!hasWorkflow">{{$t('KEventTemplateEditor.ADD_WORKFLOW_LABEL')}}</strong>
+            <strong v-show="hasWorkflow">{{$t('KEventTemplateEditor.WORKFLOW_HELPER_LABEL')}}</strong>
+            <a v-show="hasWorkflow" class="text-caption" @click="workflowEdition = true"> ({{$t('KEventTemplateEditor.WORKFLOW_MANAGE_HELPER_LABEL')}})</a>
+          </p>
+        </div>
+        <k-event-workflow-form v-show="workflowEdition" ref="workflowForm" :objectId="objectId" :layerId="layerId" />
+      </div>
       <q-spinner-cube color="primary" class="fixed-center" v-if="applyInProgress" size="4em"/>
-    </div>
-  </k-modal>
+    </k-modal>
+  </div>
 </template>
 
 <script>
@@ -33,22 +39,28 @@ export default {
     }
   },
   computed: {
+    title () {
+      return (this.workflowEdition ? this.$t('KEventTemplateEditor.WORKFLOW_TITLE') : this.editorTitle)
+    },
     buttons () {
-      return [
+      return (this.workflowEdition ? [] : [
         { name: 'apply-button', label: this.applyButton, color: 'primary', handler: () => this.apply() }
-      ]
+      ])
     }
   },
   data () {
     return {
-      hasWorkflow: false
+      hasWorkflow: false,
+      workflowEdition: false,
+      layerId: ''
     }
   },
   methods: {
     toolbar () {
-      return [
-        { name: 'close-action', label: this.$t('KEventTemplateEditor.CLOSE_ACTION'), icon: 'close', handler: () => this.doClose() }
-      ]
+      let action = { name: 'close-action', label: this.$t('KEventTemplateEditor.CLOSE_ACTION'), icon: 'close' }
+      if (this.workflowEdition) action.handler = () => this.workflowEdition = false
+      else action.handler = () => this.doClose()
+      return [action]
     },
     loadObject () {
       // When a template is provided use it as reference for object
@@ -64,13 +76,21 @@ export default {
         return mixins.objectProxy.methods.loadObject.call(this)
       }
     },
-    onWorkflow (hasWorkflow) {
+    onFieldChanged (field, value) {
+      // Setup workflow depending on target layer
+      if (field === 'layer') {
+        this.layerId = (value ? value._id : null)
+      }
+    },
+    async onWorkflow (hasWorkflow) {
       if (this.templateId) {
         if (hasWorkflow) this._object.workflow = this.template.workflow
         else delete this._object.workflow
       }
       // Activate workflow form accordingly
       this.setFormDisabled('workflowForm', !hasWorkflow)
+      // Enter workflow edition mode
+      if (hasWorkflow) this.workflowEdition = true
     },
     doClose () {
       this.$refs.modal.close()
@@ -81,6 +101,7 @@ export default {
       // In edition mode activate workflow according to its existence
       if (this.objectId || this.templateId) {
         this.hasWorkflow = !_.isNil(this.getObject().workflow)
+        this.layerId = this.getObject().layer._id
         this.setFormDisabled('workflowForm', !this.hasWorkflow)
       } else {
         // In creation mode disabled by default
