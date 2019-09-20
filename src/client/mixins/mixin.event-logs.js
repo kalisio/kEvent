@@ -109,7 +109,8 @@ const eventsMixin = {
           schema.properties = _.pickBy(this.layerSchema.properties, (value, property) => step.featureInteraction.includes(property))
           schema.required = _.filter(this.layerSchema.required, (property) => step.featureInteraction.includes(property))
         }
-      } else if (step.interaction && !_.isEmpty(step.interaction)) {
+      }
+      if (step.interaction && !_.isEmpty(step.interaction)) {
         const options = step.interaction.map(option => { return { label: option.value, value: option } })
         schema.properties.interaction = {
           type: 'object',

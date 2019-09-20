@@ -295,11 +295,11 @@ export default {
       if (this.waitingInteraction(this.participantStep, this.participantState, 'participant')) {
         this.participantLabel = this.$t('KEventCard.WAITING_FOR_PARTICIPANT_LABEL')
         // We can then load the schema and local refs in parallel
-        Promise.all([
+        await Promise.all([
           this.loadSchema(),
           this.loadRefs()
         ])
-          .then(() => this.$refs.form.build())
+        this.$refs.form.build()
       } else if (this.waitingInteraction(this.participantStep, this.participantState, 'coordinator')) {
         this.participantLabel = this.$t('KEventCard.WAITING_FOR_COORDINATOR_LABEL')
       }

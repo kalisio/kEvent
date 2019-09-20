@@ -90,22 +90,20 @@ export default {
       }
       return schemaName
     },
-    loadSchema () {
+    async loadSchema () {
       // Call super
-      return mixins.schemaProxy.methods.loadSchema.call(this, this.getSchemaName())
-        .then(schema => {
-        // When a template is provided check for workflow availability
-          if (this.template) {
-          // Start from schema template and clone it because it will be shared by all editors
-            this.schema = _.cloneDeep(schema)
-            // Remove workflow from schema if not present in template
-            if (_.isNil(this.template.workflow)) {
-              delete this.schema.properties.hasWorkflow
-              _.pull(this.schema.required, 'hasWorkflow')
-            }
-          }
-          return this.schema
-        })
+      let schema = await mixins.schemaProxy.methods.loadSchema.call(this, this.getSchemaName())
+      // When a template is provided check for workflow availability
+      if (this.template) {
+      // Start from schema template and clone it because it will be shared by all editors
+        this.schema = _.cloneDeep(schema)
+        // Remove workflow from schema if not present in template
+        if (_.isNil(this.template.workflow)) {
+          delete this.schema.properties.hasWorkflow
+          _.pull(this.schema.required, 'hasWorkflow')
+        }
+      }
+      return this.schema
     },
     getBaseQuery (object) {
       // Overriden to handle notification messages
