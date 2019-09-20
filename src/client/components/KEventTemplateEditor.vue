@@ -58,7 +58,7 @@ export default {
   methods: {
     toolbar () {
       let action = { name: 'close-action', label: this.$t('KEventTemplateEditor.CLOSE_ACTION'), icon: 'close' }
-      if (this.workflowEdition) action.handler = () => this.workflowEdition = false
+      if (this.workflowEdition) action.handler = () => { this.workflowEdition = false }
       else action.handler = () => this.doClose()
       return [action]
     },
