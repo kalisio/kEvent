@@ -10,18 +10,64 @@ const eventsMixin = {
     }
   },
   methods: {
-    hasInteraction (step) {
+    hasStepUserInteraction (step) {
       if (_.isEmpty(step)) return false
-      else return !_.isEmpty(step.interaction) || step.featureInteraction
+      else return !_.isEmpty(step.interaction)
+    },
+    hasStepFeatureInteraction (step) {
+      if (_.isEmpty(step)) return false
+      else return !_.isEmpty(step.featureInteraction)
+    },
+    hasStepInteraction (step) {
+      return this.hasStepUserInteraction(step) || this.hasStepFeatureInteraction(step)
+    },
+    hasStateUserInteraction (state) {
+      if (_.isEmpty(state)) return false
+      else return !_.isEmpty(_.get(state, 'properties.interaction'))
+    },
+    hasStateFeatureInteraction (state) {
+      if (_.isEmpty(state)) return false
+      else return !_.isEmpty(state.properties)
+    },
+    hasStateInteraction (state) {
+      return this.hasStateUserInteraction(state) || this.hasStateFeatureInteraction(state)
     },
     waitingInteraction (step, state, stakeholder) {
-      return (this.hasInteraction(step) && !this.hasInteraction(state) && (step.stakeholder === stakeholder))
+      return (this.hasStepInteraction(step) && !this.hasStateInteraction(state) && (step.stakeholder === stakeholder))
+    },
+    getUserInteraction (state = {}) {
+      // When last step had a recorded interaction use it if any
+      if (_.has(state, 'properties.interaction')) return _.get(state, 'properties.interaction.value')
+      // If we wait for an interaction use previous state if any
+      if (state.previous) return this.getUserInteraction(state.previous)
+      return ''
     },
     hasEnd (step) {
       return !_.isEmpty(step.end)
     },
     endWorkflow (step, state) {
-      return (this.hasEnd(step) && this.hasInteraction(state) && step.end.includes(state.interaction.value))
+      return (this.hasEnd(step) && this.hasStateInteraction(state) && step.end.includes(this.getUserInteraction(state)))
+    },
+    getUserIcon (state = {}, step = {}) {
+      // When last step was an interaction use it as icon
+      if (this.hasStateUserInteraction(state)) return _.get(state, 'properties.interaction.icon')
+      // When last step was a feature interaction use a specific icon
+      if (this.hasStateFeatureInteraction(state)) return { name: 'fa-edit', color: 'blue' }
+      // If we wait for an interaction use previous state icon
+      if (this.hasStateUserInteraction(state.previous)) return this.getUserIcon(state.previous, step)
+      // Otherwise use workflow icon for current step
+      if (step.icon) return step.icon
+      // In case of no workflow
+      // FIXME: not sure we'd like to have the same icon for all participants in this case, should be different from event one
+      // if (this.event && this.event.icon) return this.event.icon
+      return { name: 'fa-user', color: 'blue' }
+    },
+    getUserComment (state = {}) {
+      // When last step had a recorded interaction use its comment if any
+      if (_.has(state, 'properties.comment')) return _.get(state, 'properties.comment')
+      // If we wait for an interaction use previous state comment if any
+      if (state.previous) return this.getUserComment(state.previous)
+      return ''
     },
     isBeforeInWorkflow (stateName, stepName) {
       const stateIndex = this.event.workflow.findIndex(workflowStep => workflowStep.name === stateName)
@@ -61,37 +107,21 @@ const eventsMixin = {
     doFollowUp (participantId) {
       this.$router.push({ name: 'event-log', params: { logId: participantId } })
     },
-    getIcon (state = {}, step = {}) {
-      // When last step was an interaction use it as icon
-      if (state.interaction) return state.interaction.icon
-      // If we wait for an interaction use previous state icon
-      if (state.previous && state.previous.interaction) return state.previous.interaction.icon
-      // Otherwise use workflow icon for current step
-      if (step.icon) return step.icon
-      // In case of no workflow
-      // FIXME: not sure we'd like to have the same icon for all participants in this case, should be different from event one
-      // if (this.event && this.event.icon) return this.event.icon
-      return { name: 'fa-user', color: 'blue' }
-    },
-    getComment (state = {}) {
-      // When last step had a recorded interaction use its comment if any
-      if (state.comment) return state.comment
-      // If we wait for an interaction use previous state comment if any
-      if (state.previous && state.previous.comment) return state.previous.comment
-      return ''
-    },
-    getInteraction (state = {}) {
-      // When last step had a recorded interaction use it if any
-      if (state.interaction) return state.interaction.value
-      // If we wait for an interaction use previous state if any
-      if (state.previous && state.previous.interaction) return state.previous.interaction.value
-      return ''
-    },
     async loadLayerSchema (layerId) {
       this.layerSchema = null
       if (!layerId) return
       const layer = await this.$api.getService('catalog', this.contextId).get(layerId)
       if (layer.schema) this.layerSchema = JSON.parse(layer.schema.content)
+    },
+    async loadFeatureProperties (featureId) {
+      if (!featureId) return null
+      const feature = await this.$api.getService('features', this.contextId).get(featureId)
+      return (!_.isEmpty(feature.properties) ? feature.properties : null)
+    },
+    async loadFeatureGeometry (featureId) {
+      if (!featureId) return null
+      const feature = await this.$api.getService('features', this.contextId).get(featureId)
+      return feature.geometry
     },
     async generateSchemaForStep (step) {
       // Start from schema template and clone it because modifications
@@ -103,14 +133,14 @@ const eventsMixin = {
         if (this.baseLogSchema.default) this.baseLogSchema = this.baseLogSchema.default
       }
       let schema = _.cloneDeep(this.baseLogSchema)
-      // Then add step interaction
-      if (step.featureInteraction && !_.isEmpty(step.featureInteraction)) {
+      // Then add step interactions
+      if (this.hasStepFeatureInteraction(step)) {
         if (this.layerSchema) {
           schema.properties = _.pickBy(this.layerSchema.properties, (value, property) => step.featureInteraction.includes(property))
           schema.required = _.filter(this.layerSchema.required, (property) => step.featureInteraction.includes(property))
         }
       }
-      if (step.interaction && !_.isEmpty(step.interaction)) {
+      if (this.hasStepUserInteraction(step)) {
         const options = step.interaction.map(option => { return { label: option.value, value: option } })
         schema.properties.interaction = {
           type: 'object',
@@ -126,7 +156,7 @@ const eventsMixin = {
         }
         schema.required.push('interaction')
       }
-      // Add a comment entry
+      // Add a user comment field
       schema.properties.comment = {
         type: 'string',
         field: {
@@ -170,16 +200,20 @@ const eventsMixin = {
       }
       return log
     },
-    logStep (form, step, state = {}) {
+    async logStep (form, step, state = {}) {
       const result = form.validate()
       if (result.isValid) {
         // Directly store as GeoJson objects
-        // FIXME: what to store as feature properties for mapping ?
-        const log = this.createParticipantLog(step, state)
-        _.merge(log, result.values)
+        let log = this.createParticipantLog(step, state)
+        _.merge(log.properties, result.values)
+        if (this.hasStateFeatureInteraction(log) && this.event.feature) {
+          // Use feature geometry instead of user position in this case
+          const geometry = await this.loadFeatureGeometry(this.event.feature)
+          if (geometry) log.geometry = geometry
+        }
         return this.serviceCreate(log)
       } else {
-        return Promise.reject(new Error('Cannot log state because form is not valid'))
+        throw new Error('Cannot log state because form is not valid')
       }
     },
     hasRoleInEvent (user, roles) {

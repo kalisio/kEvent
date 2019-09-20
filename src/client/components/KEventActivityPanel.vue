@@ -1,31 +1,31 @@
 <template>
   <k-layers-panel :layers="layers" :layerHandlers="layerHandlers" :categories="layerCategories" >
-      <div slot="panel-footer" >
-        <q-expansion-item v-if="forecastModels.length > 0" icon="fas fa-globe" :label="$t('KCatalogPanel.FORECASTS_LABEL')">
-          <k-forecast-models-selector :forecastModels="forecastModels" :forecastModelHandlers="forecastModelHandlers" :forecastModel="forecastModel" />
-        </q-expansion-item>
-        <q-expansion-item v-if="participants.length > 0" icon="fas fa-user" :label="$t('KEventActivityPanel.PARTICIPANTS_LABEL')">
-          <template v-for="participant in participants">
-            <div class="row justify-between no-wrap" style="overflow: auto" :key="participant._id">
-              <div class="col-auto self-center">
-                <q-btn v-if="participant.icon" flat round small color="primary" @click="onStateClicked(participant)">
-                  <q-icon :name="participantIconName(participant)"  :color="participantIconColor(participant)" />
-                </q-btn>
-                {{participant.participant.name}}
-              </div>
-              <k-text-area v-if="participant.comment" style="flex-shrink: 0" class="col-auto light-paragraph self-center" :length="20" :text="participant.comment" />
-              <div class="col-auto self-center">
-                <q-btn v-if="canFollowUp(participant)" flat round small color="primary" @click="doFollowUp(participant._id)">
-                  <q-icon name="message" color="red" />
-                </q-btn>
-                <q-btn flat round small color="primary" @click="onZoomClicked(participant)">
-                  <q-icon name="remove_red_eye" />
-                </q-btn>
-              </div>
+    <div slot="panel-footer" >
+      <q-expansion-item v-if="forecastModels.length > 0" icon="fas fa-globe" :label="$t('KCatalogPanel.FORECASTS_LABEL')">
+        <k-forecast-models-selector :forecastModels="forecastModels" :forecastModelHandlers="forecastModelHandlers" :forecastModel="forecastModel" />
+      </q-expansion-item>
+      <q-expansion-item v-if="participants.length > 0" icon="fas fa-user" :label="$t('KEventActivityPanel.PARTICIPANTS_LABEL')">
+        <template v-for="participant in participants">
+          <div class="row justify-between no-wrap" style="overflow: auto" :key="participant._id">
+            <div class="col-auto self-center">
+              <q-btn flat round small color="primary" @click="onStateClicked(participant)">
+                <q-icon :name="participantIconName(participant)"  :color="participantIconColor(participant)" />
+              </q-btn>
+              {{participant.participant.name}}
             </div>
-          </template>
-        </q-expansion-item>
-      </div>
+            <k-text-area style="flex-shrink: 0" class="col-auto light-paragraph self-center" :length="20" :text="participantComment(participant)" />
+            <div class="col-auto self-center">
+              <q-btn v-if="canFollowUp(participant)" flat round small color="primary" @click="doFollowUp(participant._id)">
+                <q-icon name="message" color="red" />
+              </q-btn>
+              <q-btn flat round small color="primary" @click="onZoomClicked(participant)">
+                <q-icon name="remove_red_eye" />
+              </q-btn>
+            </div>
+          </div>
+        </template>
+      </q-expansion-item>
+    </div>
   </k-layers-panel>
 </template>
 
@@ -75,10 +75,13 @@ export default {
   },
   methods: {
     participantIconName (participant) {
-      return kCoreUtils.getIconName(participant)
+      return kCoreUtils.getIconName(this.getUserIcon(participant), 'name')
     },
     participantIconColor (participant) {
-      return _.get(participant, 'icon.color', '')
+      return _.get(this.getUserIcon(participant), 'color', '')
+    },
+    participantComment (participant) {
+      return this.getUserComment(participant)
     },
     onZoomClicked (participant) {
       this.$events.$emit('zoom-to-participant', participant)

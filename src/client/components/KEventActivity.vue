@@ -200,12 +200,12 @@ export default {
       // Is it the same step ?
       if (item.step !== this.filter.step) return false
       // Is it the same interaction ?
-      if (item.interaction) {
-        if (item.interaction.value === this.filter.interaction) return true
+      if (this.hasStateUserInteraction(item)) {
+        if (this.getUserInteraction(item) === this.filter.interaction) return true
         return false
       }
-      if (item.previous && item.previous.interaction) {
-        if (item.previous.interaction.value === this.filter.interaction) return true
+      if (this.hasStateUserInteraction(item.previous)) {
+        if (this.getUserInteraction(item.previous) === this.filter.interaction) return true
         return false
       }
       return true
@@ -217,12 +217,13 @@ export default {
     },
     getParticipantMarker (feature, latlng, options) {
       if (options.name !== this.$t('KEventActivity.PARTICIPANTS_LAYER_NAME')) return
+      const icon = this.getUserIcon(feature, this.getWorkflowStep(feature))
       return this.createMarkerFromStyle(latlng, {
         icon: {
           type: 'icon.fontAwesome',
           options: {
-            iconClasses: kCoreUtils.getIconName(feature) || 'fas fa-user',
-            markerColor: kCoreUtils.Colors[_.get(feature, 'icon.color', 'blue')],
+            iconClasses: kCoreUtils.getIconName(icon, 'name') || 'fas fa-user',
+            markerColor: kCoreUtils.Colors[_.get(icon, 'color', 'blue')],
             iconColor: '#FFFFFF'
           }
         }
@@ -244,10 +245,11 @@ export default {
       }
       */
       // Recall last interaction state
-      const interaction = this.getInteraction(feature)
+      const interaction = this.getUserInteraction(feature)
       if (interaction) {
         return popup.setContent(interaction)
       } else {
+        // Feature interaction will be managed through standard properties popup
         return null
       }
     },
@@ -291,8 +293,8 @@ export default {
           step: step.name,
           interaction: undefined
         }
-        if (participant.interaction) this.filter.interaction = participant.interaction.value
-        else if (participant.previous && participant.previous.interaction) this.filter.interaction = participant.previous.interaction.value
+        if (this.hasStateUserInteraction(participant)) this.filter.interaction = this.getUserInteraction(participant)
+        else if (this.hasStateUserInteraction(participant.previous)) this.filter.interaction = this.getUserInteraction(participant.previous)
       } else {
         this.filter = null
       }
@@ -304,8 +306,8 @@ export default {
     },
     onCollectionRefreshed () {
       this.items.forEach((item) => {
-        item.icon = this.getIcon(item, this.getWorkflowStep(item) || {}) // Take care when no workflow
-        item.comment = this.getComment(item)
+        item.icon = this.getUserIcon(item, this.getWorkflowStep(item) || {}) // Take care when no workflow
+        item.comment = this.getUserComment(item)
       })
       this.refreshParticipantsLayer()
       if (this.items.length < this.nbTotalItems) {
@@ -320,6 +322,7 @@ export default {
     this.$options.components['k-color-legend'] = this.$load('KColorLegend')
     this.$options.components['k-timeline'] = this.$load('KTimeline')
     this.$options.components['k-location-time-series'] = this.$load('KLocationTimeSeries')
+    this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-uploader'] = this.$load('input/KUploader')
     this.$options.components['k-media-browser'] = this.$load('media/KMediaBrowser')
     this.registerLeafletStyle('tooltip', this.getParticipantTooltip)
