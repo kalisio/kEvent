@@ -58,13 +58,25 @@ export default {
       this.setTitle(this.$t('KEventDashboard.DASHBOARD'))
       this.setSearchBar('name')
       this.refreshCollection()
+    },
+    checkSingleOrganisation () {
+      // When there is a single organisation directly go to the event activity, no need for the dashboard
+      if (this.items.length === 1) {
+        this.$router.push({ name: 'events-activity', params: { contextId: this.items[0]._id } })
+      }
     }
   },
   created () {
     // Load the required components
     this.$options.components['k-grid'] = this.$load('collection/KGrid')
+    // Used to chec kfor single organisation layout at startup or refresh
+    this.$on('collection-refreshed', this.checkSingleOrganisation)
+    this.checkSingleOrganisation()
     // Performs geolocation
     this.updatePosition()
+  },
+  beforeDestroy () {
+    this.$off('collection-refreshed', this.checkSingleOrganisation)
   }
 }
 </script>
