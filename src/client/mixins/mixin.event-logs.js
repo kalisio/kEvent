@@ -210,7 +210,11 @@ const eventsMixin = {
           // Use feature geometry instead of user position in this case
           const geometry = await this.loadFeatureGeometry(this.event.feature)
           if (geometry) log.geometry = geometry
+          // Update feature properties
+          this.$api.getService('features', this.contextId).patch(this.event.feature,
+            _.mapKeys(result.values, (value, key) => `properties.${key}`))
         }
+        // Then create interaction log
         return this.serviceCreate(log)
       } else {
         throw new Error('Cannot log state because form is not valid')
