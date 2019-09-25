@@ -111,7 +111,7 @@ const eventsMixin = {
       this.layerSchema = null
       if (!layerId) return
       const layer = await this.$api.getService('catalog', this.contextId).get(layerId)
-      if (layer.schema) this.layerSchema = JSON.parse(layer.schema.content)
+      if (layer.schema) this.layerSchema = layer.schema.content
     },
     async loadFeatureProperties (featureId) {
       if (!featureId) return null
