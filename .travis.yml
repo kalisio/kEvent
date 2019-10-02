@@ -17,9 +17,13 @@ before_install:
 - npm install -g yarn
 before_script:
 - npm install -g codeclimate-test-reporter
+- yarn cache clean
 - git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kCore.git && cd kCore && yarn install && yarn link && cd .. && yarn link @kalisio/kdk-core
+- yarn cache clean
 - git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kTeam.git && cd kTeam && yarn install && yarn link && yarn link @kalisio/kdk-core && cd .. && yarn link @kalisio/kdk-team
+- yarn cache clean
 - git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kNotify.git && cd kNotify && yarn install && yarn link && yarn link @kalisio/kdk-core && cd .. && yarn link @kalisio/kdk-notify
+- yarn cache clean
 - git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kMap.git && cd kMap && yarn install && yarn link && yarn link @kalisio/kdk-core && cd .. && yarn link @kalisio/kdk-map
 after_script:
 - codeclimate-test-reporter < coverage/lcov.info
