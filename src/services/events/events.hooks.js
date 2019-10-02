@@ -1,13 +1,13 @@
 import _ from 'lodash'
-import { hooks as coreHooks} from '@kalisio/kdk-core'
-import { hooks as mapHooks} from '@kalisio/kdk-map'
+import { hooks as coreHooks } from '@kalisio/kdk-core'
+import { hooks as mapHooks } from '@kalisio/kdk-map'
 import { setNow, discard } from 'feathers-hooks-common'
 import { addCreatorAsCoordinator, processNotification, sendEventNotifications } from '../../hooks'
 
 module.exports = {
   before: {
     all: [coreHooks.convertObjectIDs(['layer', 'feature'])],
-    find: [],
+    find: [mapHooks.marshallSpatialQuery],
     get: [],
     // Because expireAt comes from client convert it to Date object
     create: [processNotification, addCreatorAsCoordinator, setNow('createdAt', 'updatedAt'), coreHooks.convertDates(['expireAt'])],
@@ -19,7 +19,6 @@ module.exports = {
   after: {
     all: [],
     find: [mapHooks.asGeoJson({
-      queryParameter: 'geoJson',
       longitudeProperty: 'location.longitude',
       latitudeProperty: 'location.latitude'
     })],

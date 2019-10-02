@@ -56,7 +56,7 @@ const eventsMixin = {
       // If we wait for an interaction use previous state icon
       if (this.hasStateUserInteraction(state.previous)) return this.getUserIcon(state.previous, step)
       // Otherwise use workflow icon for current step
-      if (step.icon) return step.icon
+      if (step && step.icon) return step.icon
       // In case of no workflow
       // FIXME: not sure we'd like to have the same icon for all participants in this case, should be different from event one
       // if (this.event && this.event.icon) return this.event.icon
