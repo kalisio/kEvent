@@ -5,55 +5,46 @@ const servicesPath = path.join(__dirname, '..', 'services')
 
 const debug = makeDebug('kalisio:kEvent:services')
 
-export function createEventService (organisation, db) {
+export function createEventService (options = {}) {
   const app = this
 
-  app.createService('events', {
+  debug('Creating events service with options', options)
+  app.createService('events', Object.assign({
     servicesPath,
-    modelsPath,
-    context: organisation,
-    db
-  })
-  debug('Events service created for organisation ' + organisation.name)
+    modelsPath
+  }, options))
 }
 
-export function removeEventService (organisation) {
+export function removeEventService (options) {
   // TODO
 }
 
-export function createEventTemplateService (organisation, db) {
+export function createEventTemplateService (options = {}) {
   const app = this
 
-  app.createService('event-templates', {
+  debug('Creating event templates service with options', options)
+  app.createService('event-templates', Object.assign({
     servicesPath,
-    modelsPath,
-    context: organisation,
-    db
-  })
-  debug('Event templates service created for organisation ' + organisation.name)
+    modelsPath
+  }, options))
 }
 
-export function removeEventTemplateService (organisation) {
+export function removeEventTemplateService (options) {
   // TODO
 }
 
-export function createEventLogService (organisation, db) {
+export function createEventLogService (options = {}) {
   const app = this
 
-  app.createService('event-logs', {
+  debug('Creating event logs service with options', options)
+  app.createService('event-logs', Object.assign({
     servicesPath,
     modelsPath,
-    context: organisation,
-    db,
-    paginate: {
-      default: 500,
-      max: 500
-    }
-  })
-  debug('Event logs service created for organisation ' + organisation.name)
+    paginate: { default: 500, max: 500 }
+  }, options))
 }
 
-export function removeEventLogService (organisation) {
+export function removeEventLogService (options) {
   // TODO
 }
 
@@ -66,8 +57,8 @@ export default async function () {
   organisations.forEach(organisation => {
     // Get org DB
     const db = app.db.instance.db(organisation._id.toString())
-    createEventService.call(app, organisation, db)
-    createEventTemplateService.call(app, organisation, db)
-    createEventLogService.call(app, organisation, db)
+    createEventService.call(app, { context: organisation, db })
+    createEventTemplateService.call(app, { context: organisation, db })
+    createEventLogService.call(app, { context: organisation, db })
   })
 }
