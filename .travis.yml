@@ -6,6 +6,7 @@ services:
 addons:
   code_climate:
     repo_token: 7fe522f77e84aaafd85feaeca1070c62ba823c5f9869c66c5ff9961e6c538140
+cache: yarn
 notifications:
   email: false
   slack:
@@ -13,13 +14,11 @@ notifications:
       secure: orz0ZCFciT0WRUCgkv6W5pKMxvQB6L0/dAy0hhq6OFNIiq5pxlVd1Cudr+PN1skrJbfIVbj/bJoSO4/R3nHMhMcUh5JVod8QSoeTQ1kKLBXc2nUY6BfWOOHlWsA1Pmz5A703ut57BS+naOvF7OBJcuO0kfUANEhjjHB/qzE3wLVXgnMprzLq61sApuC+ln/0VBBo7t4Ds7FDnDVr8Qwb9ewhT3t4J5nRx0mQV+D3bxUCmD/CT1sPMk1bp1bl+uV90dpv2AlOB/eETBSt1TDxvHxAQ4p71nYp+5PtTzYlPasdHjkbSDe5x7yEu+LKvyE1GAGw28MaJK63MaGQ9+mq5W3rTVgJbAGcyGvA7IkAySR0p5WtNGCA4yOUuUyKO7k9WBZqKvPfVo8ewLxGKcktGS/V5iK79oubJ34We1tiqpYFCNYh7Qanw+UF7snikZKzRK6t9OtEXTmLKyGtyht2HMckWljRuJX6ix7wjjxKZ1IHeLAahk6VSaZFoutELjOhmmdXHA244/rAwqOh78Ulkv5xnE8JdK2yHZRYB5jm21/lEOLAlCVMCxAUCOT7kU4t/88i8a3klHpOv4RZi0roqWo15QJV8YcyK3HrEllDz0NXQnwRj2TE/8SfyrOZOXRidC1UDqHssrhzWDOPJxF0Qxjsr7+pHM7R8v0AqBcJzj4=
     on_success: always
     on_failure: always
-before_install:
-- npm install -g yarn
 before_script:
 - npm install -g codeclimate-test-reporter
-- git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kCore.git && cd kCore && yarn install && yarn link && cd .. && yarn link @kalisio/kdk-core
-- git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kTeam.git && cd kTeam && yarn install && yarn link && yarn link @kalisio/kdk-core && cd .. && yarn link @kalisio/kdk-team
-- git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kNotify.git && cd kNotify && yarn install && yarn link && yarn link @kalisio/kdk-core && cd .. && yarn link @kalisio/kdk-notify
-- git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kMap.git && cd kMap && yarn install && yarn link && yarn link @kalisio/kdk-core && cd .. && yarn link @kalisio/kdk-map
+- git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kCore.git && cd kCore && yarn && yarn link && cd .. && yarn link @kalisio/kdk-core
+- git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kTeam.git && cd kTeam && yarn && yarn link && yarn link @kalisio/kdk-core && cd .. && yarn link @kalisio/kdk-team
+- git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kNotify.git && cd kNotify && yarn && yarn link && yarn link @kalisio/kdk-core && cd .. && yarn link @kalisio/kdk-notify
+- git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kMap.git && cd kMap && yarn && yarn link && yarn link @kalisio/kdk-core && cd .. && yarn link @kalisio/kdk-map
 after_script:
 - codeclimate-test-reporter < coverage/lcov.info
