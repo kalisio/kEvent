@@ -66,14 +66,9 @@ export default {
       this._service = this.$api.getService('event-logs', this.contextId)
       return this._service
     },
-    loadSchema () {
-      // Call super
-      return kCoreMixins.schemaProxy.methods.loadSchema.call(this, 'event-logs.create')
-        .then(schema => {
-        // Start from schema template and clone it because it will be shared by all cards
-          this.schema = this.generateSchemaForStep(this.step, schema)
-          return this.schema
-        })
+    async loadSchema () {
+      this.schema = await this.generateSchemaForStep(this.step, this.event.layer)
+      return this.schema
     },
     async refresh () {
       this.refreshUser()
@@ -84,6 +79,8 @@ export default {
           this.loadRefs()
         ])
         await this.$refs.form.build()
+        const properties = await this.loadFeatureProperties(this.event.feature)
+        if (properties) this.$refs.form.fill(properties)
       }
     },
     async logCoordinatorState () {
@@ -100,6 +97,8 @@ export default {
     // Retrieve source log/event
     this.state = await this.loadService().get(this.logId)
     this.event = await this.$api.getService('events', this.contextId).get(this.objectId)
+    // Load layer schema if any
+    await this.loadLayerSchema(this.event.layer)
     this.step = this.getWorkflowStep(this.state)
     this.refresh()
   }

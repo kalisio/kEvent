@@ -74,7 +74,7 @@ export default {
   ],
   computed: {
     icon () {
-      return this.getIcon(this.participantState, this.participantStep)
+      return this.getUserIcon(this.participantState, this.participantStep)
     },
     iconColor () {
       return _.get(this.item, 'icon.color', '')
@@ -83,7 +83,7 @@ export default {
       return kCoreUtils.getIconName(this.item)
     },
     comment () {
-      return this.getComment(this.participantState)
+      return this.getUserComment(this.participantState)
     },
     createdAt () {
       return this.item.createdAt ? new Date(this.item.createdAt) : null
@@ -146,14 +146,11 @@ export default {
       this._service = this.$api.getService('event-logs', this.contextId)
       return this._service
     },
-    loadSchema () {
-      // Call super
-      return kCoreMixins.schemaProxy.methods.loadSchema.call(this, 'event-logs.create')
-        .then(schema => {
-        // Start from schema template and clone it because it will be shared by all cards
-          this.schema = this.generateSchemaForStep(this.participantStep, schema)
-          return this.schema
-        })
+    async loadSchema () {
+      // Load layer schema if any first
+      await this.loadLayerSchema(this.event.layer)
+      this.schema = await this.generateSchemaForStep(this.participantStep)
+      return this.schema
     },
     refreshActions () {
       // Item actions
@@ -251,9 +248,17 @@ export default {
         eventsService.remove(event._id, { query: { notification: this.$t('KEventNotifications.REMOVE') } })
       })
     },
-    followUp () {
+    async followUp () {
       if (this.hasParticipantInteraction) {
         this.$refs.followUpModal.open()
+        // We can then load the schema and local refs in parallel
+        await Promise.all([
+          this.loadSchema(),
+          this.loadRefs()
+        ])
+        await this.$refs.form.build()
+        const properties = await this.loadFeatureProperties(this.event.feature)
+        if (properties) this.$refs.form.fill(properties)
       } else if (this.isCoordinator) {
         this.$router.push({ name: 'event-activity', params: { objectId: this.item._id, contextId: this.contextId } })
       }
@@ -297,12 +302,6 @@ export default {
       this.participantLabel = ''
       if (this.waitingInteraction(this.participantStep, this.participantState, 'participant')) {
         this.participantLabel = this.$t('KEventCard.WAITING_FOR_PARTICIPANT_LABEL')
-        // We can then load the schema and local refs in parallel
-        Promise.all([
-          this.loadSchema(),
-          this.loadRefs()
-        ])
-          .then(() => this.$refs.form.build())
       } else if (this.waitingInteraction(this.participantStep, this.participantState, 'coordinator')) {
         this.participantLabel = this.$t('KEventCard.WAITING_FOR_COORDINATOR_LABEL')
       }
@@ -331,7 +330,7 @@ export default {
     },
     refreshCoordinatorState (logs) {
       this.nbParticipantsWaitingCoordination = logs.data.filter(
-        log => (log.stakeholder === 'coordinator') && !this.hasInteraction(log)
+        log => (log.stakeholder === 'coordinator') && !this.hasStateInteraction(log)
       ).length
       // Update actions according to user state
       this.refreshActions()
@@ -378,6 +377,7 @@ export default {
     },
     async logParticipantState () {
       await this.logStep(this.$refs.form, this.participantStep, this.participantState)
+      this.$refs.followUpModal.close()
     }
   },
   created () {

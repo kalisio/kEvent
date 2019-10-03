@@ -28,6 +28,10 @@ export default {
       type: String,
       default: ''
     },
+    layerId: {
+      type: String,
+      default: ''
+    },
     featureId: {
       type: String,
       default: ''
@@ -54,17 +58,23 @@ export default {
         delete this._object._id
         // Setup hasWorkflow tag
         this._object.hasWorkflow = !_.isNil(this.template.workflow)
-        // Perform reverse geocoding if we target a feature
-        if (this.featureId) {
-          const feature = await this.$api.getService('features').get(this.featureId)
-          const layer = await this.$api.getService('catalog').get(feature.layer)
-          let description = _.get(feature, 'name', _.get(feature, 'NAME'))
-          if (!description && layer.featureId) description = _.get(feature, `properties.${layer.featureId}`)
-          if (description) this._object.description = description
-          const results = await this.$api.getService('geocoder').create(feature)
-          if (results.length > 0) {
-            const element = results[0]
-            this._object.location = Object.assign(element, { name: utils.formatGeocodingResult(element) })
+        if (this.layerId) {
+          const layer = await this.$api.getService('catalog').get(this.layerId)
+          this._object.layer = this.layerId
+          // Perform reverse geocoding if we target a feature
+          if (this.featureId) {
+            const feature = await this.$api.getService('features').get(this.featureId)
+            this._object.feature = this.featureId
+            let description = _.get(feature, 'name', _.get(feature, 'NAME'))
+            if (!description && layer.featureId) description = _.get(feature, `properties.${layer.featureId}`)
+            if (description) this._object.description = description
+            const results = await this.$api.getService('geocoder').create(feature)
+            if (results.length > 0) {
+              const element = results[0]
+              this._object.location = Object.assign(element, { name: utils.formatGeocodingResult(element) })
+            }
+          } else {
+            // TODO: manage a set of features
           }
         }
       } else {
@@ -80,22 +90,20 @@ export default {
       }
       return schemaName
     },
-    loadSchema () {
+    async loadSchema () {
       // Call super
-      return mixins.schemaProxy.methods.loadSchema.call(this, this.getSchemaName())
-        .then(schema => {
-        // When a template is provided check for workflow availability
-          if (this.template) {
-          // Start from schema template and clone it because it will be shared by all editors
-            this.schema = _.cloneDeep(schema)
-            // Remove workflow from schema if not present in template
-            if (_.isNil(this.template.workflow)) {
-              delete this.schema.properties.hasWorkflow
-              _.pull(this.schema.required, 'hasWorkflow')
-            }
-          }
-          return this.schema
-        })
+      let schema = await mixins.schemaProxy.methods.loadSchema.call(this, this.getSchemaName())
+      // When a template is provided check for workflow availability
+      if (this.template) {
+      // Start from schema template and clone it because it will be shared by all editors
+        this.schema = _.cloneDeep(schema)
+        // Remove workflow from schema if not present in template
+        if (_.isNil(this.template.workflow)) {
+          delete this.schema.properties.hasWorkflow
+          _.pull(this.schema.required, 'hasWorkflow')
+        }
+      }
+      return this.schema
     },
     getBaseQuery (object) {
       // Overriden to handle notification messages
