@@ -210,7 +210,7 @@ export default {
       }
       return true
     },
-    refreshParticipantsLayer (name) {
+    refreshParticipantsLayer () {
       this.participants.splice(0, this.participants.length)
       _.filter(this.items, (item) => this.filterItem(item)).forEach(item => this.participants.push(item))
       this.updateLayer(this.$t('KEventActivity.PARTICIPANTS_LAYER_NAME'), { type: 'FeatureCollection', features: this.participants })
@@ -310,6 +310,7 @@ export default {
         item.comment = this.getUserComment(item)
       })
       this.refreshParticipantsLayer()
+      // We do not manage pagination now
       if (this.items.length < this.nbTotalItems) {
         this.$events.$emit('error', new Error(this.$t('errors.EVENT_LOG_LIMIT')))
       }
