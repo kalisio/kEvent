@@ -110,6 +110,10 @@ export default {
     getCollectionBaseQuery () {
       return { lastInEvent: true, event: this.objectId }
     },
+    getCollectionPaginationQuery () {
+      // No pagination on map items
+      return {}
+    },
     async refreshActivity () {
       this.clearActivity()
       this.event = await this.$api.getService('events', this.contextId).get(this.objectId)
@@ -299,10 +303,6 @@ export default {
         this.filter = null
       }
       this.refreshParticipantsLayer()
-    },
-    getCollectionPaginationQuery () {
-      // No pagination on map items
-      return {}
     },
     onCollectionRefreshed () {
       this.items.forEach((item) => {
