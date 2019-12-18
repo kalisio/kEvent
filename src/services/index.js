@@ -62,7 +62,7 @@ export function removeOrganisationServices (organisation) {
   removeEventLogService.call(app, { context: organisation })
 }
 
-export default async function () {
+export default function () {
   const app = this
 
   // Register services hook for organisations
