@@ -48,17 +48,25 @@ export function removeEventLogService (options) {
   // TODO
 }
 
+export function createOrganisationServices (organisation, db) {
+  const app = this
+  createEventService.call(app, { context: organisation, db })
+  createEventTemplateService.call(app, { context: organisation, db })
+  createEventLogService.call(app, { context: organisation, db })
+}
+
+export function removeOrganisationServices (organisation) {
+  const app = this
+  removeEventService.call(app, { context: organisation })
+  removeEventTemplateService.call(app, { context: organisation })
+  removeEventLogService.call(app, { context: organisation })
+}
+
 export default async function () {
   const app = this
 
-  // Reinstanciated services for all organisations
-  const organisations = await app.getService('organisations').find({ paginate: false })
-
-  organisations.forEach(organisation => {
-    // Get org DB
-    const db = app.db.instance.db(organisation._id.toString())
-    createEventService.call(app, { context: organisation, db })
-    createEventTemplateService.call(app, { context: organisation, db })
-    createEventLogService.call(app, { context: organisation, db })
+  // Register services hook for organisations
+  app.getService('organisations').registerOrganisationServicesHook({
+    createOrganisationServices, removeOrganisationServices
   })
 }

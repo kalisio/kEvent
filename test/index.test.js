@@ -3,7 +3,7 @@ import chailint from 'chai-lint'
 import core, { kalisio, hooks as coreHooks, permissions as corePermissions } from '@kalisio/kdk-core'
 import team, { permissions as teamPermissions, hooks as teamHooks } from '@kalisio/kdk-team'
 import notify, { hooks as notifyHooks } from '@kalisio/kdk-notify'
-import event, { hooks, permissions } from '../src'
+import event, { permissions } from '../src'
 
 describe('kEvent', () => {
   let app, userService, userObject, orgManagerObject, orgObject, orgUserObject, orgService,
@@ -80,8 +80,8 @@ describe('kEvent', () => {
     expect(orgService).toExist()
     orgService.hooks({
       after: {
-        create: [teamHooks.createOrganisationServices, hooks.createOrganisationServices, teamHooks.createOrganisationAuthorisations],
-        remove: [teamHooks.removeOrganisationAuthorisations, teamHooks.createOrganisationServices, hooks.removeOrganisationServices]
+        create: [teamHooks.createOrganisationServices, teamHooks.createOrganisationAuthorisations],
+        remove: [teamHooks.removeOrganisationAuthorisations, teamHooks.createOrganisationServices]
       }
     })
     authorisationService = app.getService('authorisations')
@@ -139,6 +139,8 @@ describe('kEvent', () => {
     eventLogService = app.getService('event-logs', orgObject)
     expect(eventLogService).toExist()
   })
+  // Let enough time to process
+    .timeout(5000)
 
   it('creates a org user', () => {
     return userService.create({ email: 'user@test.org', name: 'org-user' }, { checkAuthorisation: true })
