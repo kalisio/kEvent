@@ -224,7 +224,7 @@ const eventsMixin = {
       return _.findIndex(roles, role => {
         if (role.service === 'members' && role._id === user._id) return true
         if (role.service === 'groups' || role.service === 'organisations') {
-          if (sift({ [role.service + '._id']: user._id }, [user])) return true
+          if ([user].filter(sift({ [role.service + '._id']: user._id }))) return true
         }
         if (role.service === 'tags') {
           if (user.tags) {

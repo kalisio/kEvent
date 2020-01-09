@@ -110,6 +110,10 @@ export default {
     getCollectionBaseQuery () {
       return { lastInEvent: true, event: this.objectId }
     },
+    getCollectionPaginationQuery () {
+      // No pagination on map items
+      return {}
+    },
     async refreshActivity () {
       this.clearActivity()
       this.event = await this.$api.getService('events', this.contextId).get(this.objectId)
@@ -148,7 +152,8 @@ export default {
         const marker = L.marker([this.event.location.latitude, this.event.location.longitude], {
           icon: L.icon.fontAwesome({
             iconClasses: kCoreUtils.getIconName(this.event) || 'fas fa-circle',
-            markerColor: kCoreUtils.Colors[_.get(this.event, 'icon.color', 'blue')],
+            // Conversion from palette to RGB color is required for markers
+            markerColor: kCoreUtils.getColorFromPalette(_.get(this.event, 'icon.color', 'blue')),
             iconColor: '#FFFFFF'
           })
         })
@@ -223,7 +228,8 @@ export default {
           type: 'icon.fontAwesome',
           options: {
             iconClasses: kCoreUtils.getIconName(icon, 'name') || 'fas fa-user',
-            markerColor: kCoreUtils.Colors[_.get(icon, 'color', 'blue')],
+            // Conversion from palette to RGB color is required for markers
+            markerColor: kCoreUtils.getColorFromPalette(_.get(icon, 'color', 'blue')),
             iconColor: '#FFFFFF'
           }
         }
@@ -299,10 +305,6 @@ export default {
         this.filter = null
       }
       this.refreshParticipantsLayer()
-    },
-    getCollectionPaginationQuery () {
-      // No pagination on map items
-      return {}
     },
     onCollectionRefreshed () {
       this.items.forEach((item) => {
