@@ -48,6 +48,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import moment from 'moment'
 import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'

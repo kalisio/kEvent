@@ -19,7 +19,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
 
 export default {
