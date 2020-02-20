@@ -7,5 +7,4 @@ module.exports = function (app, options) {
   options.Model.createIndex({ name: 1 }, { name: 'name-fr', collation: { locale: 'fr', strength: 1 } })
   // Full text search is used by event archiving to perform template matching
   options.Model.createIndex({ name: 'text' })
-  options.Model.createIndex({ description: 'text' })
 }

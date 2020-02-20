@@ -12,13 +12,15 @@ export function defineEventAbilities (subject, can, cannot) {
             // Indeed we have for instance a 'events' service in each organisation.
             can('service', organisation._id.toString() + '/events')
             can('service', organisation._id.toString() + '/event-logs')
-            // A user can access the templates to create an event
             can('service', organisation._id.toString() + '/event-templates')
+            can('service', organisation._id.toString() + '/archived-events')
+            // A user can access the templates to create an event
             can('read', 'event-templates', { context: organisation._id })
-            // A user can access events in which he is a participant or his group or his org
-            // A coordinator can manage his events
+            // A user can create an event
             can('create', 'events', { context: organisation._id })
+            // A user can access events in which he is a participant or his group or his org
             can('read', 'events', { context: organisation._id, 'participants._id': subject._id })
+            // A coordinator can manage his events
             can('all', 'events', { context: organisation._id, 'coordinators._id': subject._id })
             // can('all', 'events', { context: organisation._id, 'coordinators._id': subject._id })
             // BUG: adding org level participant/coordinator generates a bug because the org owner
@@ -54,6 +56,7 @@ export function defineEventAbilities (subject, can, cannot) {
             // The unique identifier of a service is its path not its name.
             // Indeed we have for instance a 'events' service in each organisation.
             can('all', 'event-templates', { context: organisation._id })
+            can('all', 'archived-events', { context: organisation._id })
           }
         }
       })

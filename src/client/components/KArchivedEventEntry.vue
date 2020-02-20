@@ -1,0 +1,93 @@
+<template>
+  <div>
+    <k-history-entry v-bind="$props" :itemActions="actions">
+      <div slot="entry-date">
+        <div v-if="createdAt"><small>{{$t('KArchivedEventEntry.CREATED_AT_LABEL')}} {{createdAt.toLocaleString()}}</small></div>
+        <div v-if="updatedAt"><small>{{$t('KArchivedEventEntry.UPDATED_AT_LABEL')}} {{updatedAt.toLocaleString()}}</small></div>
+        <div v-if="deletedAt"><small>{{$t('KArchivedEventEntry.DELETED_AT_LABEL')}} {{deletedAt.toLocaleString()}}</small></div>
+        <div v-if="expiredAt"><small>{{$t('KArchivedEventEntry.EXPIRED_AT_LABEL')}} {{expiredAt.toLocaleString()}}</small></div>
+      </div>
+      <div slot="entry-title">
+        {{ item.name }}
+        <q-popup-proxy ref="locationPopup" no-parent-event transition-show="scale" transition-hide="scale">
+          <k-location-map v-model="item.location" :editable="false" />
+        </q-popup-proxy>
+      </div>
+    </k-history-entry>
+    <k-media-browser ref="mediaBrowser" :options="mediaBrowserOptions()" />
+  </div>
+</template>
+
+<script>
+import _ from 'lodash'
+import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
+
+export default {
+  name: 'k-archived-event-entry',
+  mixins: [
+    kCoreMixins.baseItem
+  ],
+  computed: {
+    createdAt () {
+      return this.item.createdAt ? new Date(this.item.createdAt) : null
+    },
+    updatedAt () {
+      return this.item.updatedAt ? new Date(this.item.updatedAt) : null
+    },
+    deletedAt () {
+      return this.item.deletedAt ? new Date(this.item.deletedAt) : null
+    },
+    expiredAt () {
+      return this.item.expireAt && !this.item.deletedAt ? new Date(this.item.expireAt) : null
+    }
+  },
+  data () {
+    return {
+    }
+  },
+  methods: {
+    hasLocation () {
+      return this.item.location && this.item.location.latitude && this.item.location.longitude
+    },
+    hasMedias () {
+      return this.item.attachments && this.item.attachments.length
+    },
+    refreshActions () {
+      // Item actions
+      this.clearActions()
+      if (this.$can('read', 'events', this.contextId, this.item)) {
+        if (this.hasLocation()) this.registerPaneAction({
+          name: 'locate', label: this.$t('KArchivedEventEntry.LOCATE_LABEL'), icon: 'place', handler: this.locate
+        })
+        if (this.hasMedias()) this.registerPaneAction({
+          name: 'browse-media', label: this.$t('KArchivedEventEntry.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
+        })
+      }
+    },
+    locate () {
+      this.$refs.locationPopup.toggle()
+    },
+    mediaBrowserOptions () {
+      return {
+        service: this.contextId + '/storage',
+        backgroundColor: 'black',
+        controlColor: 'white'
+      }
+    },
+    browseMedia () {
+      this.$refs.mediaBrowser.show(this.item.attachments)
+    }
+  },
+  created () {
+    // Load the required components
+    this.$options.components['k-history-entry'] = this.$load('collection/KHistoryEntry')
+    this.$options.components['k-media-browser'] = this.$load('media/KMediaBrowser')
+    this.$options.components['k-location-map'] = this.$load('KLocationMap')
+  },
+  beforeDestroy () {
+  }
+}
+</script>
+
+<style>
+</style>

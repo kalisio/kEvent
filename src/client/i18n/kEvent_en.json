@@ -85,6 +85,26 @@
     "FOLLOWUP_MODAL_CLOSE_ACTION": "$t(CLOSE_LABEL)",
     "FOLLOWUP_MODAL_SAVE_BUTTON": "$t(SAVE_LABEL)"
   },
+  "KArchivedEventsActivity": {
+    "FROM_DATE": "From ",
+    "TO_DATE": " to ",
+    "SORT_BY_LABEL": " by date ",
+    "SORT_BY_CREATED_DATE_LABEL": "creation",
+    "SORT_BY_UPDATED_DATE_LABEL": "update",
+    "SORT_BY_DELETED_DATE_LABEL": "removal",
+    "SORT_BY_EXPIRED_DATE_LABEL": "expiry",
+    "SHOW_MAP_LABEL": "View map",
+    "SHOW_HISTORY_LABEL": "View history",
+    "EVENTS_LAYER_NAME": "My events"
+  },
+  "KArchivedEventEntry": {
+    "LOCATE_LABEL": "Location",
+    "BROWSE_MEDIA_LABEL": "$t(KEventCard.BROWSE_MEDIA_LABEL)",
+    "CREATED_AT_LABEL": "$t(KEventCard.CREATED_AT_LABEL)",
+    "UPDATED_AT_LABEL": "$t(KEventCard.UPDATED_AT_LABEL)",
+    "DELETED_AT_LABEL": "Closed at",
+    "EXPIRED_AT_LABEL": "Expired at"
+  },
   "KEventTemplatesActivity": {
     "EVENTS_LABEL": "$t(EVENTS_LABEL)",
     "EVENT_TEMPLATES_LABEL": "$t(EVENT_TEMPLATES_LABEL)",

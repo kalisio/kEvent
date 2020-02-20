@@ -177,15 +177,6 @@ export default {
       // Then update it
       this.refreshCollection()
     },
-    async getCatalogLayers () {
-      // We get layers coming from global catalog first
-      let response = await this.$api.getService('catalog', '').find()
-      let layers = response.data
-      // Then merge layers coming from contextual catalog by calling super
-      response = await activityMixin.methods.getCatalogLayers.call(this)
-      layers = layers.concat(response)
-      return layers
-    },
     uploadMedia () {
       this.$refs.uploaderModal.open()
       // If the modal has already been created the uploader is ready otherwise wait for event

@@ -18,4 +18,5 @@ export default function init () {
   api.declareService('events', { context: true })
   api.declareService('event-logs', { context: true })
   api.declareService('event-templates', { context: true })
+  api.declareService('archived-events', { context: true })
 }
