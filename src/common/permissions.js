@@ -14,6 +14,7 @@ export function defineEventAbilities (subject, can, cannot) {
             can('service', organisation._id.toString() + '/event-logs')
             can('service', organisation._id.toString() + '/event-templates')
             can('service', organisation._id.toString() + '/archived-events')
+            can('service', organisation._id.toString() + '/archived-event-logs')
             // A user can access the templates to create an event
             can('read', 'event-templates', { context: organisation._id })
             // A user can create an event
@@ -57,6 +58,7 @@ export function defineEventAbilities (subject, can, cannot) {
             // Indeed we have for instance a 'events' service in each organisation.
             can('all', 'event-templates', { context: organisation._id })
             can('all', 'archived-events', { context: organisation._id })
+            can('all', 'archived-event-logs', { context: organisation._id })
           }
         }
       })

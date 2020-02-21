@@ -2,13 +2,12 @@
   <div>
     <k-history-entry v-bind="$props" :itemActions="actions">
       <div slot="entry-date">
-        <div v-if="createdAt"><small>{{$t('KArchivedEventEntry.CREATED_AT_LABEL')}} {{createdAt.toLocaleString()}}</small></div>
-        <div v-if="updatedAt"><small>{{$t('KArchivedEventEntry.UPDATED_AT_LABEL')}} {{updatedAt.toLocaleString()}}</small></div>
-        <div v-if="deletedAt"><small>{{$t('KArchivedEventEntry.DELETED_AT_LABEL')}} {{deletedAt.toLocaleString()}}</small></div>
-        <div v-if="expiredAt"><small>{{$t('KArchivedEventEntry.EXPIRED_AT_LABEL')}} {{expiredAt.toLocaleString()}}</small></div>
+        <div v-if="updatedAt"><small>{{$t('KArchivedEventEntry.UPDATED_AT_LABEL')}} {{formatDate(updatedAt)}}</small></div>
+        <div v-if="deletedAt"><small>{{$t('KArchivedEventEntry.DELETED_AT_LABEL')}} {{formatDate(deletedAt)}}</small></div>
+        <div v-if="expiredAt"><small>{{$t('KArchivedEventEntry.EXPIRED_AT_LABEL')}} {{formatDate(expiredAt)}}</small></div>
       </div>
       <div slot="entry-title">
-        {{ item.name }}
+        {{ item.name }} - {{formatDate(createdAt)}}
         <q-popup-proxy ref="locationPopup" no-parent-event transition-show="scale" transition-hide="scale">
           <k-location-map v-model="item.location" :editable="false" />
         </q-popup-proxy>
@@ -19,12 +18,14 @@
 </template>
 
 <script>
-import { mixins as kCoreMixins } from '@kalisio/kdk-core/client'
+import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
+import mixins from '../mixins'
 
 export default {
   name: 'k-archived-event-entry',
   mixins: [
-    kCoreMixins.baseItem
+    kCoreMixins.baseItem,
+    mixins.eventLogs
   ],
   computed: {
     createdAt () {
@@ -45,18 +46,21 @@ export default {
     }
   },
   methods: {
-    hasLocation () {
-      return this.item.location && this.item.location.latitude && this.item.location.longitude
-    },
-    hasMedias () {
-      return this.item.attachments && this.item.attachments.length
+    formatDate (date) {
+      return date.toLocaleString(kCoreUtils.getLocale(),
+        { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric' })
     },
     refreshActions () {
+      // Required alias for the event logs mixin
+      this.event = this.item
       // Item actions
       this.clearActions()
       if (this.$can('read', 'events', this.contextId, this.item)) {
         if (this.hasLocation()) this.registerPaneAction({
           name: 'locate', label: this.$t('KArchivedEventEntry.LOCATE_LABEL'), icon: 'place', handler: this.locate
+        })
+        this.registerPaneAction({
+          name: 'follow-up', label: this.$t('KArchivedEventEntry.FOLLOW_UP_LABEL'), icon: 'message', handler: this.followUp
         })
         if (this.hasMedias()) this.registerPaneAction({
           name: 'browse-media', label: this.$t('KArchivedEventEntry.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
@@ -65,6 +69,11 @@ export default {
     },
     locate () {
       this.$refs.locationPopup.toggle()
+    },
+    followUp () {
+      this.$router.push({ name: 'event-activity',
+        params: { objectId: this.item._id, contextId: this.contextId },
+        query: { archived: true } })
     },
     mediaBrowserOptions () {
       return {

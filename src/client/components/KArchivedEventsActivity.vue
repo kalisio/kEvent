@@ -3,34 +3,46 @@
     <!--
       Time range selector
      -->
-    <div class="row justify-center text-center text-h5">
-      <div class="row items-center">
-        <q-btn v-show="!showMap" round color="primary" icon="scatter_plot" @click="onShowMap">
+    <q-page-sticky position="top" :offset="[0, 4]" style="z-index: 1">
+    <div class="row justify-center text-center text-subtitle1">
+      <div class="row items-center time-range-bar">
+        <q-btn v-show="!showMap" flat round color="primary" icon="scatter_plot" @click="onShowMap">
           <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_MAP_LABEL') }}</q-tooltip>
         </q-btn>
-        <q-btn v-show="showMap" round color="primary" icon="timelapse" @click="onShowHistory">
+        <q-btn v-show="showMap" flat round color="primary" icon="timelapse" @click="onShowHistory">
           <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_HISTORY_LABEL') }}</q-tooltip>
         </q-btn>
-        &nbsp;&nbsp;{{$t('KArchivedEventsActivity.FROM_DATE')}} {{minDateTimeSelected}}
+        <q-separator vertical />
+        &nbsp;{{minDateTimeSelected}}
         <q-icon name="event" color="primary" class="cursor-pointer">
+          <q-tooltip>{{ $t('KArchivedEventsActivity.FROM_DATE') }}</q-tooltip>
           <q-popup-proxy ref="minDatePopup" transition-show="scale" transition-hide="scale">
             <q-date v-model="minDateTimeSelected" @input="updateBaseQuery()" :options="checkTimeRange"/>
           </q-popup-proxy>
         </q-icon>
-        &nbsp;{{$t('KArchivedEventsActivity.TO_DATE')}} {{maxDateTimeSelected}}
+        &nbsp;-&nbsp;{{maxDateTimeSelected}}&nbsp;
         <q-icon name="event" color="primary" class="cursor-pointer">
+          <q-tooltip>{{ $t('KArchivedEventsActivity.TO_DATE') }}</q-tooltip>
           <q-popup-proxy ref="maxDatePopup" transition-show="scale" transition-hide="scale">
             <q-date v-model="maxDateTimeSelected" @input="updateBaseQuery()" :options="checkTimeRange"/>
           </q-popup-proxy>
         </q-icon>
-        <span v-show="!showMap" >&nbsp;{{$t('KArchivedEventsActivity.SORT_BY_LABEL')}}&nbsp;</span>
-        <q-select v-show="!showMap" v-model="sortBy" class="text-h5" :options="sortOptions" @input="updateBaseQuery()"/>
+        &nbsp;<q-separator vertical />
+        <q-btn v-show="!showMap && ascendingSort" flat round color="primary" icon="arrow_upward" @click="onSortOrder">
+          <q-tooltip>{{ $t('KArchivedEventsActivity.DESCENDING_SORT') }}</q-tooltip>
+        </q-btn>
+        <q-btn v-show="!showMap && !ascendingSort" flat round color="primary" icon="arrow_downward" @click="onSortOrder">
+          <q-tooltip>{{ $t('KArchivedEventsActivity.ASCENDING_SORT') }}</q-tooltip>
+        </q-btn>
+        <!--span v-show="!showMap" >&nbsp;{{$t('KArchivedEventsActivity.SORT_BY_LABEL')}}&nbsp;</span>
+        <q-select v-show="!showMap" v-model="sortBy" class="text-h5" :options="sortOptions" @input="updateBaseQuery()"/-->
       </div>
     </div>
+    </q-page-sticky>
     <!--
-      Events history
+      Events history: switch append-items to activate infinite scroll
      -->
-    <k-history v-show="!showMap" service="archived-events" :nb-items-per-page="10" :base-query="baseQuery" :filter-query="searchQuery" :renderer="renderer" :contextId="contextId" :list-strategy="'smart'">
+    <k-history class="q-mt-lg" v-show="!showMap" service="archived-events" :nb-items-per-page="4" :append-items="false" :base-query="baseQuery" :filter-query="searchQuery" :renderer="renderer" :contextId="contextId" :list-strategy="'smart'">
     </k-history>
     <!--
       Events map
@@ -40,7 +52,7 @@
         <q-resize-observer @resize="onMapResized" />
       </div>
 
-      <q-page-sticky position="top" :offset="[0, 48]">
+      <q-page-sticky position="top-right" :offset="[4, 4]">
         <k-navigation-bar />
       </q-page-sticky>
     </div>
@@ -114,6 +126,7 @@ export default {
       maxDateTime,
       minDateTimeSelected,
       maxDateTimeSelected,
+      ascendingSort: false,
       sortBy: {
         label: this.$i18n.t('KArchivedEventsActivity.SORT_BY_CREATED_DATE_LABEL'),
         value: 'createdAt'
@@ -160,31 +173,39 @@ export default {
       return moment(date).isSameOrAfter(this.minDateTime) &&
              moment(date).isSameOrBefore(this.maxDateTime)
     },
+    formatDate (date) {
+      return date.toLocaleString(kCoreUtils.getLocale(),
+        { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric' })
+    },
     updateBaseQuery() {
       // Close calendar popups in case it has been used
       this.$refs.minDatePopup.hide()
       this.$refs.maxDatePopup.hide()
       this.baseQuery = {
         $sort: {
-          [this.sortBy.value]: -1
+          [this.sortBy.value]: (this.ascendingSort ? 1 : -1)
         },
         [this.sortBy.value]: {
           $gte: moment(this.minDateTimeSelected, 'YYYY[/]MM[/]DD').endOf('day').toISOString(),
           $lte: moment(this.maxDateTimeSelected, 'YYYY[/]MM[/]DD').endOf('day').toISOString()
         }
       }
+
+      // Refresh layer data
+      if (this.showMap) this.refreshCollection()
     },
     loadService () {
       return this.$api.getService('archived-events')
     },
     getCollectionBaseQuery () {
-      return { geoJson: true }
+      return Object.assign({ geoJson: true }, this.baseQuery)
     },
     getCollectionPaginationQuery () {
       // No pagination on map items
       return {}
     },
     async refreshEventsLayers () {
+      await this.clearEventsLayers()
       this.templates = _.uniq(this.items.map(item => item.template))
       for (let i = 0; i < this.templates.length; i++) {
         const template = this.templates[i]
@@ -204,6 +225,12 @@ export default {
         this.updateLayer(template, { type: 'FeatureCollection', features: _.filter(this.items, { template }) })
       }
     },
+    async clearEventsLayers () {
+      for (let i = 0; i < this.templates.length; i++) {
+        const template = this.templates[i]
+        await this.removeLayer(template)
+      }
+    },
     getEventMarker (feature, latlng, options) {
       if (!this.templates.includes(options.name)) return
       return this.createMarkerFromStyle(latlng, {
@@ -221,24 +248,28 @@ export default {
     getEventPopup (feature, layer, options) {
       if (!this.templates.includes(options.name)) return
       const popup = L.popup({ autoPan: false }, layer)
-      const name = _.get(feature, 'name')
-      return popup.setContent('<b>' + name + '</b>')
+      const description = _.get(feature, 'description')
+      return popup.setContent(description)
     },
     getEventTooltip (feature, layer, options) {
       if (!this.templates.includes(options.name)) return
       const tooltip = L.tooltip({ permanent: true }, layer)
       const name = _.get(feature, 'name')
-      return tooltip.setContent('<b>' + name + '</b>')
+      const date = new Date(_.get(feature, 'createdAt'))
+      return tooltip.setContent('<b>' + name + '</b> - ' + this.formatDate(date))
     },
     onCollectionRefreshed () {
       this.refreshEventsLayers()
     },
+    onSortOrder () {
+      this.ascendingSort = !this.ascendingSort
+      this.currentPage = 0
+      this.updateBaseQuery()
+    },
     onShowHistory () {
       this.showMap = false
       // Cleanup
-      this.templates.forEach(template => {
-        this.removeLayer(template)
-      })
+      this.clearEventsLayers()
       this.templates = []
     },
     onShowMap () {
@@ -254,6 +285,8 @@ export default {
     this.registerLeafletStyle('tooltip', this.getEventTooltip)
     this.registerLeafletStyle('popup', this.getEventPopup)
     this.registerLeafletStyle('markerStyle', this.getEventMarker)
+    // Initialize private properties
+    this.templates = []
   },
   mounted () {
     this.$on('collection-refreshed', this.onCollectionRefreshed)
@@ -263,3 +296,15 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+.time-range-bar {
+  border: solid 1px lightgrey;
+  border-radius: 8px;
+  background: #ffffff
+}
+
+.time-range-bar:hover {
+  border: solid 1px $primary;
+}
+</style>

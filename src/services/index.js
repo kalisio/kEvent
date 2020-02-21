@@ -63,12 +63,28 @@ export function removeArchivedEventService (options) {
   // TODO
 }
 
+export function createArchivedEventLogService (options = {}) {
+  const app = this
+
+  debug('Creating archived event logs service with options', options)
+  app.createService('archived-event-logs', Object.assign({
+    servicesPath,
+    modelsPath,
+    paginate: { default: 500, max: 500 }
+  }, options))
+}
+
+export function removeArchivedEventLogService (options) {
+  // TODO
+}
+
 export function createOrganisationServices (organisation, db) {
   const app = this
   createEventService.call(app, { context: organisation, db })
   createEventTemplateService.call(app, { context: organisation, db })
   createEventLogService.call(app, { context: organisation, db })
   createArchivedEventService.call(app, { context: organisation, db })
+  createArchivedEventLogService.call(app, { context: organisation, db })
 }
 
 export function removeOrganisationServices (organisation) {
@@ -77,6 +93,7 @@ export function removeOrganisationServices (organisation) {
   removeEventTemplateService.call(app, { context: organisation })
   removeEventLogService.call(app, { context: organisation })
   removeArchivedEventService.call(app, { context: organisation })
+  removeArchivedEventLogService.call(app, { context: organisation })
 }
 
 export default function () {

@@ -86,9 +86,11 @@
     "FOLLOWUP_MODAL_SAVE_BUTTON": "$t(SAVE_LABEL)"
   },
   "KArchivedEventsActivity": {
-    "FROM_DATE": "Depuis le ",
-    "TO_DATE": " jusqu'au ",
-    "SORT_BY_LABEL": " par date de ",
+    "FROM_DATE": "Depuis le",
+    "TO_DATE": "Jusqu'au",
+    "ASCENDING_SORT": "Plus vieux d'abord",
+    "DESCENDING_SORT": "Plus récent d'abord",
+    "SORT_BY_LABEL": "par date de",
     "SORT_BY_CREATED_DATE_LABEL": "création",
     "SORT_BY_UPDATED_DATE_LABEL": "mise à jour",
     "SORT_BY_DELETED_DATE_LABEL": "effacemment",

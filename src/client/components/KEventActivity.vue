@@ -105,7 +105,8 @@ export default {
       }
     },
     loadService () {
-      return this.$api.getService('event-logs')
+      // Archived mode ?
+      return this.$api.getService(this.archived ? 'archived-event-logs' : 'event-logs')
     },
     getCollectionBaseQuery () {
       return { lastInEvent: true, event: this.objectId }
@@ -116,7 +117,7 @@ export default {
     },
     async refreshActivity () {
       this.clearActivity()
-      this.event = await this.$api.getService('events', this.contextId).get(this.objectId)
+      this.event = await this.$api.getService(this.archived ? 'archived-events' : 'events', this.contextId).get(this.objectId)
       this.setTitle(this.event.name)
       // Setup the right drawer
       this.setRightDrawer('KEventActivityPanel', this.$data)
@@ -132,7 +133,7 @@ export default {
         })
       }
       if (this.$can('read', 'events', this.contextId, this.event)) {
-        this.registerFabAction({
+        if (this.hasMedias()) this.registerFabAction({
           name: 'browse-media', label: this.$t('KEventActivity.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
         })
       }
@@ -322,6 +323,8 @@ export default {
     this.registerLeafletStyle('tooltip', this.getParticipantTooltip)
     this.registerLeafletStyle('popup', this.getParticipantPopup)
     this.registerLeafletStyle('markerStyle', this.getParticipantMarker)
+    // Archived mode ?
+    this.archived = _.get(this.$route, 'query.archived')
   },
   mounted () {
     // Setup event connections

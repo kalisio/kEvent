@@ -108,9 +108,6 @@ export default {
     }
   },
   methods: {
-    hasLocation () {
-      return this.item.location && this.item.location.latitude && this.item.location.longitude
-    },
     getFollowUpToolbar () {
       return [{
         name: 'close-action',
@@ -204,7 +201,7 @@ export default {
         this.registerPaneAction({
           name: 'add-media', label: this.$t('KEventCard.ADD_MEDIA_LABEL'), icon: 'add_a_photo', handler: this.uploadMedia
         })
-        this.registerPaneAction({
+        if (this.hasMedias()) this.registerPaneAction({
           name: 'browse-media', label: this.$t('KEventCard.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia
         })
       }
