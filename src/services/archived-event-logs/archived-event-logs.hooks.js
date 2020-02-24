@@ -1,4 +1,4 @@
-import { disallow } from 'feathers-hooks-common'
+import { disallow, populate } from 'feathers-hooks-common'
 import { hooks } from '@kalisio/kdk-core'
 
 const populatePreviousLog = populate({
@@ -24,6 +24,7 @@ module.exports = {
 
   after: {
     all: [],
+    // Due to anonymization in archive we don't populate participant
     find: [populatePreviousLog],
     get: [],
     create: [],

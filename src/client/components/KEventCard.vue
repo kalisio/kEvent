@@ -150,6 +150,8 @@ export default {
       return this.schema
     },
     refreshActions () {
+      // Required alias for the event logs mixin
+      this.event = this.item
       // Item actions
       this.clearActions()
       if (this.$can('remove', 'events', this.contextId, this.item)) {

@@ -45,7 +45,7 @@
       "uniqueItems": true,
       "minItems": 2,
       "field": {
-        "component": "form/KChipsWithIconField",
+        "component": "form/KChipsField",
         "helper": "schemas.EVENT_WORKFLOW_INTERACTION_FIELD_HELPER",
         "icon" : {
           "name" : "label",

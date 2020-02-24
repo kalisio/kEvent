@@ -88,6 +88,7 @@
   "KArchivedEventsActivity": {
     "FROM_DATE": "From",
     "TO_DATE": " To",
+    "MAP_LABEL": "Map",
     "ASCENDING_SORT": "Oldest first",
     "DESCENDING_SORT": "Most recent first",
     "SORT_BY_LABEL": "by date",
@@ -97,10 +98,15 @@
     "SORT_BY_EXPIRED_DATE_LABEL": "expiry",
     "SHOW_MAP_LABEL": "View map",
     "SHOW_HISTORY_LABEL": "View history",
+    "SHOW_MARKERS_LABEL": "View positions",
+    "SHOW_HEATMAP_LABEL": "View distribution",
+    "SHOW_BY_TEMPLATE_LABEL": "By type",
+    "SHOW_ALL_LABEL": "Globally",
     "EVENTS_LAYER_NAME": "My events"
   },
   "KArchivedEventEntry": {
     "LOCATE_LABEL": "Location",
+    "VIEW_LABEL": "Details",
     "BROWSE_MEDIA_LABEL": "$t(KEventCard.BROWSE_MEDIA_LABEL)",
     "CREATED_AT_LABEL": "$t(KEventCard.CREATED_AT_LABEL)",
     "UPDATED_AT_LABEL": "$t(KEventCard.UPDATED_AT_LABEL)",

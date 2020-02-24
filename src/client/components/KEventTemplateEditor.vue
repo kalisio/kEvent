@@ -101,7 +101,7 @@ export default {
       // In edition mode activate workflow according to its existence
       if (this.objectId || this.templateId) {
         this.hasWorkflow = !_.isNil(this.getObject().workflow)
-        this.layerId = this.getObject().layer._id
+        this.layerId = _.get(this.getObject(), 'layer._id')
         this.setFormDisabled('workflowForm', !this.hasWorkflow)
       } else {
         // In creation mode disabled by default

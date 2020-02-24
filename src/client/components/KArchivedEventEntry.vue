@@ -60,7 +60,11 @@ export default {
           name: 'locate', label: this.$t('KArchivedEventEntry.LOCATE_LABEL'), icon: 'place', handler: this.locate
         })
         this.registerPaneAction({
-          name: 'follow-up', label: this.$t('KArchivedEventEntry.FOLLOW_UP_LABEL'), icon: 'message', handler: this.followUp
+          name: 'view-event', label: this.$t('KArchivedEventEntry.VIEW_LABEL'), icon: 'description',
+          route: { name: 'view-event', params: { contextId: this.contextId, objectId: this.item._id } }
+        })
+        this.registerPaneAction({
+          name: 'map', label: this.$t('KArchivedEventEntry.MAP_LABEL'), icon: 'scatter_plot', handler: this.followUp
         })
         if (this.hasMedias()) this.registerPaneAction({
           name: 'browse-media', label: this.$t('KArchivedEventEntry.BROWSE_MEDIA_LABEL'), icon: 'photo_library', handler: this.browseMedia

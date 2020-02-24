@@ -268,12 +268,12 @@ export default {
     },
     onPopupOpen (event) {
       const feature = _.get(event, 'layer.feature')
-      if (!feature) return
+      if (!feature || this.archived) return // No edition in archive
       if (this.canFollowUp(feature)) this.doFollowUp(feature._id)
     },
     onFeatureClicked (options, event) {
       const feature = _.get(event, 'target.feature')
-      if (!feature) return
+      if (!feature || this.archived) return // No edition in archive
       if (this.canFollowUp(feature)) this.doFollowUp(feature._id)
     },
     onZoomToParticipant (participant) {

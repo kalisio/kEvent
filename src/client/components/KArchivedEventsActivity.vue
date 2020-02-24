@@ -12,6 +12,18 @@
         <q-btn v-show="showMap" flat round color="primary" icon="timelapse" @click="onShowHistory">
           <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_HISTORY_LABEL') }}</q-tooltip>
         </q-btn>
+        <q-btn v-show="showMap && heatmap" flat round color="primary" icon="scatter_plot" @click="onHeatmap">
+          <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_MARKERS_LABEL') }}</q-tooltip>
+        </q-btn>
+        <q-btn v-show="showMap && !heatmap" flat round color="primary" icon="fas fa-bowling-ball" @click="onHeatmap">
+          <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_HEATMAP_LABEL') }}</q-tooltip>
+        </q-btn>
+        <q-btn v-show="showMap && byTemplate" flat round color="primary" icon="fas fa-object-group" @click="onByTemplate">
+          <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_ALL_LABEL') }}</q-tooltip>
+        </q-btn>
+        <q-btn v-show="showMap && !byTemplate" flat round color="primary" icon="fas fa-layer-group" @click="onByTemplate">
+          <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_BY_TEMPLATE_LABEL') }}</q-tooltip>
+        </q-btn>
         <q-separator vertical />
         &nbsp;{{minDateTimeSelected}}
         <q-icon name="event" color="primary" class="cursor-pointer">
@@ -56,6 +68,10 @@
         <k-navigation-bar />
       </q-page-sticky>
     </div>
+    <!--
+      Router view to enable routing to modals
+     -->
+    <router-view service="archived-events" :router="router()"></router-view>
   </q-page>
 </template>
 
@@ -77,6 +93,7 @@ export default {
     activityMixin,
     kMapMixins.map.baseMap,
     kMapMixins.map.geojsonLayers,
+    kMapMixins.map.heatmapLayers,
     kMapMixins.map.style,
     kMapMixins.map.tooltip,
     kMapMixins.map.popup,
@@ -127,6 +144,8 @@ export default {
       minDateTimeSelected,
       maxDateTimeSelected,
       ascendingSort: false,
+      heatmap: false,
+      byTemplate: false,
       sortBy: {
         label: this.$i18n.t('KArchivedEventsActivity.SORT_BY_CREATED_DATE_LABEL'),
         value: 'createdAt'
@@ -153,6 +172,12 @@ export default {
     }
   },
   methods: {
+    router () {
+      return {
+        onApply: { name: 'archived-events-activity', params: { contextId: this.contextId } },
+        onDismiss: { name: 'archived-events-activity', params: { contextId: this.contextId } }
+      }
+    },
     async refreshActivity () {
       this.clearActivity()
       this.setTitle(this.$store.get('context.name'))
@@ -206,23 +231,59 @@ export default {
     },
     async refreshEventsLayers () {
       await this.clearEventsLayers()
-      this.templates = _.uniq(this.items.map(item => item.template))
+      this.templates = (this.byTemplate ?
+        _.uniq(this.items.map(item => item.template)) :
+        [ this.$t('KArchivedEventsActivity.EVENTS_LAYER_NAME') ])
       for (let i = 0; i < this.templates.length; i++) {
         const template = this.templates[i]
-        // Create an empty layer used as a container for events
-        await this.addLayer({
-          name: template,
-          type: 'OverlayLayer',
-          icon: 'whatshot',
-          leaflet: {
-            type: 'geoJson',
-            realtime: true,
-            isVisible: true,
-            cluster: { spiderfyDistanceMultiplier: 5.0 }
-          }
-        })
-        // Then update it
-        this.updateLayer(template, { type: 'FeatureCollection', features: _.filter(this.items, { template }) })
+        if (this.heatmap) {
+          // Create an empty layer used as a container for events
+          await this.addLayer({
+            name: template,
+            type: 'OverlayLayer',
+            icon: 'whatshot',
+            leaflet: {
+              type: 'heatmap',
+              // The unit is in pixel, meaning
+              // 1 pixel radius (2 pixel diameter) at zoom level 0
+              // ...
+              // 64 pixel radius (128 pixel diameter) at zoom level 6
+              // ...
+              // We'd like an event to cover something like 1Km
+              // According to https://groups.google.com/forum/#!topic/google-maps-js-api-v3/hDRO4oHVSeM
+              // this means 1 pixel at level 7 so at level 0 we get 1 / 2^7
+              radius: 0.0078,
+              minOpacity: 0,
+              maxOpacity: 0.5,
+              // scales the radius based on map zoom
+              scaleRadius: true,
+              // uses the data maximum within the current map boundaries
+              // (there will always be a red spot with useLocalExtremas true)
+              useLocalExtrema: true,
+              // The higher the blur factor is, the smoother the gradients will be
+              blur: 0.8,
+              isVisible: true
+            }
+          })
+          // Then update it
+          this.updateHeatmap(template, { type: 'FeatureCollection',
+            features: this.byTemplate ? _.filter(this.items, { template }) : this.items })
+        } else {
+          // Create an empty layer used as a container for events
+          await this.addLayer({
+            name: template,
+            type: 'OverlayLayer',
+            icon: 'whatshot',
+            leaflet: {
+              type: 'geoJson',
+              realtime: true,
+              cluster: { spiderfyDistanceMultiplier: 5.0 },
+              isVisible: true
+            }
+          })// Then update it
+          this.updateLayer(template, { type: 'FeatureCollection',
+            features: this.byTemplate ? _.filter(this.items, { template }) : this.items })
+        }
       }
     },
     async clearEventsLayers () {
@@ -265,6 +326,14 @@ export default {
       this.ascendingSort = !this.ascendingSort
       this.currentPage = 0
       this.updateBaseQuery()
+    },
+    onByTemplate () {
+      this.byTemplate = !this.byTemplate
+      this.refreshEventsLayers()
+    },
+    onHeatmap () {
+      this.heatmap = !this.heatmap
+      this.refreshEventsLayers()
     },
     onShowHistory () {
       this.showMap = false

@@ -11,7 +11,7 @@
               <q-btn flat round small color="primary" @click="onStateClicked(participant)">
                 <q-icon :name="participantIconName(participant)"  :color="participantIconColor(participant)" />
               </q-btn>
-              {{participant.participant.name}}
+              {{participantName(participant)}}
             </div>
             <k-text-area style="flex-shrink: 0" class="col-auto light-paragraph self-center" :length="20" :text="participantComment(participant)" />
             <div class="col-auto self-center">
@@ -74,6 +74,9 @@ export default {
     }
   },
   methods: {
+    participantName (participant) {
+      return _.get(participant, 'name', this.$t('KEventActivity.UNAMED'))
+    },
     participantIconName (participant) {
       return kCoreUtils.getIconName(this.getUserIcon(participant), 'name')
     },
