@@ -54,6 +54,10 @@ export default {
       // When a template is provided use it as reference for object
       if (this.template) {
         this._object = Object.assign({}, this.template)
+        // Keep track of template based on its name for statistics
+        // We don't keep ref/link for simplicity and making archived events will be self-consistent
+        // No need to keep track of templates that have been removed, etc.
+        this._object.template = this.template.name
         // Remove id so that event has its own
         delete this._object._id
         // Setup hasWorkflow tag
