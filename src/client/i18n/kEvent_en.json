@@ -100,6 +100,7 @@
     "SHOW_HISTORY_LABEL": "View history",
     "SHOW_MARKERS_LABEL": "View positions",
     "SHOW_HEATMAP_LABEL": "View distribution",
+    "HEATMAP_RADIUS_LABEL": "Footprint",
     "SHOW_BY_TEMPLATE_LABEL": "By type",
     "SHOW_ALL_LABEL": "Globally",
     "EVENTS_LAYER_NAME": "My events"

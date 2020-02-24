@@ -4,52 +4,61 @@
       Time range selector
      -->
     <q-page-sticky position="top" :offset="[0, 4]" style="z-index: 1">
-    <div class="row justify-center text-center text-subtitle1">
-      <div class="row items-center time-range-bar">
-        <q-btn v-show="!showMap" flat round color="primary" icon="scatter_plot" @click="onShowMap">
-          <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_MAP_LABEL') }}</q-tooltip>
-        </q-btn>
-        <q-btn v-show="showMap" flat round color="primary" icon="timelapse" @click="onShowHistory">
-          <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_HISTORY_LABEL') }}</q-tooltip>
-        </q-btn>
-        <q-btn v-show="showMap && heatmap" flat round color="primary" icon="scatter_plot" @click="onHeatmap">
-          <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_MARKERS_LABEL') }}</q-tooltip>
-        </q-btn>
-        <q-btn v-show="showMap && !heatmap" flat round color="primary" icon="fas fa-bowling-ball" @click="onHeatmap">
-          <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_HEATMAP_LABEL') }}</q-tooltip>
-        </q-btn>
-        <q-btn v-show="showMap && byTemplate" flat round color="primary" icon="fas fa-object-group" @click="onByTemplate">
-          <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_ALL_LABEL') }}</q-tooltip>
-        </q-btn>
-        <q-btn v-show="showMap && !byTemplate" flat round color="primary" icon="fas fa-layer-group" @click="onByTemplate">
-          <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_BY_TEMPLATE_LABEL') }}</q-tooltip>
-        </q-btn>
-        <q-separator vertical />
-        &nbsp;{{minDateTimeSelected}}
-        <q-icon name="event" color="primary" class="cursor-pointer">
-          <q-tooltip>{{ $t('KArchivedEventsActivity.FROM_DATE') }}</q-tooltip>
-          <q-popup-proxy ref="minDatePopup" transition-show="scale" transition-hide="scale">
-            <q-date v-model="minDateTimeSelected" @input="updateBaseQuery()" :options="checkTimeRange"/>
-          </q-popup-proxy>
-        </q-icon>
-        &nbsp;-&nbsp;{{maxDateTimeSelected}}&nbsp;
-        <q-icon name="event" color="primary" class="cursor-pointer">
-          <q-tooltip>{{ $t('KArchivedEventsActivity.TO_DATE') }}</q-tooltip>
-          <q-popup-proxy ref="maxDatePopup" transition-show="scale" transition-hide="scale">
-            <q-date v-model="maxDateTimeSelected" @input="updateBaseQuery()" :options="checkTimeRange"/>
-          </q-popup-proxy>
-        </q-icon>
-        &nbsp;<q-separator vertical />
-        <q-btn v-show="!showMap && ascendingSort" flat round color="primary" icon="arrow_upward" @click="onSortOrder">
-          <q-tooltip>{{ $t('KArchivedEventsActivity.DESCENDING_SORT') }}</q-tooltip>
-        </q-btn>
-        <q-btn v-show="!showMap && !ascendingSort" flat round color="primary" icon="arrow_downward" @click="onSortOrder">
-          <q-tooltip>{{ $t('KArchivedEventsActivity.ASCENDING_SORT') }}</q-tooltip>
-        </q-btn>
-        <!--span v-show="!showMap" >&nbsp;{{$t('KArchivedEventsActivity.SORT_BY_LABEL')}}&nbsp;</span>
-        <q-select v-show="!showMap" v-model="sortBy" class="text-h5" :options="sortOptions" @input="updateBaseQuery()"/-->
+      <div class="row justify-center text-center text-subtitle1">
+        <div class="row items-center time-range-bar">
+          <q-btn v-show="!showMap" flat round color="primary" icon="scatter_plot" @click="onShowMap">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_MAP_LABEL') }}</q-tooltip>
+          </q-btn>
+          <q-btn v-show="showMap" flat round color="primary" icon="timelapse" @click="onShowHistory">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_HISTORY_LABEL') }}</q-tooltip>
+          </q-btn>
+          <q-btn v-show="showMap && heatmap" flat round color="primary" icon="scatter_plot" @click="onHeatmap">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_MARKERS_LABEL') }}</q-tooltip>
+          </q-btn>
+          <q-btn v-show="showMap && !heatmap" flat round color="primary" icon="fas fa-bowling-ball" @click="onHeatmap">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_HEATMAP_LABEL') }}</q-tooltip>
+          </q-btn>
+          <q-btn v-show="showMap && byTemplate" flat round color="primary" icon="fas fa-object-group" @click="onByTemplate">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_ALL_LABEL') }}</q-tooltip>
+          </q-btn>
+          <q-btn v-show="showMap && !byTemplate" flat round color="primary" icon="fas fa-layer-group" @click="onByTemplate">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_BY_TEMPLATE_LABEL') }}</q-tooltip>
+          </q-btn>
+          <q-separator vertical />
+          &nbsp;{{minDateTimeSelected}}
+          <q-icon name="event" color="primary" class="cursor-pointer">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.FROM_DATE') }}</q-tooltip>
+            <q-popup-proxy ref="minDatePopup" transition-show="scale" transition-hide="scale">
+              <q-date v-model="minDateTimeSelected" @input="updateBaseQuery()" :options="checkTimeRange"/>
+            </q-popup-proxy>
+          </q-icon>
+          &nbsp;-&nbsp;{{maxDateTimeSelected}}&nbsp;
+          <q-icon name="event" color="primary" class="cursor-pointer">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.TO_DATE') }}</q-tooltip>
+            <q-popup-proxy ref="maxDatePopup" transition-show="scale" transition-hide="scale">
+              <q-date v-model="maxDateTimeSelected" @input="updateBaseQuery()" :options="checkTimeRange"/>
+            </q-popup-proxy>
+          </q-icon>
+          &nbsp;<q-separator vertical />
+          <q-btn v-show="!showMap && ascendingSort" flat round color="primary" icon="arrow_upward" @click="onSortOrder">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.DESCENDING_SORT') }}</q-tooltip>
+          </q-btn>
+          <q-btn v-show="!showMap && !ascendingSort" flat round color="primary" icon="arrow_downward" @click="onSortOrder">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.ASCENDING_SORT') }}</q-tooltip>
+          </q-btn>
+          <!--span v-show="!showMap" >&nbsp;{{$t('KArchivedEventsActivity.SORT_BY_LABEL')}}&nbsp;</span>
+          <q-select v-show="!showMap" v-model="sortBy" class="text-h5" :options="sortOptions" @input="updateBaseQuery()"/-->
+        </div>
       </div>
-    </div>
+    </q-page-sticky>
+    <q-page-sticky v-show="showMap && heatmap" position="bottom" :offset="[0, 16]" style="z-index: 1">
+      <div class="row">
+      {{ $t('KArchivedEventsActivity.ASCENDING_SORT') }}
+      <div class="col-12">
+      <q-slider v-model="heatmapRadius" :min="1" :max="100" :step="1"
+        label-always :label-value="$t('KArchivedEventsActivity.HEATMAP_RADIUS_LABEL') + ': ' + heatmapRadius + ' Kms'" @change="onHeatmapRadius"></q-slider>
+      </div>
+      </div>
     </q-page-sticky>
     <!--
       Events history: switch append-items to activate infinite scroll
@@ -79,6 +88,7 @@
 import _ from 'lodash'
 import L from 'leaflet'
 import moment from 'moment'
+import { QSlider } from 'quasar'
 import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 
@@ -99,6 +109,9 @@ export default {
     kMapMixins.map.popup,
     kMapMixins.map.activity
   ],
+  components: {
+    QSlider
+  },
   provide () {
     return {
       kActivity: this,
@@ -144,8 +157,10 @@ export default {
       minDateTimeSelected,
       maxDateTimeSelected,
       ascendingSort: false,
+      showMap: false,
       heatmap: false,
       byTemplate: false,
+      heatmapRadius: 50,
       sortBy: {
         label: this.$i18n.t('KArchivedEventsActivity.SORT_BY_CREATED_DATE_LABEL'),
         value: 'createdAt'
@@ -167,8 +182,7 @@ export default {
           label: this.$i18n.t('KArchivedEventsActivity.SORT_BY_EXPIRED_DATE_LABEL'),
           value: 'expireAt'
         }
-      ],
-      showMap: false
+      ]
     }
   },
   methods: {
@@ -201,6 +215,28 @@ export default {
     formatDate (date) {
       return date.toLocaleString(kCoreUtils.getLocale(),
         { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric' })
+    },
+    getHeatmapOptions () {
+      return {
+        // The unit is in pixel, meaning
+        // 1 pixel radius (2 pixel diameter) at zoom level 0
+        // ...
+        // 64 pixel radius (128 pixel diameter) at zoom level 6
+        // ...
+        // We'd like an event to cover a range expressed as Km
+        // According to https://groups.google.com/forum/#!topic/google-maps-js-api-v3/hDRO4oHVSeM
+        // this means 1 pixel at level 7 so at level 0 we get 1 / 2^7
+        radius: this.heatmapRadius * 0.0078,
+        minOpacity: 0,
+        maxOpacity: 0.5,
+        // scales the radius based on map zoom
+        scaleRadius: true,
+        // uses the data maximum within the current map boundaries
+        // (there will always be a red spot with useLocalExtremas true)
+        useLocalExtrema: true,
+        // The higher the blur factor is, the smoother the gradients will be
+        blur: 0.8
+      }
     },
     updateBaseQuery() {
       // Close calendar popups in case it has been used
@@ -242,28 +278,10 @@ export default {
             name: template,
             type: 'OverlayLayer',
             icon: 'whatshot',
-            leaflet: {
+            leaflet: Object.assign({
               type: 'heatmap',
-              // The unit is in pixel, meaning
-              // 1 pixel radius (2 pixel diameter) at zoom level 0
-              // ...
-              // 64 pixel radius (128 pixel diameter) at zoom level 6
-              // ...
-              // We'd like an event to cover something like 1Km
-              // According to https://groups.google.com/forum/#!topic/google-maps-js-api-v3/hDRO4oHVSeM
-              // this means 1 pixel at level 7 so at level 0 we get 1 / 2^7
-              radius: 0.0078,
-              minOpacity: 0,
-              maxOpacity: 0.5,
-              // scales the radius based on map zoom
-              scaleRadius: true,
-              // uses the data maximum within the current map boundaries
-              // (there will always be a red spot with useLocalExtremas true)
-              useLocalExtrema: true,
-              // The higher the blur factor is, the smoother the gradients will be
-              blur: 0.8,
               isVisible: true
-            }
+            }, this.getHeatmapOptions())
           })
           // Then update it
           this.updateHeatmap(template, { type: 'FeatureCollection',
@@ -345,6 +363,9 @@ export default {
       this.showMap = true
       // Refresh layer data
       this.refreshCollection()
+    },
+    onHeatmapRadius (radius) {
+      this.refreshEventsLayers()
     }
   },
   created () {
