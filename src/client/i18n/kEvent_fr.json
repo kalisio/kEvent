@@ -101,12 +101,20 @@
     "SORT_BY_EXPIRED_DATE_LABEL": "expiration",
     "SHOW_MAP_LABEL": "Afficher la carte",
     "SHOW_HISTORY_LABEL": "Afficher l'historique",
+    "SHOW_CHART_LABEL": "Afficher le graphique",
     "SHOW_MARKERS_LABEL": "Afficher les positions",
     "SHOW_HEATMAP_LABEL": "Afficher la distribution",
     "HEATMAP_RADIUS_LABEL": "Empreinte",
+    "CHART_TITLE": "Type d'événement",
+    "CHART_LABEL_PIE": "Camembert",
+    "CHART_LABEL_POLARAREA": "Polaire",
+    "CHART_LABEL_RADAR": "Traceur",
+    "CHART_LABEL_BAR": "Histogramme",
     "SHOW_BY_TEMPLATE_LABEL": "Par type",
     "SHOW_ALL_LABEL": "Globalement",
-    "EVENTS_LAYER_NAME": "Mes événements"
+    "EVENTS_LAYER_NAME": "Mes événements",
+    "MATCHING_RESULTS": "{{total}} événements trouvés.",
+    "MAXIMUM_RESULTS": "Raffinez vos paramètres de recherches car certains résultats sont omis au-delà de {{max}} événements."
   },
   "KArchivedEventEntry": {
     "LOCATE_LABEL": "Localisation",

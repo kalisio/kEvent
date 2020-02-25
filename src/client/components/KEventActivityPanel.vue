@@ -15,7 +15,7 @@
             </div>
             <k-text-area style="flex-shrink: 0" class="col-auto light-paragraph self-center" :length="20" :text="participantComment(participant)" />
             <div class="col-auto self-center">
-              <q-btn v-if="canFollowUp(participant)" flat round small color="primary" @click="doFollowUp(participant._id)">
+              <q-btn v-if="!archived && canFollowUp(participant)" flat round small color="primary" @click="doFollowUp(participant._id)">
                 <q-icon name="message" color="red" />
               </q-btn>
               <q-btn flat round small color="primary" @click="onZoomClicked(participant)">
@@ -97,6 +97,8 @@ export default {
     this.$options.components['k-text-area'] = this.$load('frame/KTextArea')
     this.$options.components['k-layers-panel'] = this.$load('KLayersPanel')
     this.$options.components['k-forecast-models-selector'] = this.$load('KForecastModelsSelector')
+    // Archived mode ?
+    this.archived = _.get(this.$route, 'query.archived')
   }
 }
 </script>

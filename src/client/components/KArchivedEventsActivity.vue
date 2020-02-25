@@ -6,23 +6,14 @@
     <q-page-sticky position="top" :offset="[0, 4]" style="z-index: 1">
       <div class="row justify-center text-center text-subtitle1">
         <div class="row items-center time-range-bar">
+          <q-btn v-show="!showHistory" flat round color="primary" icon="timelapse" @click="onShowHistory">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_HISTORY_LABEL') }}</q-tooltip>
+          </q-btn>
           <q-btn v-show="!showMap" flat round color="primary" icon="scatter_plot" @click="onShowMap">
             <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_MAP_LABEL') }}</q-tooltip>
           </q-btn>
-          <q-btn v-show="showMap" flat round color="primary" icon="timelapse" @click="onShowHistory">
-            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_HISTORY_LABEL') }}</q-tooltip>
-          </q-btn>
-          <q-btn v-show="showMap && heatmap" flat round color="primary" icon="scatter_plot" @click="onHeatmap">
-            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_MARKERS_LABEL') }}</q-tooltip>
-          </q-btn>
-          <q-btn v-show="showMap && !heatmap" flat round color="primary" icon="fas fa-bowling-ball" @click="onHeatmap">
-            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_HEATMAP_LABEL') }}</q-tooltip>
-          </q-btn>
-          <q-btn v-show="showMap && byTemplate" flat round color="primary" icon="fas fa-object-group" @click="onByTemplate">
-            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_ALL_LABEL') }}</q-tooltip>
-          </q-btn>
-          <q-btn v-show="showMap && !byTemplate" flat round color="primary" icon="fas fa-layer-group" @click="onByTemplate">
-            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_BY_TEMPLATE_LABEL') }}</q-tooltip>
+          <q-btn v-show="!showChart" flat round color="primary" icon="pie_chart" @click="onShowChart">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_CHART_LABEL') }}</q-tooltip>
           </q-btn>
           <q-separator vertical />
           &nbsp;{{minDateTimeSelected}}
@@ -40,20 +31,34 @@
             </q-popup-proxy>
           </q-icon>
           &nbsp;<q-separator vertical />
-          <q-btn v-show="!showMap && ascendingSort" flat round color="primary" icon="arrow_upward" @click="onSortOrder">
+          <q-btn v-show="showHistory && ascendingSort" flat round color="primary" icon="arrow_upward" @click="onSortOrder">
             <q-tooltip>{{ $t('KArchivedEventsActivity.DESCENDING_SORT') }}</q-tooltip>
           </q-btn>
-          <q-btn v-show="!showMap && !ascendingSort" flat round color="primary" icon="arrow_downward" @click="onSortOrder">
+          <q-btn v-show="showHistory && !ascendingSort" flat round color="primary" icon="arrow_downward" @click="onSortOrder">
             <q-tooltip>{{ $t('KArchivedEventsActivity.ASCENDING_SORT') }}</q-tooltip>
           </q-btn>
-          <!--span v-show="!showMap" >&nbsp;{{$t('KArchivedEventsActivity.SORT_BY_LABEL')}}&nbsp;</span>
-          <q-select v-show="!showMap" v-model="sortBy" class="text-h5" :options="sortOptions" @input="updateBaseQuery()"/-->
+          <!--span v-show="showHistory" >&nbsp;{{$t('KArchivedEventsActivity.SORT_BY_LABEL')}}&nbsp;</span>
+          <q-select v-show="showHistory" v-model="sortBy" class="text-h5" :options="sortOptions" @input="updateBaseQuery()"/-->
+          <q-btn v-show="showMap && heatmap" flat round color="primary" icon="scatter_plot" @click="onHeatmap">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_MARKERS_LABEL') }}</q-tooltip>
+          </q-btn>
+          <q-btn v-show="showMap && !heatmap" flat round color="primary" icon="fas fa-bowling-ball" @click="onHeatmap">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_HEATMAP_LABEL') }}</q-tooltip>
+          </q-btn>
+          <q-btn v-show="showMap && byTemplate" flat round color="primary" icon="fas fa-object-group" @click="onByTemplate">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_ALL_LABEL') }}</q-tooltip>
+          </q-btn>
+          <q-btn v-show="showMap && !byTemplate" flat round color="primary" icon="fas fa-layer-group" @click="onByTemplate">
+            <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_BY_TEMPLATE_LABEL') }}</q-tooltip>
+          </q-btn>
         </div>
       </div>
     </q-page-sticky>
     <q-page-sticky v-show="showMap && heatmap" position="bottom" :offset="[0, 16]" style="z-index: 1">
       <div class="row">
-      {{ $t('KArchivedEventsActivity.ASCENDING_SORT') }}
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <div class="col-12">
       <q-slider v-model="heatmapRadius" :min="1" :max="100" :step="1"
         label-always :label-value="$t('KArchivedEventsActivity.HEATMAP_RADIUS_LABEL') + ': ' + heatmapRadius + ' Kms'" @change="onHeatmapRadius"></q-slider>
@@ -61,9 +66,9 @@
       </div>
     </q-page-sticky>
     <!--
-      Events history: switch append-items to activate infinite scroll
+      Events history: switch append-items on to activate infinite scroll
      -->
-    <k-history class="q-mt-lg" v-show="!showMap" service="archived-events" :nb-items-per-page="4" :append-items="false" :base-query="baseQuery" :filter-query="searchQuery" :renderer="renderer" :contextId="contextId" :list-strategy="'smart'">
+    <k-history class="q-mt-lg" v-show="showHistory" service="archived-events" :nb-items-per-page="4" :append-items="false" :base-query="baseQuery" :filter-query="searchQuery" :renderer="renderer" :contextId="contextId" :list-strategy="'smart'">
     </k-history>
     <!--
       Events map
@@ -78,6 +83,20 @@
       </q-page-sticky>
     </div>
     <!--
+      Events graph
+     -->
+    <div v-if="showChart" ref="chartContainer">
+      <br/><br/><br/>
+      <div class="row justify-center">
+        <canvas class="chart q-ma-lg" width="512" height="512" ref="pieChart"></canvas>
+        <canvas class="chart q-ma-lg" width="512" height="512" ref="polarChart"></canvas>
+      </div>
+      <div class="row justify-center">
+        <canvas class="chart q-ma-lg" width="512" height="512" ref="radarChart"></canvas>
+        <canvas class="chart q-ma-lg" width="512" height="512" ref="barChart"></canvas>
+      </div>
+    </div>
+    <!--
       Router view to enable routing to modals
      -->
     <router-view service="archived-events" :router="router()"></router-view>
@@ -88,10 +107,15 @@
 import _ from 'lodash'
 import L from 'leaflet'
 import moment from 'moment'
+import chroma from 'chroma-js'
+import Chart from 'chart.js'
+import 'chartjs-plugin-labels'
 import { QSlider } from 'quasar'
 import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 
+// For mapping or statistics we get all events at once to avoid managing pagination
+const MAX_EVENTS = 3000
 const activityMixin = kMapMixins.activity('archivedEvents')
 
 export default {
@@ -122,6 +146,17 @@ export default {
     contextId: {
       type: String,
       default: ''
+    }
+  },
+  computed: {
+    showMap () {
+      return this.mode === 'map'
+    },
+    showChart () {
+      return this.mode === 'chart'
+    },
+    showHistory () {
+      return this.mode === 'history'
     }
   },
   data () {
@@ -157,7 +192,7 @@ export default {
       minDateTimeSelected,
       maxDateTimeSelected,
       ascendingSort: false,
-      showMap: false,
+      mode: 'history',
       heatmap: false,
       byTemplate: false,
       heatmapRadius: 50,
@@ -253,7 +288,7 @@ export default {
       }
 
       // Refresh layer data
-      if (this.showMap) this.refreshCollection()
+      if (this.mode !== 'history') this.refreshCollection()
     },
     loadService () {
       return this.$api.getService('archived-events')
@@ -338,7 +373,14 @@ export default {
       return tooltip.setContent('<b>' + name + '</b> - ' + this.formatDate(date))
     },
     onCollectionRefreshed () {
-      this.refreshEventsLayers()
+      if (this.nbTotalItems > MAX_EVENTS) {
+        this.$q.dialog({
+          title: this.$t('KArchivedEventsActivity.MATCHING_RESULTS', { total: this.nbTotalItems }),
+          message: this.$t('KArchivedEventsActivity.MAXIMUM_RESULTS', { max: MAX_EVENTS })
+        })
+      }
+      if (this.mode === 'map') this.refreshEventsLayers()
+      else if (this.mode === 'chart') this.refreshEventsChart()
     },
     onSortOrder () {
       this.ascendingSort = !this.ascendingSort
@@ -354,18 +396,95 @@ export default {
       this.refreshEventsLayers()
     },
     onShowHistory () {
-      this.showMap = false
+      this.mode = 'history'
       // Cleanup
       this.clearEventsLayers()
       this.templates = []
     },
     onShowMap () {
-      this.showMap = true
+      this.mode = 'map'
       // Refresh layer data
       this.refreshCollection()
     },
     onHeatmapRadius (radius) {
       this.refreshEventsLayers()
+    },
+    getChartOptions (type, colors) {
+      const templates = _.uniq(this.items.map(item => item.template))
+      let config = {
+        type,
+        data: {
+          labels: templates,
+          datasets: [{
+            data: templates.map(template => _.filter(this.items, { template }).length)
+          }]
+        },
+        options: {
+          responsive: false,
+          title:{
+            display: true,
+            text: this.$t('KArchivedEventsActivity.CHART_TITLE') + ' - ' +
+                  this.$t(`KArchivedEventsActivity.CHART_LABEL_${type.toUpperCase()}`)
+          }
+        }
+      }
+      // ticks.precision = 0 means round displayed values to integers
+      switch (type) {
+        case 'radar': {
+          _.set(config, 'options.legend.display', false)
+          _.set(config, 'data.datasets[0].fill', true)
+          _.set(config, 'data.datasets[0].borderColor', colors[0])
+          _.set(config, 'data.datasets[0].backgroundColor', chroma(colors[0]).alpha(0.5).hex())
+          _.set(config, 'data.datasets[0].pointBorderColor', '#fff')
+          _.set(config, 'data.datasets[0].pointBackgroundColor', colors[0])
+          _.set(config, 'options.scale.ticks.beginAtZero', true)
+          _.set(config, 'options.scale.ticks.precision', 0)
+          break
+        }
+        case 'bar': {
+          _.set(config, 'options.legend.display', false)
+          _.set(config, 'options.scales.xAxes[0].ticks.maxRotation', 90)
+          _.set(config, 'options.scales.xAxes[0].ticks.minRotation', 70)
+          _.set(config, 'options.scales.yAxes[0].ticks.beginAtZero', true)
+          _.set(config, 'options.scales.yAxes[0].ticks.precision', 0)
+          //_.set(config, 'options.plugins.labels.fontSize', 0)
+        }
+        case 'pie': {
+        }
+        case 'polarArea': {
+          // FIXME: does not work in this case
+          //_.set(config, 'options.scale.display', false)
+        }
+        default:
+          _.set(config, 'data.datasets[0].backgroundColor', templates.map((template, index) => colors[index % colors.length]))
+          _.set(config, 'options.plugins.labels.render', 'percentage')
+          _.set(config, 'options.plugins.labels.precision', 0)
+          _.set(config, 'options.plugins.labels.fontSize', 24)
+          _.set(config, 'options.plugins.labels.fontColor', '#fff')
+      }
+
+      return config
+    },
+    onShowChart () {
+      this.mode = 'chart'
+      // Refresh chart data
+      this.refreshCollection()
+    },
+    refreshEventsChart () {
+      // Destroy previous graph if any
+      if (this.charts) {
+        this.charts.forEach(chart => chart.destroy())
+        this.charts = []
+      }
+      // Setup the chart
+      const colors = _.shuffle(Object.values(kCoreUtils.Colors))
+      
+      this.charts = [
+        new Chart(this.$refs.pieChart.getContext('2d'), this.getChartOptions('pie', colors)),
+        new Chart(this.$refs.polarChart.getContext('2d'), this.getChartOptions('polarArea', colors)),
+        new Chart(this.$refs.radarChart.getContext('2d'), this.getChartOptions('radar', colors)),
+        new Chart(this.$refs.barChart.getContext('2d'), this.getChartOptions('bar', colors))
+      ]
     }
   },
   created () {
@@ -396,5 +515,11 @@ export default {
 
 .time-range-bar:hover {
   border: solid 1px $primary;
+}
+
+.chart {
+  border: solid 1px lightgrey;
+  border-radius: 8px;
+  background: #ffffff
 }
 </style>

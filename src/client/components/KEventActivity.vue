@@ -116,6 +116,8 @@ export default {
       return {}
     },
     async refreshActivity () {
+      // Archived mode ?
+      this.archived = _.get(this.$route, 'query.archived')
       this.clearActivity()
       this.event = await this.$api.getService(this.archived ? 'archived-events' : 'events', this.contextId).get(this.objectId)
       this.setTitle(this.event.name)
@@ -233,7 +235,7 @@ export default {
       const step = this.getWorkflowStep(feature)
       // Check for any recorded interaction to be displayed
       // Nothing visible because clicking on the marker opens a dialog in this case
-      if (this.waitingInteraction(step, feature, 'coordinator')) {
+      if (!this.archived && this.waitingInteraction(step, feature, 'coordinator')) {
         return null
       }
       // Already shown in tooltip
@@ -258,9 +260,9 @@ export default {
       const step = this.getWorkflowStep(feature)
       const name = _.get(feature, 'participant.name', this.$t('KEventActivity.UNAMED'))
       // Check for any interaction to be performed
-      if (this.waitingInteraction(step, feature, 'coordinator')) {
+      if (!this.archived && this.waitingInteraction(step, feature, 'coordinator')) {
         return tooltip.setContent('<b>' + name + '<br>' + this.$t('KEventActivity.ACTION_REQUIRED') + '</b>')
-      } else if (this.waitingInteraction(step, feature, 'participant')) {
+      } else if (!this.archived && this.waitingInteraction(step, feature, 'participant')) {
         return tooltip.setContent('<b>' + name + '<br>' + this.$t('KEventActivity.AWAITING_INFORMATION') + '</b>')
       } else {
         return tooltip.setContent('<b>' + name + '</b>')

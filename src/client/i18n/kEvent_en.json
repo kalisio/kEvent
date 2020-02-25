@@ -98,12 +98,20 @@
     "SORT_BY_EXPIRED_DATE_LABEL": "expiry",
     "SHOW_MAP_LABEL": "View map",
     "SHOW_HISTORY_LABEL": "View history",
+    "SHOW_CHART_LABEL": "View graph",
     "SHOW_MARKERS_LABEL": "View positions",
     "SHOW_HEATMAP_LABEL": "View distribution",
     "HEATMAP_RADIUS_LABEL": "Footprint",
+    "CHART_TITLE": "Event type",
+    "CHART_LABEL_PIE": "Pie",
+    "CHART_LABEL_POLARAREA": "Polar",
+    "CHART_LABEL_RADAR": "Radar",
+    "CHART_LABEL_BAR": "Bar",
     "SHOW_BY_TEMPLATE_LABEL": "By type",
     "SHOW_ALL_LABEL": "Globally",
-    "EVENTS_LAYER_NAME": "My events"
+    "EVENTS_LAYER_NAME": "My events",
+    "MATCHING_RESULTS": "{{total}} events found.",
+    "MAXIMUM_RESULTS": "Please refine your search parameters because you miss some results beyond {{max}} events."
   },
   "KArchivedEventEntry": {
     "LOCATE_LABEL": "Location",
