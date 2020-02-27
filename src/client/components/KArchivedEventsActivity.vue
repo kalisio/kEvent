@@ -85,17 +85,22 @@
     <!--
       Events graph
      -->
-    <div v-if="showChart" ref="chartContainer">
-      <br/><br/><br/>
-      <div class="row justify-center">
-        <canvas class="chart q-ma-lg" width="512" height="512" ref="pieChart"></canvas>
-        <canvas class="chart q-ma-lg" width="512" height="512" ref="polarChart"></canvas>
+    <k-modal ref="chartModal" :title="$t('KArchivedEventsActivity.CHART_MODAL_TITLE')" :toolbar="toolbar" :buttons="[]" >
+      <div slot="modal-content">
+        <div class="row justify-center text-center">
+          <q-select class="col-1" v-model="chartType" :label="$t('KArchivedEventsActivity.CHART_LABEL')" stack-label
+          :options="chartOptions" @input="refreshChart"/>
+          <q-select class="col-1" v-model="nbValuesPerChart" :label="$t('KArchivedEventsActivity.PAGINATION_LABEL')" stack-label
+            :options="paginationOptions" @input="refreshChartAndPagination"/>
+          <q-select class="col-1" v-model="render" :label="$t('KArchivedEventsActivity.RENDER_LABEL')" stack-label
+            :options="renderOptions" @input="refreshChart"/>
+          <q-pagination v-if="nbCharts > 1" v-model="currentChart" :max="nbCharts" @input="refreshChart" :input="true"/>
+        </div>
+        <div class="row justify-center text-center">
+          <canvas class="chart q-ma-lg" ref="chart"></canvas>
+        </div>
       </div>
-      <div class="row justify-center">
-        <canvas class="chart q-ma-lg" width="512" height="512" ref="radarChart"></canvas>
-        <canvas class="chart q-ma-lg" width="512" height="512" ref="barChart"></canvas>
-      </div>
-    </div>
+    </k-modal>
     <!--
       Router view to enable routing to modals
      -->
@@ -157,9 +162,31 @@ export default {
     },
     showHistory () {
       return this.mode === 'history'
+    },
+    nbCharts () {
+      if (!this.chartData.length || (this.nbValuesPerChart.value === 0)) return 1
+      else return Math.ceil(this.chartData.length / this.nbValuesPerChart.value)
     }
   },
   data () {
+    const chartTypes = ['pie', 'polarArea', 'radar', 'bar']
+    const chartOptions = chartTypes.map(
+        type => ({ value: type, label: this.$i18n.t(`KArchivedEventsActivity.CHART_LABEL_${type.toUpperCase()}`) }))
+    const paginationOptions = [{
+      value: 0, label: this.$i18n.t('KArchivedEventsActivity.ALL_VALUES')
+    }, {
+      value: 5, label: '5'
+    }, {
+      value: 10, label: '10'
+    }, {
+      value: 20, label: '20'
+    }]
+    const renderOptions = [{
+      value: 'value', label: this.$i18n.t('KArchivedEventsActivity.VALUE_LABEL')
+    }, {
+      value: 'percentage', label: this.$i18n.t('KArchivedEventsActivity.PERCENTAGE_LABEL')
+    }]
+
     const now = moment()
     const lastMonth = now.clone().subtract(1, 'months')
     const nextMonth = now.clone().add(1, 'months')
@@ -171,6 +198,7 @@ export default {
     const maxDateTimeSelected = nextMonth.format('YYYY[/]MM[/]DD')
 
     return {
+      toolbar: [{ name: 'close', icon: 'close', handler: () => this.$refs.chartModal.close() }],
       baseQuery: {
         $sort: {
           createdAt: -1
@@ -217,7 +245,15 @@ export default {
           label: this.$i18n.t('KArchivedEventsActivity.SORT_BY_EXPIRED_DATE_LABEL'),
           value: 'expireAt'
         }
-      ]
+      ],
+      chartType: _.find(chartOptions, { value: 'pie' }),
+      chartOptions,
+      currentChart: 1,
+      nbValuesPerChart: _.find(paginationOptions, { value: 10 }),
+      paginationOptions,
+      renderOptions,
+      render: _.find(renderOptions, { value: 'value' }),
+      chartData: []
     }
   },
   methods: {
@@ -288,7 +324,7 @@ export default {
       }
 
       // Refresh layer data
-      if (this.mode !== 'history') this.refreshCollection()
+      if (this.mode === 'map') this.refreshCollection()
     },
     loadService () {
       return this.$api.getService('archived-events')
@@ -300,8 +336,8 @@ export default {
       // No pagination on map items
       return {}
     },
-    async refreshEventsLayers () {
-      await this.clearEventsLayers()
+    async refreshLayers () {
+      await this.clearLayers()
       this.templates = (this.byTemplate ?
         _.uniq(this.items.map(item => item.template)) :
         [ this.$t('KArchivedEventsActivity.EVENTS_LAYER_NAME') ])
@@ -339,7 +375,7 @@ export default {
         }
       }
     },
-    async clearEventsLayers () {
+    async clearLayers () {
       for (let i = 0; i < this.templates.length; i++) {
         const template = this.templates[i]
         await this.removeLayer(template)
@@ -379,8 +415,7 @@ export default {
           message: this.$t('KArchivedEventsActivity.MAXIMUM_RESULTS', { max: MAX_EVENTS })
         })
       }
-      if (this.mode === 'map') this.refreshEventsLayers()
-      else if (this.mode === 'chart') this.refreshEventsChart()
+      this.refreshLayers()
     },
     onSortOrder () {
       this.ascendingSort = !this.ascendingSort
@@ -389,16 +424,16 @@ export default {
     },
     onByTemplate () {
       this.byTemplate = !this.byTemplate
-      this.refreshEventsLayers()
+      this.refreshLayers()
     },
     onHeatmap () {
       this.heatmap = !this.heatmap
-      this.refreshEventsLayers()
+      this.refreshLayers()
     },
     onShowHistory () {
       this.mode = 'history'
       // Cleanup
-      this.clearEventsLayers()
+      this.clearLayers()
       this.templates = []
     },
     onShowMap () {
@@ -407,20 +442,36 @@ export default {
       this.refreshCollection()
     },
     onHeatmapRadius (radius) {
-      this.refreshEventsLayers()
+      this.refreshLayers()
     },
-    getChartOptions (type, colors) {
-      const templates = _.uniq(this.items.map(item => item.template))
+    async getChartData () {
+      // Get possible values
+      this.values = await this.loadService().find({ query: { $distinct: 'template' } })
+      // Then count events for each value
+      let data = await Promise.all(this.values.map(async value => {
+        const response = await this.loadService()
+          .find({ query: Object.assign({ $limit: 0, template: value }, this.baseQuery) })
+        return { value, count: response.total }
+      }))
+      // Sort data so that we don't have charts mixin large and small numbers when paginating, go large first
+      data = _.sortBy(data, item => -item.count)
+      this.values = data.map(item => item.value)
+      this.chartData = data.map(item => item.count)
+    },
+    getChartOptions (type) {
+      const start = (this.currentChart - 1) * this.nbValuesPerChart.value
+      const end = (this.nbValuesPerChart.value > 0 ? start + this.nbValuesPerChart.value : this.chartData.length)
+      const colors = _.shuffle(chroma.scale('Spectral').colors(end - start))
       let config = {
         type,
         data: {
-          labels: templates,
+          labels: this.values.slice(start, end),
           datasets: [{
-            data: templates.map(template => _.filter(this.items, { template }).length)
+            data: this.chartData.slice(start, end)
           }]
         },
         options: {
-          responsive: false,
+          responsive: true,
           title:{
             display: true,
             text: this.$t('KArchivedEventsActivity.CHART_TITLE') + ' - ' +
@@ -456,39 +507,44 @@ export default {
           //_.set(config, 'options.scale.display', false)
         }
         default:
-          _.set(config, 'data.datasets[0].backgroundColor', templates.map((template, index) => colors[index % colors.length]))
-          _.set(config, 'options.plugins.labels.render', 'percentage')
+          _.set(config, 'data.datasets[0].backgroundColor', colors)
+          _.set(config, 'options.plugins.labels.render', this.render.value)
+          _.set(config, 'options.plugins.labels.position', 'border')
+          _.set(config, 'options.plugins.labels.overlap', false)
+          _.set(config, 'options.plugins.labels.showActualPercentages', true)
           _.set(config, 'options.plugins.labels.precision', 0)
+          _.set(config, 'options.plugins.labels.textShadow', true)
           _.set(config, 'options.plugins.labels.fontSize', 24)
-          _.set(config, 'options.plugins.labels.fontColor', '#fff')
+          _.set(config, 'options.plugins.labels.fontColor', (type === 'bar' ? '#000' : '#fff'))
       }
 
       return config
     },
     onShowChart () {
-      this.mode = 'chart'
+      this.$refs.chartModal.openMaximized()
       // Refresh chart data
-      this.refreshCollection()
+      this.refreshChart()
     },
-    refreshEventsChart () {
+    async refreshChart () {
       // Destroy previous graph if any
-      if (this.charts) {
-        this.charts.forEach(chart => chart.destroy())
-        this.charts = []
+      if (this.chart) {
+        this.chart.destroy()
       }
-      // Setup the chart
-      const colors = _.shuffle(Object.values(kCoreUtils.Colors))
-      
-      this.charts = [
-        new Chart(this.$refs.pieChart.getContext('2d'), this.getChartOptions('pie', colors)),
-        new Chart(this.$refs.polarChart.getContext('2d'), this.getChartOptions('polarArea', colors)),
-        new Chart(this.$refs.radarChart.getContext('2d'), this.getChartOptions('radar', colors)),
-        new Chart(this.$refs.barChart.getContext('2d'), this.getChartOptions('bar', colors))
-      ]
+      // Retrieve data
+      await this.getChartData()
+      // We need to force a refresh so that the computed props are correctly updated by Vuejs
+      await this.$nextTick()
+      this.chart = new Chart(this.$refs.chart.getContext('2d'),
+        this.getChartOptions(this.chartType.value))
+    },
+    async refreshChartAndPagination () {
+      this.currentChart = 1
+      await this.refreshChart()
     }
   },
   created () {
     // Load the required components
+    this.$options.components['k-modal'] = this.$load('frame/KModal')
     this.$options.components['k-history'] = this.$load('collection/KHistory')
     this.$options.components['k-navigation-bar'] = this.$load('KNavigationBar')
     this.registerLeafletStyle('tooltip', this.getEventTooltip)
