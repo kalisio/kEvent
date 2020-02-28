@@ -4,13 +4,13 @@ import { hooks as mapHooks } from '@kalisio/kdk-map'
 
 module.exports = {
   before: {
-    all: [],
+    all: [coreHooks.convertDates(['createdAt', 'updatedAt', 'expireAt']), coreHooks.convertObjectIDs(['layer', 'feature'])],
     find: [mapHooks.marshallSpatialQuery, coreHooks.marshallComparisonQuery, coreHooks.distinct],
     get: [],
-    create: [disallow()],
-    update: [disallow()],
-    patch: [disallow()],
-    remove: [disallow()]
+    create: [disallow('external')],
+    update: [disallow('external')],
+    patch: [disallow('external')],
+    remove: [disallow('external')]
   },
 
   after: {
