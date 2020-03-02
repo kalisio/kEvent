@@ -336,8 +336,8 @@ export default {
       // No pagination on map items
       return {}
     },
-    async refreshLayers () {
-      await this.clearLayers()
+    async refreshEventsLayers () {
+      await this.clearEventsLayers()
       this.templates = (this.byTemplate ?
         _.uniq(this.items.map(item => item.template)) :
         [ this.$t('KArchivedEventsActivity.EVENTS_LAYER_NAME') ])
@@ -375,7 +375,7 @@ export default {
         }
       }
     },
-    async clearLayers () {
+    async clearEventsLayers () {
       for (let i = 0; i < this.templates.length; i++) {
         const template = this.templates[i]
         await this.removeLayer(template)
@@ -415,7 +415,7 @@ export default {
           message: this.$t('KArchivedEventsActivity.MAXIMUM_RESULTS', { max: MAX_EVENTS })
         })
       }
-      this.refreshLayers()
+      this.refreshEventsLayers()
     },
     onSortOrder () {
       this.ascendingSort = !this.ascendingSort
@@ -424,16 +424,16 @@ export default {
     },
     onByTemplate () {
       this.byTemplate = !this.byTemplate
-      this.refreshLayers()
+      this.refreshEventsLayers()
     },
     onHeatmap () {
       this.heatmap = !this.heatmap
-      this.refreshLayers()
+      this.refreshEventsLayers()
     },
     onShowHistory () {
       this.mode = 'history'
       // Cleanup
-      this.clearLayers()
+      this.clearEventsLayers()
       this.templates = []
     },
     onShowMap () {
@@ -442,7 +442,7 @@ export default {
       this.refreshCollection()
     },
     onHeatmapRadius (radius) {
-      this.refreshLayers()
+      this.refreshEventsLayers()
     },
     async getChartData () {
       // Get possible values
