@@ -13,12 +13,12 @@ const populatePreviousLog = populate({
 
 module.exports = {
   before: {
-    all: [coreHooks.convertDates(['createdAt', 'expireAt']), hooks.convertObjectIDs(['participant', 'event'])],
+    all: [],
     find: [],
     get: [],
-    create: [disallow('external')],
-    update: [disallow('external')],
-    patch: [disallow('external')],
+    create: [disallow('external'), hooks.convertDates(['createdAt', 'expireAt']), hooks.convertObjectIDs(['participant', 'event'])],
+    update: [disallow('external'), hooks.convertDates(['createdAt', 'expireAt']), hooks.convertObjectIDs(['participant', 'event'])],
+    patch: [disallow('external'), hooks.convertDates(['createdAt', 'expireAt']), hooks.convertObjectIDs(['participant', 'event'])],
     remove: [disallow('external')]
   },
 
