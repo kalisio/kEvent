@@ -1,5 +1,7 @@
 <template>
   <q-page>
+    <!-- Invisible link used to download data -->
+    <a ref="downloadLink" v-show="false" :href="currentDownloadLink" :download="currentDownloadName"></a>
     <!--
       Time range selector
      -->
@@ -51,6 +53,7 @@
           <q-btn v-show="showMap && !byTemplate" flat round color="primary" icon="fas fa-layer-group" @click="onByTemplate">
             <q-tooltip>{{ $t('KArchivedEventsActivity.SHOW_BY_TEMPLATE_LABEL') }}</q-tooltip>
           </q-btn>
+          <q-btn v-show="!byTemplate" flat round color="primary" icon="cloud_download" @click="downloadEventsData"/>
         </div>
       </div>
     </q-page-sticky>
@@ -95,6 +98,7 @@
           <q-select class="col-1" v-model="render" :label="$t('KArchivedEventsActivity.RENDER_LABEL')" stack-label
             :options="renderOptions" @input="refreshChart"/>
           <q-pagination v-if="nbCharts > 1" v-model="currentChart" :max="nbCharts" @input="refreshChart" :input="true"/>
+          <q-btn flat round color="primary" icon="cloud_download" @click="downloadChartData" />
         </div>
         <div class="row justify-center text-center">
           <canvas class="chart q-ma-lg" ref="chart"></canvas>
@@ -115,7 +119,8 @@ import moment from 'moment'
 import chroma from 'chroma-js'
 import Chart from 'chart.js'
 import 'chartjs-plugin-labels'
-import { QSlider } from 'quasar'
+import Papa from 'papaparse'
+import { Platform, QSlider } from 'quasar'
 import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 
@@ -206,7 +211,8 @@ export default {
         createdAt: {
           $gte: moment(minDateTimeSelected, 'YYYY[/]MM[/]DD').endOf('day').toISOString(),
           $lte: moment(maxDateTimeSelected, 'YYYY[/]MM[/]DD').endOf('day').toISOString()
-        }
+        },
+        $skip: 0, $limit: MAX_EVENTS
       },
       renderer: {
         component: 'KArchivedEventEntry',
@@ -253,7 +259,9 @@ export default {
       paginationOptions,
       renderOptions,
       render: _.find(renderOptions, { value: 'value' }),
-      chartData: []
+      chartData: [],
+      currentDownloadLink: null,
+      currentDownloadName: null
     }
   },
   methods: {
@@ -330,7 +338,12 @@ export default {
       return this.$api.getService('archived-events')
     },
     getCollectionBaseQuery () {
-      return Object.assign({ geoJson: true }, this.baseQuery)
+      // No pagination in this case (map) and filter required data
+      return Object.assign({
+        geoJson: true, $skip: 0, $limit: MAX_EVENTS,
+        $select: ['_id', 'name', 'description', 'icon', 'template', 'location',
+          'createdAt', 'updatedAt', 'expireAt', 'deletedAt']
+      }, this.baseQuery)
     },
     getCollectionPaginationQuery () {
       // No pagination on map items
@@ -534,6 +547,85 @@ export default {
     async refreshChartAndPagination () {
       this.currentChart = 1
       await this.refreshChart()
+    },
+    downloadChartData () {
+      const json = this.values.map((value, index) => ({
+        [this.$t('KArchivedEventsActivity.CHART_VALUE_LABEL')]: value,
+        [this.$t('KArchivedEventsActivity.CHART_COUNT_LABEL')]: this.chartData[index]
+      }))
+      const csv = Papa.unparse(json)
+      // Need to convert to blob
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      this.currentDownloadLink = URL.createObjectURL(blob)
+      this.currentDownloadName = this.$t('KArchivedEventsActivity.CHART_EXPORT_FILE')
+      if (Platform.is.cordova) {
+        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, (fs) => {
+          fs.root.getFile(this.currentMedia.name, { create: true, exclusive: false }, (fileEntry) => {
+            fileEntry.createWriter((fileWriter) => {
+              fileWriter.write(blob)
+              cordova.plugins.fileOpener2.open(fileEntry.nativeURL, mimeType)
+            })
+          })
+        })
+      } else {
+        // We call Vue.nextTick() to let Vue update its DOM to get the download link ready
+        this.$nextTick(() => this.$refs.downloadLink.click())
+      }
+    },
+    async downloadEventsData () {
+      // Need to convert to blob
+      let blob
+      if (this.showMap) {
+        let geoJson = this.toGeoJson(this.$t('KArchivedEventsActivity.EVENTS_LAYER_NAME'))
+        geoJson.features = geoJson.features.map(feature => {
+          // Move required event information into properties
+          let properties = _.omit(feature, ['type', 'geometry', 'icon', 'layer', 'properties',
+            'participants', 'coordinators', 'workflow', 'hasWorkflow'])
+          return Object.assign({ properties }, _.pick(feature, ['type', 'geometry']))
+        })
+        blob = new Blob([JSON.stringify(geoJson)], { type: 'application/json;charset=utf-8;' })
+      } else {
+        // Make full request to avoid pagination and filter required data
+        const response = await this.loadService().find({
+          query: Object.assign({
+            $skip: 0, $limit: MAX_EVENTS,
+            $select: ['_id', 'name', 'description', 'template', 'location',
+                      'createdAt', 'updatedAt', 'expireAt', 'deletedAt']
+          }, this.baseQuery)
+        })
+        // Check if overpass max limit
+        if (response.total > MAX_EVENTS) {
+          this.$q.dialog({
+            title: this.$t('KArchivedEventsActivity.MATCHING_RESULTS', { total: response.total }),
+            message: this.$t('KArchivedEventsActivity.MAXIMUM_RESULTS', { max: MAX_EVENTS })
+          })
+        }
+        const json = response.data.map(item => {
+          // No nested structure in CSV
+          if (item.location) item.location = item.location.name
+          return item
+        })
+        const csv = Papa.unparse(json)
+        blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      }
+      
+      this.currentDownloadLink = URL.createObjectURL(blob)
+      this.currentDownloadName = (this.showMap ?
+        this.$t('KArchivedEventsActivity.MAP_EXPORT_FILE') :
+        this.$t('KArchivedEventsActivity.EVENTS_EXPORT_FILE'))
+      if (Platform.is.cordova) {
+        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, (fs) => {
+          fs.root.getFile(this.currentMedia.name, { create: true, exclusive: false }, (fileEntry) => {
+            fileEntry.createWriter((fileWriter) => {
+              fileWriter.write(blob)
+              cordova.plugins.fileOpener2.open(fileEntry.nativeURL, mimeType)
+            })
+          })
+        })
+      } else {
+        // We call Vue.nextTick() to let Vue update its DOM to get the download link ready
+        this.$nextTick(() => this.$refs.downloadLink.click())
+      }
     }
   },
   created () {
