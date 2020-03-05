@@ -125,7 +125,7 @@ import { mixins as kCoreMixins, utils as kCoreUtils } from '@kalisio/kdk-core/cl
 import { mixins as kMapMixins } from '@kalisio/kdk-map/client.map'
 
 // For mapping or statistics we get all events at once to avoid managing pagination
-const MAX_EVENTS = 3000
+const MAX_EVENTS = 5000
 const activityMixin = kMapMixins.activity('archivedEvents')
 
 export default {

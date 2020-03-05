@@ -55,7 +55,7 @@ export function createArchivedEventService (options = {}) {
   app.createService('archived-events', Object.assign({
     servicesPath,
     modelsPath,
-    paginate: { default: 20, max: 3000 }
+    paginate: { default: 20, max: 5000 }
   }, options))
 }
 
